@@ -32,6 +32,9 @@ const VendorManagement = () => {
     const [vendorItems,setVendorItems] = useState([])
     const [loading,setLoading] = useState(false)
 
+    const [selectedItem,setSelectedItem] = useState()
+
+    
     const vendorsRef = collection(db, 'vendors')
 
     const [formData,setFormData] = useState({

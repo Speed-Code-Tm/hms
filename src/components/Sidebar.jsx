@@ -409,6 +409,9 @@ const SideBar = () => {
           label="Supply Chain Management"
           icon={<i className="fas fa-truck"></i>}
         >
+
+
+
           <MenuItem
             component={
               <Link to="/Procurement" onClick={handleActive}>

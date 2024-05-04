@@ -18,6 +18,8 @@ import Procurement from './pages/Procurement';
 import InpatientManagement from './pages/inpatientManagement'
 import FinancialManagement from './pages/FinancialManagement'
 import SideBar from './components/Sidebar';
+import VendorManagement from './pages/VendorManagement';
+import { ToastContainer } from 'react-toastify';
 function App() {
   return (
     <>
@@ -50,6 +52,9 @@ function App() {
               <Route path="/Pharmacy" element={<Pharmacy/>}/>
               {/* Procurement Route */}
               <Route path="/Procurement" element={<Procurement/>}/>
+              {/* Procurement Route */}
+
+              <Route path="/receiving-vendor-management" element={<VendorManagement/>} />
               {/* Inpatient management Route */}
               <Route path='/InpatientManagement' element={<InpatientManagement/>}/>
               {/* FinancialManagement */}
@@ -57,6 +62,9 @@ function App() {
               {/* Other routes */}
             </Routes>
           </div>
+          {/* gloabal toast container */}
+      <ToastContainer />
+
         </div>
         {/* <Footer /> */}
 

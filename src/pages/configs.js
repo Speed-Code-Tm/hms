@@ -10,14 +10,26 @@ import { getFirestore, collection, doc, setDoc, addDoc, getDocs, updateDoc, dele
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
+// const firebaseConfig = {
+//     apiKey: "AIzaSyClrrTa3zFjkX5Qg85F5V9GtTxRyqL7cLM",
+//     authDomain: "hmsk-5be24.firebaseapp.com",
+//     projectId: "hmsk-5be24",
+//     storageBucket: "hmsk-5be24.appspot.com",
+//     messagingSenderId: "611583456298",
+//     appId: "1:611583456298:web:a1bafa5b565d5a1fce7f53",
+//     measurementId: "G-6WYRMK8FC7"
+// };
+
+
+//testing
+
 const firebaseConfig = {
-    apiKey: "AIzaSyClrrTa3zFjkX5Qg85F5V9GtTxRyqL7cLM",
-    authDomain: "hmsk-5be24.firebaseapp.com",
-    projectId: "hmsk-5be24",
-    storageBucket: "hmsk-5be24.appspot.com",
-    messagingSenderId: "611583456298",
-    appId: "1:611583456298:web:a1bafa5b565d5a1fce7f53",
-    measurementId: "G-6WYRMK8FC7"
+  apiKey: "AIzaSyA6ZpA2SySvu-SWkjWXoXjVMsXh7D-l72g",
+  authDomain: "vue-blog-bd556.firebaseapp.com",
+  projectId: "vue-blog-bd556",
+  storageBucket: "vue-blog-bd556.appspot.com",
+  messagingSenderId: "1038332898742",
+  appId: "1:1038332898742:web:43bd9d6032bac4fbe16517"
 };
 
 // Initialize Firebase

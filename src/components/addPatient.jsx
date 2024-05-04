@@ -161,6 +161,7 @@ const AddPatientModal = ({ show, onHide }) => {
       }
       return true;
     } catch (errors) {
+      console.log(errors);
       if (errors.inner && errors.inner.length > 0) {
         const firstErrorMessage = errors.inner[0].message;
         toast.error(`Please fix the following error: ${firstErrorMessage}`);
@@ -435,7 +436,7 @@ const AddPatientModal = ({ show, onHide }) => {
              </Form.Group>
           
          </Col>
-            </>:
+            </>:formData.insuranceType === "government" ?
             <>
               <Col md={6} className="mb-3">
             
@@ -466,7 +467,7 @@ const AddPatientModal = ({ show, onHide }) => {
                 </Form.Group>
              
             </Col>
-            </>}
+            </>:<></>}
            
           </Row>
         </>

@@ -181,7 +181,7 @@ const PatientRegistration = () => {
         show={showAddPatientModal}
         onHide={() => setShowAddPatientModal(false)}
       />
-      <ToastContainer />
+      {/* <ToastContainer /> */}
     </Container>
   );
 };

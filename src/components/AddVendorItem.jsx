@@ -14,7 +14,7 @@ width: 200px;
 `;
 
 
-const AddVendorItem = ({closeModal}) => {
+const AddVendorItem = ({onClose}) => {
 
     const [loading,setLoading] = useState(false)
     const [vendors,setVendors] = useState([])
@@ -92,11 +92,11 @@ const AddVendorItem = ({closeModal}) => {
           });
     
           
-         closeModal()
+         onClose()
          
           setLoading(false);
         } catch (errors) {
-            
+            console.log(errors)
           if (errors.inner && errors.inner.length > 0) {
             const firstErrorMessage = errors.inner[0].message;
             toast.error(`Please fix the following error: ${firstErrorMessage}`);

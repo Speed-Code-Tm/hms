@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState,useEffect } from "react";
 import ReusableTable from "./ReusableTable";
 import {
   FaEdit,
@@ -10,6 +10,7 @@ import {
   FaClipboard,
 } from "react-icons/fa";
 import styled from "styled-components";
+
 import {
   Modal,
   Button,
@@ -27,6 +28,12 @@ import {
 const procurementData = [
   // Add your sample data here
 ];
+import {initializeApp} from 'firebase/app'
+import firebaseConfig from "./configs";
+import {getDocs,collection, getFirestore} from 'firebase/firestore'
+import OrderManagement from "../components/OrderManagement";
+const app = initializeApp(firebaseConfig)
+const db = getFirestore(app)
 
 const DepartmentNeedsTab = () => {
   const departmentNeedsColumns = [
@@ -51,13 +58,14 @@ const DepartmentNeedsTab = () => {
   );
 };
 
-const OrderManagementTab = () => {
+const OrderManagementTab = ({orders}) => {
   const orderManagementColumns = [
-    { Header: "Order ID", accessor: "orderId" },
-    { Header: "Items", accessor: "items" },
+    { Header: "Order ID", accessor: "id" },
+    { Header: "Items", accessor: "item" },
     { Header: "Quantity", accessor: "quantity" },
     { Header: "Vendor", accessor: "vendor" },
     { Header: "Status", accessor: "status" },
+    { Header: "Date Ordered", accessor: "orderDate" },
     { Header: "Delivery Date", accessor: "deliveryDate" },
   ];
 
@@ -66,13 +74,17 @@ const OrderManagementTab = () => {
     pageSize: 10,
   });
 
+ 
+
   return (
-    <ReusableTable
+     <ReusableTable
       columns={orderManagementColumns}
-      data={procurementData}
+      data={orders}
       initialState={initialState}
       ActionDropdown={ActionDropdown}
     />
+  
+
   );
 };
 
@@ -179,8 +191,79 @@ const ActionDropdown = ({ row }) => {
 
 const Procurement = () => {
   const [activeTab, setActiveTab] = useState("departmentNeeds");
+  const [loading,setLoading] = useState([])
+  const [departmentRequests,setDepartmentRequests] = useState([])
+  const [issuedItems,setIssuedItems] = useState([])
+  const [inventory,setInventory] = useState([])
+  
+
+const fetchDepartmentRequests = async () => {
+  try {
+     
+      const departmentRequestsCollection = collection(db, 'departmentRequests');
+      
+     
+      const departmentRequestSnapshot = await getDocs(departmentRequestsCollection);
+      
+    
+      const departmentRequestData = departmentRequestSnapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data(),
+      }));
+      
+      setDepartmentRequests(departmentRequestData);
+  } catch (error) {
+      console.error('Error fetching orders:', error);
+     
+  }
+};
 
 
+const fetchInventory = async () => {
+  try {
+     
+      const inventorysCollection = collection(db, 'inventory');
+      
+     
+      const inventorySnapshot = await getDocs(inventoryCollection);
+      
+    
+      const inventoryData = ordersSnapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data(),
+      }));
+      
+      setOrders(ordersData);
+  } catch (error) {
+      console.error('Error fetching orders:', error);
+     
+  }
+};
+
+
+const fetchIssuedItems = async () => {
+  try {
+     
+      const issuedItemsCollection = collection(db, 'issuedItems');
+      
+     
+      const issuedItemsSnapshot = await getDocs(issuedItemsCollection);
+      
+    
+      const issuedItemsData = issuedItemsSnapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data(),
+      }));
+      
+      setIssuedItems(issuedItemsData);
+  } catch (error) {
+      console.error('Error fetching orders:', error);
+     
+  }
+};
+
+
+ 
   return (
     <Container>
       <Row>
@@ -195,7 +278,7 @@ const Procurement = () => {
               <DepartmentNeedsTab />
             </Tab>
             <Tab eventKey="orderManagement" title="order Management">
-              <OrderManagementTab />
+              <OrderManagement activeTab={activeTab} />
             </Tab>
             <Tab eventKey="inventory" title="Inventory">
               <InventoryTab />

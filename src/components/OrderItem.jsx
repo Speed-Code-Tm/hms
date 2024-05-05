@@ -1,38 +1,105 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from "react";
+import * as Yup from "yup";
+import { Form, Button } from "react-bootstrap";
+import styled from "styled-components";
+import {
+  addDoc,
+  collection,
+  getDocs,
+  deleteDoc,
+  doc,
+  getFirestore,
+  Timestamp,
+} from "firebase/firestore";
+import firebaseConfig from "../pages/configs";
+import { initializeApp } from "firebase/app";
+import { toast } from "react-toastify";
+const app = initializeApp(firebaseConfig); // Initialize Firebase app
 
-import { Form, Button } from 'react-bootstrap';
-import styled from 'styled-components';
+const db = getFirestore(app); // Get Firestore instance
 
-const OrderItem = () => {
-    const vendors = []
+const StyledSubmitButton = styled(Button)`
+  width: 200px;
+`;
 
-    const [loading,setLoading] = useState(false)
+const OrderItem = ({ selectedItem, setSelectedItem, onClose }) => {
+  const [loading, setLoading] = useState(false);
 
-    const [formData, setFormData] = useState({
-        vendorId: '',
-        itemName: '',
-        unitCost: '',
-        unitType: '',
-        quantity:'',
+  const [formData, setFormData] = useState({
+    vendor: "",
+    item: "",
+    unitCost: "",
+    quantity: "",
+    deliveryDate: "",
+    orderDate: "",
+    status: "ordered",
+  });
+
+  const changeHandler = (e, field) => {
+    const { value } = e.target;
+    setFormData({
+      ...formData,
+      [field]: value,
+    });
+  };
+
+  const orderValidationSchema = Yup.object().shape({
+    quantity: Yup.number()
+      .required("Quantity is required")
+      .integer("Quantity must be an integer")
+      .min(1, "Quantity must be at least 1"),
+  });
+
+  const handleFormSubmit = async (e) => {
+    e.preventDefault();
+
+    e.preventDefault();
+    setLoading(true);
+    try {
+      await orderValidationSchema.validate(formData, { abortEarly: false });
+      const timestamp = Timestamp.now()
+      const date = timestamp.toDate()
+      const formattedDate = date.toLocaleString();
+    
+      let newFormData = {...formData, orderDate:formattedDate}
+      const orderCollection = collection(db, "orders");
+      await addDoc(orderCollection, newFormData);
+      
+      setFormData({
+        vendor: "",
+        item: "",
+        unitCost: "",
+        quantity: "",
+        deliveryDate: "",
+        orderDate: "",
+        status: "ordered",
       });
 
-      const changeHandler = (e, field) => {
-        const { value } = e.target;
-        setFormData({
-          ...formData,
-          [field]: value,
-        });
-      };
+      onClose();
+      setSelectedItem();
+      setLoading(false);
+    } catch (errors) {
+      if (errors.inner && errors.inner.length > 0) {
+        const firstErrorMessage = errors.inner[0].message;
+        toast.error(`Please fix the following error: ${firstErrorMessage}`);
+      } else {
+        toast.error(
+          "An unknown validation error occurred. Please check the form data."
+        );
+      }
+    } 
+  };
 
-      const handleFormSubmit = (e) => {
-        e.preventDefault();
-        
-        
-      };
-    
-      const StyledSubmitButton = styled(Button)`
-      width: 200px;
-    `;
+  useEffect(() => {
+    if (selectedItem) {
+      setFormData({
+        ...formData,
+        vendor: selectedItem.vendor,
+        item: selectedItem.itemName,
+        unitCost: selectedItem.unitCost,
+      });
+    }
+  }, [selectedItem]);
 
   return (
     <Form onSubmit={handleFormSubmit}>
@@ -40,31 +107,22 @@ const OrderItem = () => {
       <Form.Group controlId="vendorId" className="mb-2">
         <Form.Label>Vendor</Form.Label>
         <Form.Control
-          as="select"
-          value={formData.vendorId}
-          onChange={(e) => changeHandler(e, 'vendorId')}
-        >
-          <option value="">Select a vendor</option>
-          {/* Render available vendors as options */}
-          {vendors.map((vendor) => (
-            <option key={vendor.id} value={vendor.id}>
-              {vendor.name}
-            </option>
-          ))}
-        </Form.Control>
-      </Form.Group>
-
-      {/* Item Name field */}
-      <Form.Group controlId="itemName" className="mb-2"> 
-        <Form.Label>Name</Form.Label>
-        <Form.Control
-          type="text"
-          value={formData.itemName}
-          onChange={(e) => changeHandler(e, 'itemName')}
+          value={selectedItem?.vendor}
           disabled
+          onChange={(e) => changeHandler(e, "vendorId")}
         />
       </Form.Group>
 
+      {/* Item Name field */}
+      <Form.Group controlId="itemName" className="mb-2">
+        <Form.Label>Name</Form.Label>
+        <Form.Control
+          type="text"
+          value={selectedItem?.itemName}
+          onChange={(e) => changeHandler(e, "itemName")}
+          disabled
+        />
+      </Form.Group>
 
       {/* Unit Cost field */}
       <Form.Group controlId="unitCost" className="mb-2">
@@ -72,8 +130,8 @@ const OrderItem = () => {
         <Form.Control
           type="number"
           disabled
-          value={formData.unitCost}
-          onChange={(e) => changeHandler(e, 'unitCost')}
+          value={selectedItem?.unitCost}
+          onChange={(e) => changeHandler(e, "unitCost")}
         />
       </Form.Group>
 
@@ -81,10 +139,10 @@ const OrderItem = () => {
       <Form.Group controlId="unitType" className="mb-2">
         <Form.Label>Unit Type</Form.Label>
         <Form.Control
-         disabled
+          disabled
           type="text"
-          value={formData.unitType}
-          onChange={(e) => changeHandler(e, 'unitType')}
+          value={selectedItem?.unitType}
+          onChange={(e) => changeHandler(e, "unitType")}
         />
       </Form.Group>
 
@@ -92,24 +150,21 @@ const OrderItem = () => {
         <Form.Label>Quantity</Form.Label>
         <Form.Control
           type="number"
-         
           value={formData.quantity}
-          onChange={(e) => changeHandler(e, 'quantity')}
+          onChange={(e) => changeHandler(e, "quantity")}
         />
       </Form.Group>
 
-
       <StyledSubmitButton
-                variant="primary"
-                type="submit"
-                disabled={loading}
-                className='mt-3'
-              >
-                {loading ? "Submitting..." : "Submit"}
-              </StyledSubmitButton>
+        variant="primary"
+        type="submit"
+        disabled={loading}
+        className="mt-3"
+      >
+        {loading ? "Submitting..." : "Submit"}
+      </StyledSubmitButton>
+    </Form>
+  );
+};
 
-      </Form>
-  )
-}
-
-export default OrderItem
+export default OrderItem;

@@ -8,10 +8,9 @@ import OrderItem from '../components/OrderItem';
 import * as Yup from 'yup';
 import { toast } from 'react-toastify';
 import { initializeApp } from "firebase/app";
-import firebaseConfig from "../pages/configs"; // Import your Firebase configuration
-import {  getFirestore, query, where } from 'firebase/firestore';
+import firebaseConfig from "./configs"; // Import your Firebase configuration
 
-import { addDoc, collection, getDocs,deleteDoc, doc } from 'firebase/firestore';
+import { addDoc, collection, getDocs,deleteDoc, doc,getFirestore, query, where } from 'firebase/firestore';
 
 import "react-toastify/dist/ReactToastify.css";
 
@@ -30,11 +29,12 @@ const VendorManagement = () => {
     const [showOrderModal,setShowOrderModal] = useState(false)
     const [data,setData] = useState([])
     const [vendorItems,setVendorItems] = useState([])
+   
     const [loading,setLoading] = useState(false)
 
     const [selectedItem,setSelectedItem] = useState()
 
-    
+
     const vendorsRef = collection(db, 'vendors')
 
     const [formData,setFormData] = useState({
@@ -114,25 +114,18 @@ const handleSubmit = async (e) =>{
         { Header: 'Item Name', accessor: 'itemName' },
         { Header: 'Description', accessor: 'description' },
 
-        { Header: 'Unit Price', accessor: 'unitPrice' },
+        { Header: 'Unit Price', accessor: 'unitCost' },
         { Header: 'Unit Type', accessor: 'unitType' },
     ];
 
     const vendorCategories = [
-      'Medical Equipment',
-      'Pharmaceutical',
+      'Pharmaceuticals',
       'Medical Supplies',
+      'Medical Equipment',
+      'Office Supplies',
       'Laboratory Supplies',
-      'Radiology Supplies',
-      'Furniture',
-      'Housekeeping and Sanitation Supplies',
-      'Information Technology (IT)',
-      'Food and Beverage',
-      'Laundry and Linen',
-      'Waste Management',
-      'Printing and Publishing',
-      'Uniform and Apparel',
-      'Biomedical Engineering Services'
+      'Personal Protective Equipment',
+      "IT Supplies"
     ];
     
     
@@ -147,6 +140,7 @@ const handleSubmit = async (e) =>{
     const closeModal = () => {
         
         setShowSuppliesModal(false)
+        setShowOrderModal(false)
     };
 
     
@@ -173,7 +167,7 @@ const handleSubmit = async (e) =>{
 
     const vendorItemsSnapshot = await getDocs(vendorItemsCollection);
     const vendorItemsData = vendorItemsSnapshot.docs.map(async (doc) => {
-      const vendorItemData = doc.data();
+      const vendorItemData ={ id:doc.id,...doc.data()};
       const vendorQuery = query(
         vendorsCollection,
         where('__name__', '==', vendorItemData.vendorId)
@@ -186,6 +180,13 @@ const handleSubmit = async (e) =>{
     setVendorItems(resolvedVendorItems);
     
 };
+
+// Order item
+
+const handleItemOrder = (item)=>{
+  setShowOrderModal(true)
+  setSelectedItem(item)
+}
 
 
 useEffect(() => {
@@ -237,7 +238,7 @@ useEffect(() => {
                               <div>
                                 {/* add a drop down button menu wth icons and functions */}
                                 <DropdownButton dropup="true" id="dropdown-basic-button" title="Actions">
-                                <Dropdown.Item href="#/action-1" onClick={()=>setShowOrderModal(true)}>
+                                <Dropdown.Item href="#/action-1" onClick={()=>handleItemOrder(row.original)}>
                                  Order
                                   </Dropdown.Item>
                                 
@@ -321,8 +322,8 @@ useEffect(() => {
 
                 {/* add new vendor item modal */}
 
-                <ReusableModal show={showSuppliesModal} title="Add Vendor Item" onClose={closeModal} onHide={()=> setShowSuppliesModal(false)}>
-            <AddVendorItem/>
+                <ReusableModal show={showSuppliesModal} title="Add Vendor Item" onHide={()=> setShowSuppliesModal(false)}>
+            <AddVendorItem  onClose={closeModal}/>
           </ReusableModal>
 
 {/* order item modal */}
@@ -330,7 +331,7 @@ useEffect(() => {
  {/* add new vendor item modal */}
 
  <ReusableModal show={showOrderModal} title="Order Item" onHide={()=>setShowOrderModal(false)}>
-            <OrderItem/>
+            <OrderItem selectedItem={selectedItem}  onClose={closeModal} setSelectedItem={setSelectedItem}/>
           </ReusableModal>
 
         </Container>

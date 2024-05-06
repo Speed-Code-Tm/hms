@@ -4,7 +4,7 @@ import { collection, doc, getDocs } from "firebase/firestore";
 import ReusableTable from "../pages/ReusableTable";
 import { Dropdown, DropdownButton } from "react-bootstrap";
 import ReusableModal from "./ReusableModal";
-import InventoryManagement from "./InventoryManagement";
+import CompleteOrder from "./CompleteOrder";
 import { toast } from "react-toastify";
 
 const OrderManagement = ({ activeTab }) => {
@@ -62,7 +62,7 @@ const OrderManagement = ({ activeTab }) => {
     <ReusableModal title="Update Inventory" show={showModal}
     onHide={()=>setShowModal(false)}
     >
-        <InventoryManagement orderItem={orderItem} onHide={()=>setShowModal(false)} setOrderItem={setOrderItem}/>
+        <CompleteOrder orderItem={orderItem} onHide={()=>setShowModal(false)} setOrderItem={setOrderItem}/>
 
     </ReusableModal>
     <ReusableTable

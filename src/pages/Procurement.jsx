@@ -23,6 +23,7 @@ import {initializeApp} from 'firebase/app'
 import firebaseConfig from "./configs";
 import {getDocs,collection, getFirestore} from 'firebase/firestore'
 import OrderManagement from "../components/OrderManagement";
+import DepartmentNeeds from "../components/DepartmentNeeds";
 const app = initializeApp(firebaseConfig)
 const db = getFirestore(app)
 
@@ -273,7 +274,7 @@ const fetchIssuedItems = async () => {
             className="justify-content-center"
           >
             <Tab eventKey="departmentNeeds" title="department Needs">
-              <DepartmentNeedsTab />
+              <DepartmentNeeds activeTab={activeTab} />
             </Tab>
             <Tab eventKey="orderManagement" title="order Management">
               <OrderManagement activeTab={activeTab} />

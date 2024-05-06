@@ -3,7 +3,6 @@ import { Tabs, Tab, Form, Button, Row, Col } from "react-bootstrap";
 import * as yup from 'yup';
 
 import {
-  getFirestore,
   collection,
   query,
   where,
@@ -17,7 +16,7 @@ import { toast } from "react-toastify";
 import { db } from "../pages/configs";
 import { FaSave } from "react-icons/fa";
 
-const InventoryManagement = ({ orderItem, onHide }) => {
+const CompleteOrder = ({ orderItem, onHide }) => {
   const [activeTab, setActiveTab] = useState("addNewItem");
   const [formData, setFormData] = useState({
     itemName: "",
@@ -115,7 +114,7 @@ const InventoryManagement = ({ orderItem, onHide }) => {
               currentStock: formData.quantity, 
               description:formData.description
           });
-          
+
       }
 
       await updateDoc(orderDocRef, {
@@ -123,10 +122,9 @@ const InventoryManagement = ({ orderItem, onHide }) => {
         deliveryDate:  formattedDate
     });
 
-
       onHide();
     } catch (errors) {
-      console.log(errors);
+      
         if (errors.inner && errors.inner.length > 0) {
             const firstErrorMessage = errors.inner[0].message;
             toast.error(`Please fix the following error: ${firstErrorMessage}`);
@@ -345,4 +343,4 @@ const InventoryManagement = ({ orderItem, onHide }) => {
   );
 };
 
-export default InventoryManagement;
+export default CompleteOrder;

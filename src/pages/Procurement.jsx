@@ -3,13 +3,7 @@ import ReusableTable from "./ReusableTable";
 import {
   FaEdit,
   FaTrash,
-  FaPlus,
-  FaClipboardList,
-  FaBoxes,
-  FaChartBar,
-  FaClipboard,
 } from "react-icons/fa";
-import styled from "styled-components";
 
 import {
   Modal,
@@ -24,16 +18,18 @@ import {
   Tab,
 } from "react-bootstrap";
 
-// Sample data
-const procurementData = [
-  // Add your sample data here
-];
+
 import {initializeApp} from 'firebase/app'
 import firebaseConfig from "./configs";
 import {getDocs,collection, getFirestore} from 'firebase/firestore'
 import OrderManagement from "../components/OrderManagement";
 const app = initializeApp(firebaseConfig)
 const db = getFirestore(app)
+
+  // Sample data
+  const procurementData = [
+    // Add your sample data here
+  ];
 
 const DepartmentNeedsTab = () => {
   const departmentNeedsColumns = [
@@ -48,6 +44,8 @@ const DepartmentNeedsTab = () => {
     pageIndex: 0,
     pageSize: 10,
   });
+
+
 
   return (
     <ReusableTable
@@ -222,18 +220,18 @@ const fetchDepartmentRequests = async () => {
 const fetchInventory = async () => {
   try {
      
-      const inventorysCollection = collection(db, 'inventory');
+      const inventoryCollection = collection(db, 'inventory');
       
      
       const inventorySnapshot = await getDocs(inventoryCollection);
       
     
-      const inventoryData = ordersSnapshot.docs.map(doc => ({
+      const inventoryData = inventorySnapshot.docs.map(doc => ({
           id: doc.id,
           ...doc.data(),
       }));
       
-      setOrders(ordersData);
+      setInventory(inventoryData);
   } catch (error) {
       console.error('Error fetching orders:', error);
      

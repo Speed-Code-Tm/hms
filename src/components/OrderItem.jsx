@@ -30,6 +30,7 @@ const OrderItem = ({ selectedItem, setSelectedItem, onClose }) => {
     item: "",
     unitCost: "",
     quantity: "",
+    unitType:'',
     deliveryDate: "",
     orderDate: "",
     status: "ordered",
@@ -70,6 +71,7 @@ const OrderItem = ({ selectedItem, setSelectedItem, onClose }) => {
         item: "",
         unitCost: "",
         quantity: "",
+        unitType:'',
         deliveryDate: "",
         orderDate: "",
         status: "ordered",
@@ -97,6 +99,7 @@ const OrderItem = ({ selectedItem, setSelectedItem, onClose }) => {
         vendor: selectedItem.vendor,
         item: selectedItem.itemName,
         unitCost: selectedItem.unitCost,
+        unitType:selectedItem.unitType
       });
     }
   }, [selectedItem]);

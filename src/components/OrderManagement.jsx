@@ -59,7 +59,9 @@ const OrderManagement = ({ activeTab }) => {
     <>
     {/* inventory management modal */}
 
-    <ReusableModal title="Manage Inventory" show={showModal}>
+    <ReusableModal title="Update Inventory" show={showModal}
+    onHide={()=>setShowModal(false)}
+    >
         <InventoryManagement orderItem={orderItem} onHide={()=>setShowModal(false)} setOrderItem={setOrderItem}/>
 
     </ReusableModal>

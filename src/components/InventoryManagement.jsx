@@ -11,6 +11,7 @@ import {
   addDoc,
   updateDoc,
   doc,
+  Timestamp
 } from "firebase/firestore";
 import { toast } from "react-toastify";
 import { db } from "../pages/configs";
@@ -23,7 +24,7 @@ const InventoryManagement = ({ orderItem, onHide }) => {
     category: "",
     unitCost: "",
     unitType: "",
-    stockCount: "",
+    quantity: "",
     description: "",
   });
   const [loading, setLoading] = useState(false);
@@ -40,12 +41,13 @@ const InventoryManagement = ({ orderItem, onHide }) => {
 
   useEffect(() => {
     if (orderItem) {
+      console.log(orderItem);
       setFormData({
         itemName: orderItem.item || "",
         category: orderItem.category || "",
         unitCost: orderItem.unitCost || "",
         unitType: orderItem.unitType || "",
-        stockCount: orderItem.quantity || "",
+        quantity: orderItem.quantity || "",
         description: orderItem.description || "",
       });
     }
@@ -63,10 +65,10 @@ const InventoryManagement = ({ orderItem, onHide }) => {
       .required("Unit cost is required.")
       .min(1, "Unit cost must be be greater than 0"),
     unitType: yup.string().required("Unit type is required."),
-    stockCount: yup
+    quantity: yup
       .number()
-      .required("Stock Count is required.")
-      .min(0, "Stock Count must be non-negative."),
+      .required("Quantity is required.")
+      .min(0, "Quantity must be non-negative."),
     description: yup.string(),
   });
 
@@ -79,47 +81,52 @@ const InventoryManagement = ({ orderItem, onHide }) => {
     try {
         await inventoryValidationSchema.validate(formData, { abortEarly: false });
 
-        console.log(orderItem);
-        
-      if (activeTab === "addNewItem") {
-        const inventoryRef = collection(db, "inventory");
-        await addDoc(inventoryRef, formData);
-        // update order status
         const orderDocRef = doc(db, 'orders', orderItem.id);
 
         const timestamp = Timestamp.now()
         const date = timestamp.toDate()
         const formattedDate = date.toLocaleString();
 
-        await updateDoc(orderDocRef, {
-            status: 'delivered',
-            deliveryDate:  formattedDate
-        });
-        toast.success("New inventory item added successfully!");
-      } else if (activeTab === "updateInventory") {
-        const inventoryRef = collection(db, "inventory");
-        const q = query(inventoryRef, where("itemName", "==", orderItem.item));
-        const querySnapshot = await getDocs(q);
-        if (!querySnapshot.empty) {
-          const itemDoc = querySnapshot.docs[0];
-          const itemRef = doc(db, "inventory", itemDoc.id);
-          await updateDoc(itemRef, formData);
-          const timestamp = Timestamp.now()
-          const date = timestamp.toDate()
-          const formattedDate = date.toLocaleString();
-  
-          await updateDoc(orderDocRef, {
-              status: 'delivered',
-              deliveryDate:  formattedDate
+      const inventoryCollection = collection(db, 'inventory');
+        
+      
+      const inventoryQuery = query(inventoryCollection, where('itemName', '==', orderItem.item));
+      const inventorySnapshot = await getDocs(inventoryQuery);
+      
+      if (!inventorySnapshot.empty) {
+        
+          const inventoryDocRef = inventorySnapshot.docs[0].ref;
+          const inventoryData = inventorySnapshot.docs[0].data();
+          
+          
+          const newCurrentStock = inventoryData.currentStock + orderItem.quantity;
+          
+          
+          await updateDoc(inventoryDocRef, {
+              currentStock: newCurrentStock,
+          });
+      } else {
+        
+          await addDoc(inventoryCollection, {
+              itemName: formData.itemName,
+              category: formData.category,
+              unitCost:formData.unitCost,
+              unitType: formData.unitType,
+              currentStock: formData.quantity, 
+              description:formData.description
           });
           
-          toast.success("Inventory item updated successfully!");
-        } else {
-          toast.error("Inventory item not found.");
-        }
       }
+
+      await updateDoc(orderDocRef, {
+        status: 'delivered',
+        deliveryDate:  formattedDate
+    });
+
+
       onHide();
     } catch (errors) {
+      console.log(errors);
         if (errors.inner && errors.inner.length > 0) {
             const firstErrorMessage = errors.inner[0].message;
             toast.error(`Please fix the following error: ${firstErrorMessage}`);
@@ -152,6 +159,7 @@ const InventoryManagement = ({ orderItem, onHide }) => {
                       value={formData.itemName}
                       onChange={(e) => changeHandler(e, "itemName")}
                       required
+                      disabled
                     />
                   </Form.Group>
                 </Col>
@@ -182,6 +190,7 @@ const InventoryManagement = ({ orderItem, onHide }) => {
                       value={formData.unitCost}
                       onChange={(e) => changeHandler(e, "unitCost")}
                       required
+                      disabled
                     />
                   </Form.Group>
                 </Col>
@@ -194,18 +203,20 @@ const InventoryManagement = ({ orderItem, onHide }) => {
                       value={formData.unitType}
                       onChange={(e) => changeHandler(e, "unitType")}
                       required
+                      disabled
                     />
                   </Form.Group>
                 </Col>
 
                 <Col md={6} className="mb-2">
-                  <Form.Group controlId="stockCount" className="mb-2">
-                    <Form.Label>Stock Count</Form.Label>
+                  <Form.Group controlId="quantity" className="mb-2">
+                    <Form.Label>Quantity</Form.Label>
                     <Form.Control
                       type="number"
-                      value={formData.stockCount}
-                      onChange={(e) => changeHandler(e, "stockCount")}
+                      value={formData.quantity}
+                      onChange={(e) => changeHandler(e, "quantity")}
                       required
+                      disabled
                     />
                   </Form.Group>
                 </Col>
@@ -217,6 +228,7 @@ const InventoryManagement = ({ orderItem, onHide }) => {
                       rows={3}
                       value={formData.description}
                       onChange={(e) => changeHandler(e, "description")}
+                    
                     />
                   </Form.Group>
                 </Col>
@@ -245,6 +257,7 @@ const InventoryManagement = ({ orderItem, onHide }) => {
                       value={formData.itemName}
                       onChange={(e) => changeHandler(e, "itemName")}
                       required
+                      disabled
                     />
                   </Form.Group>
                 </Col>
@@ -273,6 +286,7 @@ const InventoryManagement = ({ orderItem, onHide }) => {
                       value={formData.unitCost}
                       onChange={(e) => changeHandler(e, "unitCost")}
                       required
+                      disabled
                     />
                   </Form.Group>
                 </Col>
@@ -284,17 +298,19 @@ const InventoryManagement = ({ orderItem, onHide }) => {
                       value={formData.unitType}
                       onChange={(e) => changeHandler(e, "unitType")}
                       required
+                      disabled
                     />
                   </Form.Group>
                 </Col>
                 <Col md={6} className="mb-2">
-                  <Form.Group controlId="stockCount" className="mb-2">
-                    <Form.Label>Stock Count</Form.Label>
+                  <Form.Group controlId="quantity" className="mb-2">
+                    <Form.Label>Quantity</Form.Label>
                     <Form.Control
                       type="number"
-                      value={formData.stockCount}
-                      onChange={(e) => changeHandler(e, "stockCount")}
+                      value={formData.quantity}
+                      onChange={(e) => changeHandler(e, "quantity")}
                       required
+                      disabled
                     />
                   </Form.Group>
                 </Col>

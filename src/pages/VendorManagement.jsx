@@ -34,7 +34,6 @@ const VendorManagement = () => {
 
     const [selectedItem,setSelectedItem] = useState()
 
-
     const vendorsRef = collection(db, 'vendors')
 
     const [formData,setFormData] = useState({

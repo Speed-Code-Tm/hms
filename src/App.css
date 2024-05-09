@@ -1,0 +1,37 @@
+
+/* App container styling */
+.app-container {
+  display: flex;
+  min-height: 100vh;
+}
+
+.content-container {
+  flex-grow: 1;
+  overflow-y: hidden; /* Add this if you want the content to be scrollable */
+}
+span{
+  color: white;
+  text-decoration: none;
+}
+
+/* styling for links */
+.page-link {
+  display: flex;
+  align-items: center;
+  color: #e2e8f0; /* Match the text color with other menu items */
+  text-decoration: none; /* Remove underline */
+  /* padding: 0.5rem 1rem; Add some padding */
+  transition: background-color 0.3s ease; /* Add a transition for smooth hover effect */
+}
+
+/* general modal styles */
+
+.modal-header{
+  background-color: #007bff;
+  color: #fff;
+  padding: 1rem;
+  border-top-left-radius: 0.5rem;
+  border-top-right-radius: 0.5rem;
+}
+
+

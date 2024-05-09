@@ -17,10 +17,7 @@ import Pharmacy from './pages/pharmacy';
 import Procurement from './pages/Procurement';
 import InpatientManagement from './pages/inpatientManagement'
 import FinancialManagement from './pages/FinancialManagement'
-<<<<<<< HEAD
 import PatientManagement from './pages/patientManagement';
-=======
->>>>>>> 08efc8be649421700c8dfd33ccb1d4fce331c7b7
 import SideBar from './components/Sidebar';
 import VendorManagement from './pages/VendorManagement';
 import { ToastContainer } from 'react-toastify';
@@ -45,35 +42,31 @@ function App() {
               {/* Patient Profile Route */}
               <Route path="/PatientProfile" element={<PatientProfile />} />
               {/* imaging dashboard */}
-              <Route path='/ImagingDashboard' element={<ImagingDashboard/>}/>
+              <Route path='/ImagingDashboard' element={<ImagingDashboard />} />
               {/* Laboratory route */}
-              <Route path='/Laboratory' element={<LaboratoryManagement/>}/>
+              <Route path='/Laboratory' element={<LaboratoryManagement />} />
               {/* Telemedicine Route */}
               <Route path="/TeleMedicine" element={<TeleMedicine />} />
               {/* User Management Route */}
-              <Route path="/UserManagement" element={<UserManagement/>}/>
+              <Route path="/UserManagement" element={<UserManagement />} />
               {/* Pharmacy Route */}
-              <Route path="/Pharmacy" element={<Pharmacy/>}/>
+              <Route path="/Pharmacy" element={<Pharmacy />} />
               {/* Procurement Route */}
-              <Route path="/Procurement" element={<Procurement/>}/>
+              <Route path="/Procurement" element={<Procurement />} />
               {/* Procurement Route */}
 
-              <Route path="/receiving-vendor-management" element={<VendorManagement/>} />
+              <Route path="/receiving-vendor-management" element={<VendorManagement />} />
               {/* Inpatient management Route */}
-              <Route path='/InpatientManagement' element={<InpatientManagement/>}/>
+              <Route path='/InpatientManagement' element={<InpatientManagement />} />
               {/* FinancialManagement */}
-<<<<<<< HEAD
-              <Route path='/FinancialManagement' element={<FinancialManagement/>}/>
+              <Route path='/FinancialManagement' element={<FinancialManagement />} />
               {/* Patiet management Route */}
-              <Route path='/PatientManagement' element={<PatientManagement/>}/>
-=======
-              <Route path='./FinancialManagement' element={<FinancialManagement/>}/>
->>>>>>> 08efc8be649421700c8dfd33ccb1d4fce331c7b7
+              <Route path='/PatientManagement' element={<PatientManagement />} />
               {/* Other routes */}
             </Routes>
           </div>
           {/* gloabal toast container */}
-      <ToastContainer />
+          <ToastContainer />
 
         </div>
         {/* <Footer /> */}

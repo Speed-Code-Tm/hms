@@ -17,7 +17,10 @@ import Pharmacy from './pages/pharmacy';
 import Procurement from './pages/Procurement';
 import InpatientManagement from './pages/inpatientManagement'
 import FinancialManagement from './pages/FinancialManagement'
+<<<<<<< HEAD
 import PatientManagement from './pages/patientManagement';
+=======
+>>>>>>> 08efc8be649421700c8dfd33ccb1d4fce331c7b7
 import SideBar from './components/Sidebar';
 import VendorManagement from './pages/VendorManagement';
 import { ToastContainer } from 'react-toastify';
@@ -59,9 +62,13 @@ function App() {
               {/* Inpatient management Route */}
               <Route path='/InpatientManagement' element={<InpatientManagement/>}/>
               {/* FinancialManagement */}
+<<<<<<< HEAD
               <Route path='/FinancialManagement' element={<FinancialManagement/>}/>
               {/* Patiet management Route */}
               <Route path='/PatientManagement' element={<PatientManagement/>}/>
+=======
+              <Route path='./FinancialManagement' element={<FinancialManagement/>}/>
+>>>>>>> 08efc8be649421700c8dfd33ccb1d4fce331c7b7
               {/* Other routes */}
             </Routes>
           </div>

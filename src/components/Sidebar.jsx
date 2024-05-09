@@ -136,6 +136,7 @@ const SideBar = () => {
           >
             Outpatient Management
           </MenuItem>
+          
         </SubMenu>
         <MenuItem
           component={
@@ -205,7 +206,7 @@ const SideBar = () => {
         >
           <MenuItem
             component={
-              <Link to="/PatientManagement" onClick={handleActive}>
+              <Link to="/patient-management-systems" onClick={handleActive}>
                 Patient Management Systems
               </Link>
             }
@@ -408,6 +409,9 @@ const SideBar = () => {
           label="Supply Chain Management"
           icon={<i className="fas fa-truck"></i>}
         >
+
+
+
           <MenuItem
             component={
               <Link to="/Procurement" onClick={handleActive}>

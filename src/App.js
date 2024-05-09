@@ -20,7 +20,6 @@ import FinancialManagement from './pages/FinancialManagement'
 import PatientManagement from './pages/patientManagement';
 import SideBar from './components/Sidebar';
 import VendorManagement from './pages/VendorManagement';
-import { ToastContainer } from 'react-toastify';
 function App() {
   return (
     <>
@@ -65,8 +64,7 @@ function App() {
               {/* Other routes */}
             </Routes>
           </div>
-          {/* gloabal toast container */}
-          <ToastContainer />
+        
 
         </div>
         {/* <Footer /> */}

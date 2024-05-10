@@ -215,7 +215,7 @@ const SideBar = () => {
           </MenuItem>
           <MenuItem
             component={
-              <Link to="/ward-management" onClick={handleActive}>
+              <Link to="/wardManagement" onClick={handleActive}>
                 Ward Management
               </Link>
             }
@@ -485,7 +485,7 @@ const SideBar = () => {
           </MenuItem>
         </SubMenu>
         <SubMenu
-          label="Recording & Reporting"
+          label="Department Management"
           icon={<i className="fas fa-chart-bar"></i>}
         >
           <MenuItem
@@ -510,13 +510,13 @@ const SideBar = () => {
           </MenuItem>
           <MenuItem
             component={
-              <Link to="/operational-reports" onClick={handleActive}>
+              <Link to="/DutyRota" onClick={handleActive}>
                 Operational Reports
               </Link>
             }
             icon={<i className="fas fa-chart-pie"></i>}
           >
-            Operational Reports
+            Duty Rota
           </MenuItem>
         </SubMenu>
         <SubMenu label="Administration" icon={<i className="fas fa-cogs"></i>}>

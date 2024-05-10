@@ -7,6 +7,7 @@ import "react-toastify/dist/ReactToastify.css";
 import { initializeApp } from "firebase/app";
 import firebaseConfig from "../pages/configs";
 
+
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
@@ -111,7 +112,7 @@ const AddPatientModal = ({ show, onHide }) => {
   };
 
   return (
-    <Modal show={show} onHide={onHide} centered>
+    <Modal show={show} onHide={onHide} centered   >
       <Modal.Header closeButton>
         <Modal.Title>Add Patient</Modal.Title>
       </Modal.Header>

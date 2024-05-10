@@ -20,7 +20,7 @@ import PatientManagement from './pages/patientManagement';
 import SideBar from './components/Sidebar';
 import VendorManagement from './pages/VendorManagement';
 import Loader from './components/Loader';
-
+import WorkSchedule from './components/Workschedule';
 function App() {
   return (
     <>
@@ -29,7 +29,7 @@ function App() {
           <SideBar />
           <div className="content-container">
             <NavBar />
-            <Loader /> {/* Render the Loader component here */}
+            {/* <Loader /> Render the Loader component here */}
             <Routes>
               {/* Home Route */}
               <Route path="/" element={<Dashboard />} />
@@ -61,6 +61,10 @@ function App() {
               <Route path='/FinancialManagement' element={<FinancialManagement />} />
               {/* Patiet management Route */}
               <Route path='/PatientManagement' element={<PatientManagement />} />
+              {/**Route for ward management */}
+              <Route path='/wardManagement' element={<Loader />} />
+              {/**Route for work schedule */}
+              <Route path='/DutyRota' element={<WorkSchedule />} />
               {/* Other routes */}
             </Routes>
           </div>

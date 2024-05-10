@@ -60,7 +60,8 @@ const LoaderAnimation = styled.div`
       transform: translate(-50%, -50%) scale(0);
     }
   }
-`;
+  `;
+
 
 const Loader = () => {
   const [isOnline, setIsOnline] = useState(navigator.onLine);

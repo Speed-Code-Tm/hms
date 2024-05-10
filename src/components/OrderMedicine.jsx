@@ -1,167 +1,123 @@
-import React, { useState } from 'react';
-import { Modal, Form, Button, Spinner, Container, Row, Col } from 'react-bootstrap';
-import Autocomplete from '@mui/material/Autocomplete';
-import TextField from '@mui/material/TextField';
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import React, { useState, useEffect } from 'react';
+import { Box, Typography, Grid, Chip, TextField, Autocomplete, CircularProgress } from '@mui/material';
+import { getFirestore, collection, getDocs } from 'firebase/firestore';
+import { CloseRounded } from '@mui/icons-material';
 
-const OrderMedicine = ({ show, onHide, patientName, loggedInUser }) => {
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [initialFormState, setInitialFormState] = useState({
-    medicineName: '',
-    medicineQuantity: '',
-    medicineUrgency: '',
-    medicineWard: '',
-    orderingPhysician: '',
-  });
+const OrderMedicine = ({ clientName, caregiverName, orderDate, selectedPlan }) => {
+  const [medicineOptions, setMedicineOptions] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [open, setOpen] = useState(false);
+  const [medicineOrders, setMedicineOrders] = useState([]);
 
-  // Function to handle form field changes
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setInitialFormState((prevState) => ({
-      ...prevState,
-      [name]: value,
-    }));
-  };
-
-  // Function to handle medicine selection
-  const handleMedicineChange = (event, value) => {
-    setInitialFormState((prevState) => ({
-      ...prevState,
-      medicineName: value,
-    }));
-  };
-
-  // Function to handle form submission
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    const { medicineName, medicineQuantity, medicineUrgency, medicineWard, orderingPhysician } = initialFormState;
-
-    // Validate form fields
-    if (!medicineName || !medicineQuantity || !medicineUrgency || !medicineWard || !orderingPhysician) {
-      toast.error('Please fill in all fields', {
-        key: Math.random().toString(),
-      });
-      return;
-    }
-
-    setIsSubmitting(true);
+  const fetchMedicineOptions = async () => {
+    setLoading(true);
     try {
-      // Simulate API call or any other submission logic
-      console.log('Medicine Order submitted:', initialFormState);
-
-      // Show success toast
-      toast.success('Medicine Order submitted successfully!', {
-      });
-
-      // Reset form fields and close the modal after successful submission
-      setInitialFormState({
-        medicineName: '',
-        medicineQuantity: '',
-        medicineUrgency: '',
-        medicineWard: '',
-        orderingPhysician: '',
-      });
-
-      onHide();
+      const firestore = getFirestore();
+      const medicinesCollection = collection(firestore, 'Medicines');
+      const medicinesSnapshot = await getDocs(medicinesCollection);
+      const options = medicinesSnapshot.docs.map((doc) => ({
+        id: doc.id,
+        name: doc.data().name,
+      }));
+      setMedicineOptions(options);
     } catch (error) {
-      toast.error('An error occurred while submitting the medicine order.', {
-      });
-      console.error(error);
+      console.error('Error fetching medicine options:', error);
     } finally {
-      setIsSubmitting(false);
+      setLoading(false);
     }
+  };
+
+  useEffect(() => {
+    fetchMedicineOptions();
+  }, []);
+
+  const handleMedicineSelect = (event, value) => {
+    if (value) {
+      setMedicineOrders((prevOrders) => [...prevOrders, { name: value.name, quantity: '' }]);
+      setOpen(false);
+    }
+  };
+
+  const handleQuantityChange = (index, quantity) => {
+    setMedicineOrders((prevOrders) => {
+      const updatedOrders = [...prevOrders];
+      updatedOrders[index].quantity = quantity;
+      return updatedOrders;
+    });
+  };
+
+  const handleMedicineDelete = (index) => {
+    setMedicineOrders((prevOrders) => prevOrders.filter((_, i) => i !== index));
   };
 
   return (
-    <>
-      <Modal show={show} onHide={onHide} backdrop="static" keyboard={false} centered>
-        <Modal.Header closeButton>
-          <Modal.Title>
-            <strong>{patientName}</strong>
-          </Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <Container>
-            <Form>
-              <Row className="mb-3">
-                <Col>
-                  <Form.Label>Medicine Name</Form.Label>
-                  <Autocomplete
-                    freeSolo
-                    disableClearable
-                    options={[]}
-                    renderInput={(params) => <TextField {...params} label="Medicine Name" />}
-                    onChange={handleMedicineChange}
-                    value={initialFormState.medicineName}
-                  />
-                </Col>
-                <Col>
-                  <Form.Label>Medicine Quantity</Form.Label>
-                  <Form.Control
-                    type="number"
-                    name="medicineQuantity"
-                    value={initialFormState.medicineQuantity}
-                    onChange={handleInputChange}
-                    placeholder="Enter Quantity"
-                  />
-                </Col>
-              </Row>
-              <Row className="mb-3">
-                <Col>
-                  <Form.Label>Urgency</Form.Label>
-                  <Form.Control
-                    type="text"
-                    name="medicineUrgency"
-                    value={initialFormState.medicineUrgency}
-                    onChange={handleInputChange}
-                    placeholder="Enter Urgency"
-                  />
-                </Col>
-                <Col>
-                  <Form.Label>Ward</Form.Label>
-                  <Form.Control
-                    type="text"
-                    name="medicineWard"
-                    value={initialFormState.medicineWard}
-                    onChange={handleInputChange}
-                    placeholder="Enter Ward"
-                  />
-                </Col>
-              </Row>
-              <Row>
-                <Col>
-                  <Form.Label>Ordering Physician</Form.Label>
-                  <Form.Control
-                    type="text"
-                    name="orderingPhysician"
-                    value={initialFormState.orderingPhysician}
-                    onChange={handleInputChange}
-                    placeholder="Enter Ordering Physician"
-                  />
-                </Col>
-              </Row>
-            </Form>
-          </Container>
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={onHide}>
-            Close
-          </Button>
-          <Button variant="primary" onClick={handleSubmit} disabled={isSubmitting}>
-            {isSubmitting ? (
-              <>
-                <Spinner as="span" animation="border" size="sm" role="status" aria-hidden="true" />
-                &nbsp;Submitting...
-              </>
-            ) : (
-              'Submit'
+    <Box>
+      <Typography variant="h6" gutterBottom>
+        Order Medicine
+      </Typography>
+      <Grid container spacing={2}>
+        <Grid item xs={12}>
+          <Typography variant="body1">Client Name: {clientName}</Typography>
+        </Grid>
+        <Grid item xs={12}>
+          <Typography variant="body1">Caregiver Name: {caregiverName}</Typography>
+        </Grid>
+        <Grid item xs={12}>
+          <Typography variant="body1">Order Date: {orderDate}</Typography>
+        </Grid>
+        
+        <Grid item xs={12}>
+          <Autocomplete
+            open={open}
+            onOpen={() => setOpen(true)}
+            onClose={() => setOpen(false)}
+            options={medicineOptions}
+            loading={loading}
+            getOptionLabel={(option) => option.name}
+            onChange={handleMedicineSelect}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                label="Search for Medicine"
+                InputProps={{
+                  ...params.InputProps,
+                  endAdornment: (
+                    <React.Fragment>
+                      {loading ? <CircularProgress color="inherit" size={20} /> : null}
+                      {params.InputProps.endAdornment}
+                    </React.Fragment>
+                  ),
+                }}
+              />
             )}
-          </Button>
-        </Modal.Footer>
-      </Modal>
-    </>
+          />
+        </Grid>
+        <Grid item xs={12}>
+          <Box display="flex" flexWrap="wrap" gap={1}>
+            {medicineOrders.map((order, index) => (
+              <Chip
+                key={index}
+                label={`${order.name} - Quantity: ${order.quantity}`}
+                onDelete={() => handleMedicineDelete(index)}
+                deleteIcon={<CloseRounded />}
+              />
+            ))}
+          </Box>
+        </Grid>
+        <Grid item xs={12}>
+          {medicineOrders.map((order, index) => (
+            <TextField
+              key={index}
+              label="Quantity"
+              type="number"
+              value={order.quantity}
+              onChange={(e) => handleQuantityChange(index, e.target.value)}
+              margin="normal"
+            />
+          ))}
+        </Grid>
+      </Grid>
+    </Box>
   );
 };
 

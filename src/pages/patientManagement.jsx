@@ -7,8 +7,9 @@ import firebaseConfig from "../pages/configs";
 import ReusableTable from "./ReusableTable";
 import { FaNotesMedical, FaUserNurse, FaCapsules, FaFlask, FaXRay, FaBed } from "react-icons/fa";
 import { ToastContainer } from "react-toastify";
-import NursingNotes from "../components/AddNursingNotes"; // Import the NursingNotes component
+import NursingNotes from "../components/AddNursingNotes"; 
 import DoctorsNotes from "../components/DoctorsNotes";
+import OrderMedicine from "../components/OrderMedicine"; // Import the OrderMedicine component
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
@@ -16,10 +17,12 @@ const db = getFirestore(app);
 const PatientManagement = () => {
   const [data, setData] = useState([]);
   const [showDoctorsNotes, setShowDoctorsNotes] = useState(false);
-  const [showNursingNotes, setShowNursingNotes] = useState(false); // State to control the visibility of NursingNotes modal
+  const [showNursingNotes, setShowNursingNotes] = useState(false);
+  const [showOrderMedicine, setShowOrderMedicine] = useState(false); // State to control the visibility of OrderMedicine modal
   
   const toggleDoctorsNotes = () => setShowDoctorsNotes(!showDoctorsNotes);
-  const toggleNursingNotes = () => setShowNursingNotes(!showNursingNotes); // Function to toggle the visibility of NursingNotes modal
+  const toggleNursingNotes = () => setShowNursingNotes(!showNursingNotes);
+  const toggleOrderMedicine = () => setShowOrderMedicine(!showOrderMedicine); // Function to toggle the visibility of OrderMedicine modal
 
   useEffect(() => {
     const fetchData = async () => {
@@ -78,13 +81,13 @@ const PatientManagement = () => {
         initialState={{ pageIndex: 0, pageSize: 10 }}
         ActionDropdown={({ row }) => (
           <DropdownButton dropup={true} id={`actions-dropdown-${row.id}`} title="Actions">
-            <Dropdown.Item href="#/action-1" onClick={toggleNursingNotes}> {/* Add event handler to open NursingNotes modal */}
+            <Dropdown.Item href="#/action-1" onClick={toggleNursingNotes}>
               <FaUserNurse /> Add Nursing Notes
             </Dropdown.Item>
             <Dropdown.Item href="#/action-2" onClick={toggleDoctorsNotes}>
               <FaNotesMedical /> Add Doctor's Notes
             </Dropdown.Item>
-            <Dropdown.Item href="#/action-3" onClick={() => console.log("Order Medicine")}>
+            <Dropdown.Item href="#/action-3" onClick={toggleOrderMedicine}> {/* Update to toggleOrderMedicine */}
               <FaCapsules /> Order Medicine
             </Dropdown.Item>
             <Dropdown.Item href="#/action-4" onClick={() => console.log("Order Lab Tests")}>
@@ -101,8 +104,9 @@ const PatientManagement = () => {
       />
 
       <DoctorsNotes show={showDoctorsNotes} onHide={() => setShowDoctorsNotes(false)} />
-      <NursingNotes show={showNursingNotes} onHide={() => setShowNursingNotes(false)} /> {/* Render NursingNotes modal with the show prop */}
-      <ToastContainer limit={1}/>
+      <NursingNotes show={showNursingNotes} onHide={() => setShowNursingNotes(false)} />
+      <OrderMedicine show={showOrderMedicine} onHide={() => setShowOrderMedicine(false)} /> {/* Render OrderMedicine modal */}
+      <ToastContainer limit={5}/>
     </Container>
   );
 };

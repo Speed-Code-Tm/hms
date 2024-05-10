@@ -136,7 +136,6 @@ const SideBar = () => {
           >
             Outpatient Management
           </MenuItem>
-          
         </SubMenu>
         <MenuItem
           component={
@@ -206,7 +205,7 @@ const SideBar = () => {
         >
           <MenuItem
             component={
-              <Link to="/patient-management-systems" onClick={handleActive}>
+              <Link to="/PatientManagement" onClick={handleActive}>
                 Patient Management Systems
               </Link>
             }

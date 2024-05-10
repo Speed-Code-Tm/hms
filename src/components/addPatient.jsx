@@ -4,62 +4,14 @@ import * as Yup from "yup";
 import { getFirestore, collection, addDoc } from "firebase/firestore";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import styled from "styled-components";
 import { initializeApp } from "firebase/app";
 import firebaseConfig from "../pages/configs";
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-const StyledModal = styled(Modal)`
-  .modal-dialog {
-    max-width: 800px;
-  }
-
-  .modal-header {
-    background-color: #007bff;
-    color: #fff;
-    padding: 1rem;
-    border-top-left-radius: 0.5rem;
-    border-top-right-radius: 0.5rem;
-  }
-
-  .modal-header .close {
-    color: #fff;
-    opacity: 0.8;
-    transition: opacity 0.3s;
-
-    &:hover {
-      opacity: 1;
-    }
-  }
-`;
-
-const StyledModalHeader = styled(Modal.Header)`
-  background-color: #007bff;
-  color: #fff;
-  padding: 1rem;
-  border-top-left-radius: 0.5rem;
-  border-top-right-radius: 0.5rem;
-`;
-
-const StyledModalTitle = styled(Modal.Title)`
-  font-weight: bold;
-  font-size: 1.25rem;
-`;
-
-const StyledButtonRow = styled.div`
-  display: flex;
-  justify-content: space-between;
-  margin-top: 1rem;
-`;
-
-const StyledSubmitButton = styled(Button)`
-  width: 200px;
-`;
-
 const AddPatientModal = ({ show, onHide }) => {
-  const [formData, setFormData] = useState({
+  const initialForm = {
     firstName: "",
     middleName: "",
     lastName: "",
@@ -75,38 +27,37 @@ const AddPatientModal = ({ show, onHide }) => {
     policyNumber: "",
     memberNumber: "",
     nationalId: "",
-  });
+  };
+  const [formData, setFormData] = useState(initialForm);
   const [loading, setLoading] = useState(false);
 
   const validationSchema = Yup.object().shape({
-    firstName: Yup.string().required("Please enter your first name"),
-    lastName: Yup.string().required("Please enter your last name"),
-    dateOfBirth: Yup.date().required("Please enter your date of birth"),
-    gender: Yup.string().required("Please select your gender"),
-    preferredContact: Yup.string().required(
-      "Please select your preferred contact"
-    ),
-    primaryAddress: Yup.string().required("Please enter your primary address"),
-    phoneNumber: Yup.string().required("Please enter your phone number"),
+    firstName: Yup.string().required("First Name is required"),
+    lastName: Yup.string().required("Last Name is required"),
+    dateOfBirth: Yup.date().required("Date of Birth is required"),
+    gender: Yup.string().required("Gender is required"),
+    preferredContact: Yup.string().required("Preferred Contact is required"),
+    primaryAddress: Yup.string().required("Primary Address is required"),
+    phoneNumber: Yup.string().required("Phone Number is required"),
     governmentIssuedId: Yup.string().required(
-      "Please enter your government-issued ID"
+      "Government-issued ID is required"
     ),
-    insuranceType: Yup.string().required("Please select your insurance type"),
+    insuranceType: Yup.string().required("Insurance Type is required"),
     insuranceProvider: Yup.string().when("insuranceType", {
       is: "private",
-      then: Yup.string().required("Please enter your insurance provider"),
+      then: Yup.string().required("Insurance Provider is required"),
     }),
     policyNumber: Yup.string().when("insuranceType", {
       is: "private",
-      then: Yup.string().required("Please enter your policy number"),
+      then: Yup.string().required("Policy Number is required"),
     }),
     memberNumber: Yup.string().when("insuranceType", {
       is: "government",
-      then: Yup.string().required("Please enter your member number"),
+      then: Yup.string().required("Member Number is required"),
     }),
     nationalId: Yup.string().when("insuranceType", {
       is: "government",
-      then: Yup.string().required("Please enter your national ID"),
+      then: Yup.string().required("National ID is required"),
     }),
   });
 
@@ -124,9 +75,7 @@ const AddPatientModal = ({ show, onHide }) => {
 
     try {
       await validationSchema.validate(formData, { abortEarly: false });
-      const patientsCollection = collection(db, "patients");
-      const docRef = await addDoc(patientsCollection, formData);
-      console.log("Patient document written with ID:", docRef.id);
+      await saveToFirestore(formData);
       toast.success("Patient added successfully!");
       resetForm();
     } catch (error) {
@@ -135,7 +84,9 @@ const AddPatientModal = ({ show, onHide }) => {
           toast.error(err.message);
         });
       } else {
-        toast.error("Error during form submission. Please try again.");
+        toast.error(
+          "An error occurred during form submission. Please try again."
+        );
       }
     } finally {
       setLoading(false);
@@ -143,23 +94,7 @@ const AddPatientModal = ({ show, onHide }) => {
   };
 
   const resetForm = () => {
-    setFormData({
-      firstName: "",
-      middleName: "",
-      lastName: "",
-      dateOfBirth: "",
-      gender: "",
-      preferredContact: "",
-      primaryAddress: "",
-      phoneNumber: "",
-      secondaryPhoneNumber: "",
-      governmentIssuedId: "",
-      insuranceType: "",
-      insuranceProvider: "",
-      policyNumber: "",
-      memberNumber: "",
-      nationalId: "",
-    });
+    setFormData({ ...initialForm });
   };
 
   const saveToFirestore = async (data) => {
@@ -169,15 +104,17 @@ const AddPatientModal = ({ show, onHide }) => {
       console.log("Patient document written successfully");
     } catch (error) {
       console.error("Error adding document: ", error);
-      toast.error("Error adding patient. Please try again.");
+      toast.error(
+        "An error occurred while saving the patient data. Please try again."
+      );
     }
   };
 
   return (
-    <StyledModal show={show} onHide={onHide} centered>
-      <StyledModalHeader closeButton>
-        <StyledModalTitle>Add Patient</StyledModalTitle>
-      </StyledModalHeader>
+    <Modal show={show} onHide={onHide} centered>
+      <Modal.Header closeButton>
+        <Modal.Title>Add Patient</Modal.Title>
+      </Modal.Header>
       <Modal.Body>
         <Form onSubmit={handleSubmit}>
           <Row>
@@ -189,6 +126,7 @@ const AddPatientModal = ({ show, onHide }) => {
                   name="firstName"
                   value={formData.firstName}
                   onChange={handleInputChange}
+                  required
                 />
               </Form.Group>
             </Col>
@@ -211,6 +149,7 @@ const AddPatientModal = ({ show, onHide }) => {
                   name="lastName"
                   value={formData.lastName}
                   onChange={handleInputChange}
+                  required
                 />
               </Form.Group>
             </Col>
@@ -224,6 +163,7 @@ const AddPatientModal = ({ show, onHide }) => {
                   name="dateOfBirth"
                   value={formData.dateOfBirth}
                   onChange={handleInputChange}
+                  required
                 />
               </Form.Group>
             </Col>
@@ -235,6 +175,7 @@ const AddPatientModal = ({ show, onHide }) => {
                   name="gender"
                   value={formData.gender}
                   onChange={handleInputChange}
+                  required
                 >
                   <option value="">Select Gender</option>
                   <option value="male">Male</option>
@@ -254,6 +195,7 @@ const AddPatientModal = ({ show, onHide }) => {
                   name="preferredContact"
                   value={formData.preferredContact}
                   onChange={handleInputChange}
+                  required
                 >
                   <option value="">Select Preferred Contact</option>
                   <option value="phone">Phone</option>
@@ -270,6 +212,7 @@ const AddPatientModal = ({ show, onHide }) => {
                   name="primaryAddress"
                   value={formData.primaryAddress}
                   onChange={handleInputChange}
+                  required
                 />
               </Form.Group>
             </Col>
@@ -283,6 +226,7 @@ const AddPatientModal = ({ show, onHide }) => {
                   name="phoneNumber"
                   value={formData.phoneNumber}
                   onChange={handleInputChange}
+                  required
                 />
               </Form.Group>
             </Col>
@@ -307,6 +251,7 @@ const AddPatientModal = ({ show, onHide }) => {
                   name="governmentIssuedId"
                   value={formData.governmentIssuedId}
                   onChange={handleInputChange}
+                  required
                 />
               </Form.Group>
             </Col>
@@ -318,6 +263,7 @@ const AddPatientModal = ({ show, onHide }) => {
                   name="insuranceType"
                   value={formData.insuranceType}
                   onChange={handleInputChange}
+                  required
                 >
                   <option value="">Select Insurance Type</option>
                   <option value="private">Private Insurance</option>
@@ -339,6 +285,7 @@ const AddPatientModal = ({ show, onHide }) => {
                       name="insuranceProvider"
                       value={formData.insuranceProvider}
                       onChange={handleInputChange}
+                      required
                     />
                   </Form.Group>
                 </Col>
@@ -350,6 +297,7 @@ const AddPatientModal = ({ show, onHide }) => {
                       name="policyNumber"
                       value={formData.policyNumber}
                       onChange={handleInputChange}
+                      required
                     />
                   </Form.Group>
                 </Col>
@@ -367,6 +315,7 @@ const AddPatientModal = ({ show, onHide }) => {
                       name="memberNumber"
                       value={formData.memberNumber}
                       onChange={handleInputChange}
+                      required
                     />
                   </Form.Group>
                 </Col>
@@ -378,24 +327,21 @@ const AddPatientModal = ({ show, onHide }) => {
                       name="nationalId"
                       value={formData.nationalId}
                       onChange={handleInputChange}
+                      required
                     />
                   </Form.Group>
                 </Col>
               </Row>
             </>
           )}
-          <StyledButtonRow>
-            <StyledSubmitButton
-              variant="primary"
-              type="submit"
-              disabled={loading}
-            >
+          <div className="text-end mt-3">
+            <Button variant="primary" type="submit" disabled={loading}>
               {loading ? "Submitting..." : "Submit"}
-            </StyledSubmitButton>
-          </StyledButtonRow>
+            </Button>
+          </div>
         </Form>
       </Modal.Body>
-    </StyledModal>
+    </Modal>
   );
 };
 

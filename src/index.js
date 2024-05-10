@@ -5,8 +5,6 @@ import reportWebVitals from './reportWebVitals';
 import { initializeApp } from 'firebase/app';
 import 'firebase/database'; // Import the specific Firebase services you need
 import firebaseConfig from './pages/configs'; // Import the Firebase configuration
-import { ToastContainer } from 'react-toastify'; // Import ToastContainer from react-toastify
-import 'react-toastify/dist/ReactToastify.css'; // Import default toast styles
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
@@ -15,7 +13,6 @@ const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
     <App />
-    <ToastContainer />
   </React.StrictMode>
 );
 

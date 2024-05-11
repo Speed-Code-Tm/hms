@@ -41,23 +41,22 @@ const openSesion = () => {
   </Modal.Dialog>;
 };
 
-
 const AddPatientButton = styled.button`
-background-color: #007bff;
-border: none;
-color: #fff;
-padding: 0.5rem 1rem;
-border-radius: 0.25rem;
-font-size: 1rem;
-cursor: pointer;
-transition: background-color 0.3s ease;
-display: flex;
-align-items: center;
-margin-left: auto; /* This will push the button to the right */
+  background-color: #007bff;
+  border: none;
+  color: #fff;
+  padding: 0.5rem 1rem;
+  border-radius: 0.25rem;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  display: flex;
+  align-items: center;
+  margin-left: auto; /* This will push the button to the right */
 
-&:hover {
-  background-color: #0056b3;
-}
+  &:hover {
+    background-color: #0056b3;
+  }
 `;
 
 const HeaderContainer = styled.div`
@@ -66,7 +65,6 @@ const HeaderContainer = styled.div`
   align-items: center;
   margin-bottom: 1rem;
 `;
-
 
 const PatientRegistration = () => {
   const [data, setData] = useState([]);
@@ -83,7 +81,7 @@ const PatientRegistration = () => {
         const patientInfo = patientData[patientId] || {};
         const personalInfo = patientInfo.personalInfo || {};
         // const fullName = `${personalInfo.firstName || ''} ${personalInfo.middleName || ''} ${personalInfo.lastName || ''}`;
-  
+
         return {
           id: patientId,
           personalInfo,
@@ -91,33 +89,37 @@ const PatientRegistration = () => {
       });
       setData(patientsData);
     };
-  
+
     fetchData();
   }, []);
 
   const COLUMNS = [
     {
       Header: "Name",
-      accessor: (row) => `${row.personalInfo.firstName || ''} ${row.personalInfo.middleName || ''} ${row.personalInfo.lastName || ''}`,
+      accessor: (row) =>
+        `${row.personalInfo.firstName || ""} ${
+          row.personalInfo.middleName || ""
+        } ${row.personalInfo.lastName || ""}`,
     },
     {
       Header: "Phone Number",
-      accessor: (row) => row.personalInfo.phoneNumber || '',
+      accessor: (row) => row.personalInfo.phoneNumber || "",
     },
     {
       Header: "Insurance Type",
-      accessor: (row) => row.personalInfo.insuranceType || '',
+      accessor: (row) => row.personalInfo.insuranceType || "",
     },
     {
       Header: "Gender",
-      accessor: (row) => row.personalInfo.gender || '',
+      accessor: (row) => row.personalInfo.gender || "",
     },
     {
       Header: "Age",
       accessor: (row) => {
         const today = new Date();
         const birthDate = new Date(row.personalInfo.dateOfBirth);
-        if (!isNaN(birthDate.getTime())) { // Check if dateOfBirth is a valid date
+        if (!isNaN(birthDate.getTime())) {
+          // Check if dateOfBirth is a valid date
           let age = today.getFullYear() - birthDate.getFullYear();
           const monthDiff = today.getMonth() - birthDate.getMonth();
           if (
@@ -128,20 +130,17 @@ const PatientRegistration = () => {
           }
           return age;
         } else {
-          return ''; // Return empty string if dateOfBirth is not available
+          return ""; // Return empty string if dateOfBirth is not available
         }
       },
     },
     {
       Header: "National ID",
-      accessor: (row) => row.personalInfo.nationalId || '',
+      accessor: (row) => row.personalInfo.nationalId || "",
     },
   ];
-  
 
   const columns = useMemo(() => COLUMNS, []);
-
-
 
   const ToggleAddPatientModal = () => {
     setShowAddPatientModal(!showAddPatientModal);
@@ -163,8 +162,11 @@ const PatientRegistration = () => {
         ActionDropdown={({ row }) => (
           <div>
             {/* add a drop down button menu wth icons and functions */}
-            <DropdownButton dropup="true" id="dropdown-basic-button" title="Actions">
-            
+            <DropdownButton
+              dropup="true"
+              id="dropdown-basic-button"
+              title="Actions"
+            >
               <Dropdown.Item href="#/action-1" onClick={openSesion()}>
                 Start Session
               </Dropdown.Item>
@@ -181,10 +183,9 @@ const PatientRegistration = () => {
         show={showAddPatientModal}
         onHide={() => setShowAddPatientModal(false)}
       />
-      {/* <ToastContainer /> */}
+      <ToastContainer />
     </Container>
   );
 };
-
 
 export default PatientRegistration;

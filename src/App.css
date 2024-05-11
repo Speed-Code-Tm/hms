@@ -34,4 +34,10 @@ span{
   border-top-right-radius: 0.5rem;
 }
 
+table  th{
+  font-size: 15px;
+}
 
+table td{
+  font-size: 15px;
+}

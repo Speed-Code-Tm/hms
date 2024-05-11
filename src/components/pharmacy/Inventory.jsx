@@ -1,26 +1,33 @@
 import React, { useEffect, useState } from "react";
 import ReusableTable from "../../pages/ReusableTable";
 import { Timestamp, addDoc, collection, getDocs } from "firebase/firestore";
-import { db } from "../../pages/configs";
+import { db, retrievePharmacyInventory } from "../../pages/configs";
 import { Button, Col, Dropdown, DropdownButton, Form, Row } from "react-bootstrap";
 import ReusableModal from "../ReusableModal";
 import * as yup from 'yup';
 import { FaSave } from "react-icons/fa";
 import { toast } from "react-toastify";
+import AddMedicine from "./AddMedicine";
 
-const Inventory = ({ activeTab }) => {
+const MedicineInventory = ({ activeTab }) => {
   const [inventoryItems, setInventoryItems] = useState([]);
   const [inventory, setInventory] = useState();
+  const [inventoryModal,setInventoryModal] = useState(false)
   const [showModal, setShowModal] = useState(false);
   const [loading,setLoading] = useState(false)
   const user = { name: "Oliver Wanyonyi", department: "Pharmacy" };
-
+  const [editing,setEditing]  = useState(false)
   const [formData, setFormData] = useState({ quantity: "" });
 
-  const handleRowClick = (item) => {
-    setShowModal(true);
+  const handleRowClick = (item, action) => 
+  {
     setInventory(item);
+    if(action  === 'edit'){
+        setShowModal(true);
+        setEditing(true)
+    }
   };
+
 
 
   const handleFormSubmit = async(e) =>{
@@ -75,9 +82,9 @@ const Inventory = ({ activeTab }) => {
 
   const inventoryColumns = [
     // { Header: "", accessor: "id" },
-    { Header: "Item", accessor: "itemName" },
-    { Header: "Category", accessor: "category" },
-    { Header: "Current Stock", accessor: "currentStock" },
+    { Header: "Item", accessor: "name" },
+    { Header: "Quantity", accessor: "quantity" },
+    { Header: "Unit", accessor: "unitType" },
   ];
 
   const initialState = {
@@ -87,75 +94,32 @@ const Inventory = ({ activeTab }) => {
 
   const fetchInventoryItems = async () => {
     try {
-      const inventoryCollection = collection(db, "inventory");
-
-      const inventorySnapshot = await getDocs(inventoryCollection);
-
-      const items = inventorySnapshot.docs.map((doc) => {
-        const itemData = doc.data();
-        const itemId = doc.id;
-        return {
-          id: itemId,
-          ...itemData,
-        };
-      });
-
-      setInventoryItems(items);
+      const inventoryData = await retrievePharmacyInventory()
+      console.log(inventoryData);
+      setInventoryItems(inventoryData);
     } catch (error) {
       console.error("Error fetching inventory items:", error);
     }
   };
 
   useEffect(() => {
-    if (activeTab === "inventory") {
+    if (activeTab === "medicine") {
       fetchInventoryItems();
     }
   }, [activeTab]);
 
   return (
     <>
-    <ReusableModal title='Request Item From Procurement' show={showModal} onHide={()=>setShowModal(false)}>
-    <Form onSubmit={handleFormSubmit}>
-              <Row>
-                <Col md={6} className="mb-2">
-                  <Form.Group controlId="itemName" className="mb-2">
-                    <Form.Label>Item Name</Form.Label>
-                    <Form.Control
-                      type="text"
-                      value={inventory?.itemName}
-                      required
-                      disabled
-                    />
-                  </Form.Group>
-                </Col>  
+  
 
-                <Col md={6} className="mb-2">
-                  <Form.Group controlId="quantity" className="mb-2">
-                    <Form.Label>Quantity</Form.Label>
-                    <Form.Control
-                      type="number"
-                      value={formData.quantity}
-                      onChange={(e) => setFormData({...formData,quantity:e.target.value})}
-                      required
-                    />
-                  </Form.Group>
-                </Col>
-                
-               </Row>
-
-               <Button variant="primary" type="submit" disabled={loading}>
-                {loading ? (
-                  "Saving..."
-                ) : (
-                  <>
-                    {" "}
-                    <FaSave style={{ marginRight: "0.5rem" }} />
-                    Save
-                  </>
-                )}
-              </Button>
-               </Form>
+    <ReusableModal title={"Add Item"} show={inventoryModal} onHide={()=>setInventoryModal(false)}>
+       <AddMedicine onHide={()=>setInventoryModal(false)}  refetch={fetchInventoryItems}/>
     </ReusableModal>
+    <div className="d-flex justify-content-end p-2">
+    <Button onClick={()=>setInventoryModal(true)} className="btn-sm">Add Medicine</Button>
+
+    </div>
+
     <ReusableTable
       columns={inventoryColumns}
       data={inventoryItems}
@@ -170,9 +134,15 @@ const Inventory = ({ activeTab }) => {
           >
             <Dropdown.Item
               href="#/action-1"
-              onClick={() => handleRowClick(row.original)}
+              onClick={() => handleRowClick(row.original, 'edit')}
             >
-              Request Item
+              Update
+            </Dropdown.Item>
+            <Dropdown.Item
+              href="#/action-1"
+              onClick={() => handleRowClick(row.original, 'delete')}
+            >
+             Delete
             </Dropdown.Item>
           </DropdownButton>
         </div>
@@ -182,4 +152,4 @@ const Inventory = ({ activeTab }) => {
   );
 };
 
-export default Inventory;
+export default MedicineInventory;

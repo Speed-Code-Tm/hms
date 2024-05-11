@@ -4,7 +4,8 @@ import Tabs from 'react-bootstrap/Tabs';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { Container, Row, Col } from 'react-bootstrap';
 import Prescriptions from './pharmacy_patient_prescriptions'
-import Inventory from '../components/pharmacy/Inventory';
+import MainInventory from './MainInventory';
+import MedicineInventory from '../components/pharmacy/Inventory';
 
 const Pharmacy = () => {
   const [activeTab, setActiveTab] = useState('prescriptions');
@@ -57,8 +58,12 @@ const Pharmacy = () => {
             <Tab eventKey="ward-orders" title="Ward Orders">
               {renderWardOrdersContent()}
             </Tab>
+            <Tab eventKey="medicine" title="Medicine">
+              <MedicineInventory activeTab='medicine'/>
+            </Tab>
+
             <Tab eventKey="inventory" title="Inventory">
-              <Inventory activeTab='inventory'/>
+              <MainInventory activeTab='inventory' department="pharmacy"/>
             </Tab>
           </Tabs>
         </Col>

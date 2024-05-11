@@ -95,3 +95,111 @@ export const updateVitalSigns = async (hospitalVisitId, vitalSigns) => {
   // CRUD functions for bloodSugarLog
   
  
+
+
+  //manage pharmacy inventory
+
+  // adding a new inventory item
+
+  export const addPharmacyInventoryItem = async(item) =>{
+    try {
+      const pharmacyInventoryRef = collection(db, 'pharmacyInventory')
+      await addDoc( pharmacyInventoryRef, item)
+      
+    } catch (error) {
+      return error
+    }
+  }
+
+
+  export const retrievePharmacyInventory  = async () =>{
+    try{
+      const pharmacyInventoryRef = collection(db, 'pharmacyInventory')
+      
+      const pharmacyInventorySnapshot = await getDocs(pharmacyInventoryRef);
+
+      const pharmacyInventoryData = pharmacyInventorySnapshot.docs.map(doc => {
+          
+          const data = doc.data();
+
+          return { id: doc.id, ...data };
+      });
+
+
+      return pharmacyInventoryData
+    }catch(error){
+      return error
+    }
+  }
+
+
+  // request an item from procurement
+
+
+
+
+  // retrieve 
+
+
+
+
+  //main inventory
+
+  //retrieving data from the main inventory
+
+  export const retrieveInventoryItems= async() =>{
+    try {
+      const inventoryRef = collection(db, 'inventory')
+      
+      const inventorySnapshot = await getDocs(inventoryRef);
+  
+      const inventoryData = inventorySnapshot.docs.map(doc => {
+          
+          const data = doc.data();
+  
+          return { id: doc.id, ...data };
+      });
+  
+      return inventoryData
+      
+    } catch (error) {
+      return error
+    }
+   
+  }
+
+  //requesting an item from procurement
+
+ export const requestItem = async (item, department) =>{
+
+    try {
+    const departmentNeedsRef = collection(db, 'departmentNeeds')
+    await addDoc(departmentNeedsRef,{...item,department:department})
+      
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+
+  //manage items requested by departments
+
+  export const retrieveDepartmentNeeds = async () =>{
+    try {
+      const departmentNeedsRef = collection(db, 'departmentNeeds')
+      
+      const departmentNeedsSnapshot = await getDocs(departmentNeedsRef);
+  
+      const departmentNeedsData = departmentNeedsSnapshot.docs.map(doc => {
+          
+          const data = doc.data();
+  
+          return { id: doc.id, ...data };
+      });
+  
+      return departmentNeedsData
+      
+    } catch (error) {
+      console.log(error);
+    }
+  }

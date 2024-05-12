@@ -28,14 +28,14 @@ const PatientManagement = () => {
   const [showDoctorsNotes, setShowDoctorsNotes] = useState(false);
   const [showNursingNotes, setShowNursingNotes] = useState(false);
   const [showOrderMedicine, setShowOrderMedicine] = useState(false);
-  const [showOrderImaging, setShowOrderImaging] = useState(false); // State to control the visibility of OrderImaging modal
-  const [showOrderLabTest, setShowOrderLabTest] = useState(false); // State to control the visibility of OrderLabTest modal
+  const [showOrderImaging, setShowOrderImaging] = useState(false); 
+  const [showOrderLabTest, setShowOrderLabTest] = useState(false); 
 
   const toggleDoctorsNotes = () => setShowDoctorsNotes(!showDoctorsNotes);
   const toggleNursingNotes = () => setShowNursingNotes(!showNursingNotes);
   const toggleOrderMedicine = () => setShowOrderMedicine(!showOrderMedicine);
-  const toggleOrderImaging = () => setShowOrderImaging(!showOrderImaging); // Function to toggle the visibility of OrderImaging modal
-  const toggleOrderLabTest = () => setShowOrderLabTest(!showOrderLabTest); // Function to toggle the visibility of OrderLabTest modal
+  const toggleOrderImaging = () => setShowOrderImaging(!showOrderImaging); 
+  const toggleOrderLabTest = () => setShowOrderLabTest(!showOrderLabTest); 
 
   useEffect(() => {
     const fetchData = async () => {

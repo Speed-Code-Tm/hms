@@ -1,27 +1,56 @@
 import React, { useState, useEffect } from "react";
-import { Container, Row, Col, Form, Button, Modal } from "react-bootstrap";
+import {
+  Container,
+  Row,
+  Col,
+  Form,
+  Button,
+  Modal,
+  ListGroup,
+} from "react-bootstrap";
 import { Calendar, momentLocalizer } from "react-big-calendar";
 import moment from "moment";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import "react-big-calendar/lib/addons/dragAndDrop/styles.css";
-import './workplace_customization.css';
+import "./workplace_customization.css";
+import {
+  Box,
+  Typography,
+  Autocomplete,
+  TextField,
+  IconButton,
+  InputAdornment,
+  ListItem,
+  ListItemText,
+  ListItemAvatar,
+  Avatar,
+} from "@mui/material";
+import CloseIcon from "@mui/icons-material/Close";
+import AddIcon from "@mui/icons-material/Add";
+import CheckIcon from "@mui/icons-material/Check";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
 const localizer = momentLocalizer(moment);
 
 const WorkSchedule = () => {
   const [employees, setEmployees] = useState([]);
-  const [selectedEmployee, setSelectedEmployee] = useState(null);
   const [events, setEvents] = useState([]);
   const [showShiftModal, setShowShiftModal] = useState(false);
   const [shiftDetails, setShiftDetails] = useState({
-    title: "",
     start: null,
     end: null,
     employees: [],
     duties: [],
-    ward: "",
-    clockIn: "",
-    clockOut: "",
+    wards: [],
+    clockIn: null,
+    clockOut: null,
   });
+  const [selectedDate, setSelectedDate] = useState(new Date());
+  const [dutyInput, setDutyInput] = useState("");
+  const [wardInput, setWardInput] = useState("");
+  const [newDuty, setNewDuty] = useState([]);
+  const [newWard, setNewWard] = useState([]);
 
   // Fetch employees data from an API or database
   useEffect(() => {
@@ -36,12 +65,11 @@ const WorkSchedule = () => {
 
   const handleSelectEvent = (event) => {
     setShiftDetails({
-      title: event.title,
       start: event.start,
       end: event.end,
       employees: event.employees,
       duties: event.duties,
-      ward: event.ward,
+      wards: event.wards,
       clockIn: event.clockIn,
       clockOut: event.clockOut,
     });
@@ -59,12 +87,11 @@ const WorkSchedule = () => {
 
   const handleShiftSubmit = () => {
     const newEvent = {
-      title: shiftDetails.title,
       start: shiftDetails.start,
       end: shiftDetails.end,
       employees: shiftDetails.employees,
       duties: shiftDetails.duties,
-      ward: shiftDetails.ward,
+      wards: shiftDetails.wards,
       clockIn: shiftDetails.clockIn,
       clockOut: shiftDetails.clockOut,
     };
@@ -82,44 +109,119 @@ const WorkSchedule = () => {
     });
 
     if (hasConflict) {
-      alert("Conflict detected! Please check the employee schedules.");
+      toast.error("Conflict detected! Please check the employee schedules.");
     } else {
       setEvents([...events, newEvent]);
       setShowShiftModal(false);
     }
   };
 
-  const handleEmployeeSearch = (event) => {
-    const searchTerm = event.target.value.toLowerCase();
-    setSelectedEmployee(
-      employees.find((employee) =>
-        employee.name.toLowerCase().includes(searchTerm)
-      ) || null
-    );
-  };
-
-  const handleAddEmployee = () => {
-    if (selectedEmployee) {
+  const handleEmployeeSearch = (event, value) => {
+    if (value) {
       setShiftDetails((prevState) => ({
         ...prevState,
-        employees: [...prevState.employees, selectedEmployee],
+        employees: [...prevState.employees, value],
       }));
-      setSelectedEmployee(null);
+    }
+  };
+
+  const handleEmployeeRemove = (employee) => {
+    setShiftDetails((prevState) => ({
+      ...prevState,
+      employees: prevState.employees.filter((emp) => emp !== employee),
+    }));
+  };
+
+  const handleDutyAdd = () => {
+    if (dutyInput.trim()) {
+      setNewDuty([...newDuty, dutyInput.trim()]);
+      setDutyInput("");
+    }
+  };
+
+  const handleDutyRemove = (duty) => {
+    setNewDuty(newDuty.filter((d) => d !== duty));
+  };
+
+  const handleWardAdd = () => {
+    if (wardInput.trim()) {
+      setNewWard([...newWard, wardInput.trim()]);
+      setWardInput("");
+    }
+  };
+
+  const handleWardRemove = (ward) => {
+    setNewWard(newWard.filter((w) => w !== ward));
+  };
+
+  const handleDutyInputChange = (e) => {
+    setDutyInput(e.target.value);
+  };
+
+  const handleWardInputChange = (e) => {
+    setWardInput(e.target.value);
+  };
+
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter") {
+      if (dutyInput.trim()) {
+        setNewDuty([...newDuty, dutyInput.trim()]);
+        setDutyInput("");
+      }
+      if (wardInput.trim()) {
+        setNewWard([...newWard, wardInput.trim()]);
+        setWardInput("");
+      }
     }
   };
 
   const renderEventContent = (event) => {
     return (
       <div>
-        <h5>{event.title}</h5>
-        <p>Ward: {event.ward}</p>
+        <h5>Shift</h5>
+        <p>Duties: {event.duties.join(", ")}</p>
+        <p>Wards: {event.wards.join(", ")}</p>
         <p>
           Employees:{" "}
           {event.employees.map((employee) => employee.name).join(", ")}
         </p>
-        <p>Clock In: {event.clockIn}</p>
-        <p>Clock Out: {event.clockOut}</p>
+        <p>Clock In: {moment(event.clockIn).format("hh:mm A")}</p>
+        <p>Clock Out: {moment(event.clockOut).format("hh:mm A")}</p>
       </div>
+    );
+  };
+
+  const renderShiftsList = () => {
+    const shiftsForSelectedDate = events.filter((event) =>
+      moment(event.start).isSame(selectedDate, "day")
+    );
+
+    return (
+      <ListGroup>
+        {shiftsForSelectedDate.length > 0 ? (
+          shiftsForSelectedDate.map((shift, index) => (
+            <ListGroup.Item
+              key={index}
+              style={index % 2 === 0 ? { backgroundColor: "#f2f2f2" } : {}}
+            >
+              <Box
+                display="flex"
+                justifyContent="space-between"
+                alignItems="center"
+              >
+                <Typography>Shift</Typography>
+                <Typography variant="body2">{`${moment(shift.clockIn).format(
+                  "hh:mm A"
+                )} - ${moment(shift.clockOut).format("hh:mm A")}`}</Typography>
+              </Box>
+            </ListGroup.Item>
+          ))
+        ) : (
+          <ListGroup.Item>
+            <Typography>No work scheduled for this date.</Typography>
+          </ListGroup.Item>
+        )}
+      </ListGroup>
     );
   };
 
@@ -146,104 +248,208 @@ const WorkSchedule = () => {
             selectable
             resizable
             style={{ height: 500 }}
+            onNavigate={(date) => setSelectedDate(date)}
           />
         </Col>
         <Col md={3}>
-          <Form.Group>
-            <Form.Label>Search Employee</Form.Label>
-            <Form.Control
-              type="text"
-              placeholder="Enter employee name"
-              onChange={handleEmployeeSearch}
-            />
-          </Form.Group>
-          {selectedEmployee && (
-            <div>
-              <p>
-                <strong>Selected Employee:</strong> {selectedEmployee.name}
-              </p>
-              <Button variant="primary" onClick={handleAddEmployee}>
-                Add to Shift
-              </Button>
-            </div>
-          )}
-          <hr />
-          <h5>Shift Employees:</h5>
-          <ul>
-            {shiftDetails.employees.map((employee) => (
-              <li key={employee.id}>{employee.name}</li>
-            ))}
-          </ul>
+          <h5>Shifts for {moment(selectedDate).format("MMMM DD, YYYY")}</h5>
+          {renderShiftsList()}
+          <Button
+            variant="primary"
+            onClick={() => setShowShiftModal(true)}
+            style={{ marginTop: "1rem" }}
+          >
+            Add New Shift
+          </Button>
         </Col>
       </Row>
 
-      <Modal show={showShiftModal} onHide={() => setShowShiftModal(false)}>
-        <Modal.Header closeButton>
+      <Modal
+        show={showShiftModal}
+        onHide={() => setShowShiftModal(false)}
+        size="lg"
+      >
+        <Modal.Header
+          closeButton
+          style={{
+            backgroundColor: "#FF9B44",
+            color: "black",
+            textAlign: "center",
+            padding: "1rem",
+          }}
+        >
           <Modal.Title>Shift Details</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <Form>
-            <Form.Group>
-              <Form.Label>Shift Title</Form.Label>
-              <Form.Control
-                type="text"
-                placeholder="Enter shift title"
-                value={shiftDetails.title}
-                onChange={(e) =>
-                  setShiftDetails({ ...shiftDetails, title: e.target.value })
-                }
-              />
-            </Form.Group>
-            <Form.Group>
-              <Form.Label>Ward</Form.Label>
-              <Form.Control
-                type="text"
-                placeholder="Enter ward name"
-                value={shiftDetails.ward}
-                onChange={(e) =>
-                  setShiftDetails({ ...shiftDetails, ward: e.target.value })
-                }
-              />
-            </Form.Group>
-            <Form.Group>
-              <Form.Label>Duties</Form.Label>
-              <Form.Control
-                type="text"
-                placeholder="Enter duties"
-                value={shiftDetails.duties.join(", ")}
-                onChange={(e) =>
-                  setShiftDetails({
-                    ...shiftDetails,
-                    duties: e.target.value
-                      .split(",")
-                      .map((duty) => duty.trim()),
-                  })
-                }
-              />
-            </Form.Group>
-            <Form.Group>
-              <Form.Label>Clock In</Form.Label>
-              <Form.Control
-                type="text"
-                placeholder="Enter clock in time (e.g., 08:00 AM)"
-                value={shiftDetails.clockIn}
-                onChange={(e) =>
-                  setShiftDetails({ ...shiftDetails, clockIn: e.target.value })
-                }
-              />
-            </Form.Group>
-            <Form.Group>
-              <Form.Label>Clock Out</Form.Label>
-              <Form.Control
-                type="text"
-                placeholder="Enter clock out time (e.g., 04:00 PM)"
-                value={shiftDetails.clockOut}
-                onChange={(e) =>
-                  setShiftDetails({ ...shiftDetails, clockOut: e.target.value })
-                }
-              />
-            </Form.Group>
-          </Form>
+          <Row>
+            <Col md={6}>
+              <Form>
+                <Form.Group>
+                  <Form.Label>Shift Date</Form.Label>
+                  <input
+                    required
+                    className="form-control"
+                    type="date"
+                    value={moment(shiftDetails.start).format("YYYY-MM-DD")}
+                    onChange={(e) =>
+                      setShiftDetails({
+                        ...shiftDetails,
+                        start: moment(e.target.value, "YYYY-MM-DD").toDate(),
+                      })
+                    }
+                  />
+                </Form.Group>
+                <Form.Group>
+                  <Form.Label>Clock In Time</Form.Label>
+                  <input
+                    required
+                    className="form-control"
+                    type="time"
+                    value={moment(shiftDetails.clockIn).format("HH:mm")}
+                    onChange={(e) =>
+                      setShiftDetails({
+                        ...shiftDetails,
+                        clockIn: moment(e.target.value, "HH:mm").toDate(),
+                      })
+                    }
+                  />
+                </Form.Group>
+                <Form.Group>
+                  <Form.Label>Clock Out Time</Form.Label>
+                  <input
+                    required
+                    className="form-control"
+                    type="time"
+                    value={moment(shiftDetails.clockOut).format("HH:mm")}
+                    onChange={(e) =>
+                      setShiftDetails({
+                        ...shiftDetails,
+                        clockOut: moment(e.target.value, "HH:mm").toDate(),
+                      })
+                    }
+                  />
+                </Form.Group>
+                <Form.Group>
+                  <Form.Label>Duties</Form.Label>
+                  <ListGroup>
+                    {newDuty.map((duty, index) => (
+                      <ListGroup.Item key={index}>
+                        <Box
+                          display="flex"
+                          justifyContent="space-between"
+                          alignItems="center"
+                        >
+                          <Typography>{duty}</Typography>
+                          <IconButton
+                            onClick={() => handleDutyRemove(duty)}
+                            aria-label="Remove Duty"
+                          >
+                            <CloseIcon fontSize="small" />
+                          </IconButton>
+                        </Box>
+                      </ListGroup.Item>
+                    ))}
+                    <ListItem button onClick={handleDutyAdd}>
+                      <ListItemText primary={dutyInput} />
+                      {dutyInput && (
+                        <IconButton
+                          onClick={handleDutyAdd}
+                          aria-label="Add Duty"
+                          edge="end"
+                          style={{ backgroundColor: "green" }}
+                        >
+                          <CheckIcon fontSize="small" />
+                        </IconButton>
+                      )}
+                    </ListItem>
+                  </ListGroup>
+                  <Form.Control
+                    type="text"
+                    placeholder="Add new duty"
+                    value={dutyInput}
+                    onChange={handleDutyInputChange}
+                    onKeyDown={handleKeyDown}
+                  />
+                </Form.Group>
+                <Form.Group>
+                  <Form.Label>Wards</Form.Label>
+                  <ListGroup>
+                    {newWard.map((ward, index) => (
+                      <ListGroup.Item key={index}>
+                        <Box
+                          display="flex"
+                          justifyContent="space-between"
+                          alignItems="center"
+                        >
+                          <Typography>{ward}</Typography>
+                          <IconButton
+                            onClick={() => handleWardRemove(ward)}
+                            aria-label="Remove Ward"
+                          >
+                            <CloseIcon fontSize="small" />
+                          </IconButton>
+                        </Box>
+                      </ListGroup.Item>
+                    ))}
+                    <ListItem button onClick={handleWardAdd}>
+                      <ListItemText primary={wardInput} />
+                      {wardInput && (
+                        <IconButton
+                          onClick={handleWardAdd}
+                          aria-label="Add Ward"
+                          edge="end"
+                          style={{ backgroundColor: "green" }}
+                        >
+                          <CheckIcon fontSize="small" />
+                        </IconButton>
+                      )}
+                    </ListItem>
+                  </ListGroup>
+                  <Form.Control
+                    type="text"
+                    placeholder="Enter ward name"
+                    value={wardInput}
+                    onChange={handleWardInputChange}
+                    onKeyDown={handleKeyDown}
+                  />
+                </Form.Group>
+              </Form>
+            </Col>
+            <Col md={6}>
+              <Form.Group>
+                <Form.Label>Search and Add Employees</Form.Label>
+                <Autocomplete
+                  options={employees.map((employee) => employee)}
+                  getOptionLabel={(option) => option.name}
+                  onChange={handleEmployeeSearch}
+                  renderInput={(params) => <TextField {...params} />}
+                />
+              </Form.Group>
+              <ListGroup style={{ maxHeight: "200px", overflowY: "auto" }}>
+                {shiftDetails.employees.map((employee, index) => (
+                  <ListGroup.Item key={index}>
+                    <Box
+                      display="flex"
+                      justifyContent="space-between"
+                      alignItems="center"
+                    >
+                      <ListItemAvatar>
+                        <Avatar>{employee.name[0]}</Avatar>
+                      </ListItemAvatar>
+                      <Typography>{employee.name}</Typography>
+                      <IconButton
+                        onClick={() => handleEmployeeRemove(employee)}
+                        aria-label="Remove Employee"
+                        style={{ backgroundColor: "red" }}
+                      >
+                        <CloseIcon fontSize="small" />
+                      </IconButton>
+                    </Box>
+                  </ListGroup.Item>
+                ))}
+              </ListGroup>
+            </Col>
+          </Row>
         </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={() => setShowShiftModal(false)}>
@@ -254,6 +460,7 @@ const WorkSchedule = () => {
           </Button>
         </Modal.Footer>
       </Modal>
+      <ToastContainer />
     </Container>
   );
 };

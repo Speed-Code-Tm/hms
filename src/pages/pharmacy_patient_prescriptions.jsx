@@ -267,7 +267,7 @@ const Prescriptions = ({activeTab}) => {
     <Container className="patient-registration-container" style={{marginTop:'5px'}}>
       {/* <h2>Patient Registration</h2> */}
       <HeaderContainer>
-        <AddPatientButton className="btn btn-sm" onClick={ToggleAddPrescriptionModal}>
+        <AddPatientButton  onClick={ToggleAddPrescriptionModal}>
           <Add />
           Add Prescription
         </AddPatientButton>

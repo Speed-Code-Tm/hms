@@ -51,6 +51,10 @@ const UserRoleMapping = () => {
   };
 
   const renderConfirmationModal = () => {
+    if (!selectedRole) {
+      return null; // Return early if selectedRole is null
+    }
+
     return (
       <Modal show={showConfirmationModal} onHide={() => setShowConfirmationModal(false)}>
         <Modal.Header closeButton>
@@ -62,14 +66,16 @@ const UserRoleMapping = () => {
           <Typography variant="body2">{selectedRole.description}</Typography>
           <Typography variant="h6">Selected Actions:</Typography>
           <ListGroup>
-            {selectedRole.actions
-              .filter((action) => selectedActions.includes(action.id))
-              .map((action) => (
-                <ListGroup.Item key={action.id}>
-                  <Typography variant="body1">{action.name}</Typography>
-                  <Typography variant="body2">{action.description}</Typography>
-                </ListGroup.Item>
-              ))}
+            {selectedRole.actions &&
+              selectedRole.actions.length > 0 &&
+              selectedRole.actions
+                .filter((action) => selectedActions.includes(action.id))
+                .map((action) => (
+                  <ListGroup.Item key={action.id}>
+                    <Typography variant="body1">{action.name}</Typography>
+                    <Typography variant="body2">{action.description}</Typography>
+                  </ListGroup.Item>
+                ))}
           </ListGroup>
         </Modal.Body>
         <Modal.Footer>

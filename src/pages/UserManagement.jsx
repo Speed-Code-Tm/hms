@@ -1,200 +1,203 @@
-import React, { useState, useEffect } from 'react';
-import { Table, Button, Form, Modal } from 'react-bootstrap';
+import React, { useState } from "react";
+import {
+  Container,
+  Row,
+  Col,
+  Button,
+  Card,
+  Form,
+  Dropdown,
+} from "react-bootstrap";
+import { MoreVert, Edit, ArrowBack, ArrowForward } from "@mui/icons-material";
+import styled from "styled-components";
+import EmployeeModal from "../components/AddEmployee";
+
+const UserCard = styled(Card)`
+  transition: all 0.3s ease;
+  &:hover {
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    transform: translateY(-5px);
+  }
+`;
 
 const UserManagement = () => {
-  const [users, setUsers] = useState([]);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [showModal, setShowModal] = useState(false);
-  const [selectedUser, setSelectedUser] = useState(null);
-  const [newUser, setNewUser] = useState({
-    name: '',
-    email: '',
-    department: '',
-    role: '',
-    permissions: [],
-    isHead: false,
-  });
-  const [roles, setRoles] = useState([]);
-  const [permissions, setPermissions] = useState([]);
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [recordsPerPage, setRecordsPerPage] = useState(10);
 
-  useEffect(() => {
-    // Fetch users, roles, and permissions from the server or database
-    const fetchedUsers = [
-      { id: 1, name: 'John Doe', email: 'john@example.com', department: 'Cardiology', role: 'Doctor', permissions: ['viewPatientRecords', 'createPrescriptions'] },
-      { id: 2, name: 'Jane Smith', email: 'jane@example.com', department: 'Nursing', role: 'Nurse', permissions: ['updatePatientVitals', 'scheduleAppointments'] },
-      // Add more dummy user data as needed
-    ];
-    setUsers(fetchedUsers);
-
-    const fetchedRoles = ['Doctor', 'Nurse', 'Admin', 'Receptionist'];
-    setRoles(fetchedRoles);
-
-    const fetchedPermissions = [
-      { id: 'viewPatientRecords', name: 'View Patient Records' },
-      { id: 'createPrescriptions', name: 'Create Prescriptions' },
-      { id: 'updatePatientVitals', name: 'Update Patient Vitals' },
-      { id: 'scheduleAppointments', name: 'Schedule Appointments' },
-      // Add more permissions as needed
-    ];
-    setPermissions(fetchedPermissions);
-  }, []);
-
-  const handleSearch = (event) => {
-    setSearchTerm(event.target.value);
+  const toggleAddModal = () => {
+    setShowAddModal(!showAddModal);
   };
+
+  const handleSearch = (e) => {
+    setSearchQuery(e.target.value);
+    setCurrentPage(1);
+  };
+
+  const handlePrevPage = () => {
+    setCurrentPage((prevPage) => prevPage - 1);
+  };
+
+  const handleNextPage = () => {
+    setCurrentPage((prevPage) => prevPage + 1);
+  };
+
+  // Dummy data for users
+  const users = [
+    {
+      id: 1,
+      name: "John Doe",
+      department: "IT",
+      role: "Software Engineer",
+      avatar: "https://source.unsplash.com/C8Ta0gwPbQg",
+    },
+    {
+      id: 2,
+      name: "Jane Smith",
+      department: "Marketing",
+      role: "Marketing Manager",
+      avatar: "https://source.unsplash.com/n4iBylRcxIc",
+    },
+    {
+      id: 3,
+      name: "Michael Johnson",
+      department: "Finance",
+      role: "Financial Analyst",
+      avatar: "https://source.unsplash.com/JLWnuaTYVhc",
+    },
+    {
+      id: 4,
+      name: "Emily Brown",
+      department: "Human Resources",
+      role: "HR Specialist",
+      avatar: "https://source.unsplash.com/UqvEwuOOXfo",
+    },
+    {
+      id: 5,
+      name: "David Wilson",
+      department: "Sales",
+      role: "Sales Representative",
+      avatar: "https://source.unsplash.com/tLmtcArNVtk",
+    },
+  ];
 
   const filteredUsers = users.filter((user) =>
-    user.name.toLowerCase().includes(searchTerm.toLowerCase())
+    `${user.name} ${user.department} ${user.role}`
+      .toLowerCase()
+      .includes(searchQuery.toLowerCase())
   );
 
-  const handleShowModal = (user = null) => {
-    setSelectedUser(user);
-    setNewUser(user || { name: '', email: '', department: '', role: '', permissions: [], isHead: false });
-    setShowModal(true);
-  };
-
-  const handleCloseModal = () => {
-    setShowModal(false);
-  };
-
-  const handleSaveUser = (user) => {
-    if (selectedUser) {
-      // Update existing user
-      const updatedUsers = users.map((u) =>
-        u.id === selectedUser.id ? user : u
-      );
-      setUsers(updatedUsers);
-    } else {
-      // Create new user
-      const newUserId = users.length + 1;
-      const newUserData = { ...user, id: newUserId };
-      setUsers([...users, newUserData]);
-    }
-    handleCloseModal();
-  };
-
-  const handlePermissionChange = (permissionId) => {
-    const updatedPermissions = newUser.permissions.includes(permissionId)
-      ? newUser.permissions.filter((p) => p !== permissionId)
-      : [...newUser.permissions, permissionId];
-    setNewUser({ ...newUser, permissions: updatedPermissions });
-  };
+  const indexOfLastRecord = currentPage * recordsPerPage;
+  const indexOfFirstRecord = indexOfLastRecord - recordsPerPage;
+  const currentRecords = filteredUsers.slice(
+    indexOfFirstRecord,
+    indexOfLastRecord
+  );
 
   return (
-    <div>
-      <h2>User Management</h2>
-      <Form.Control
-        type="text"
-        placeholder="Search users..."
-        value={searchTerm}
-        onChange={handleSearch}
-      />
-      <Table striped bordered hover>
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th>Email</th>
-            <th>Department</th>
-            <th>Role</th>
-            <th>Permissions</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {filteredUsers.map((user) => (
-            <tr key={user.id}>
-              <td>{user.name}</td>
-              <td>{user.email}</td>
-              <td>{user.department}</td>
-              <td>{user.role}</td>
-              <td>
-                {user.permissions.map((permissionId) => (
-                  <span key={permissionId}>{permissions.find((p) => p.id === permissionId).name}, </span>
-                ))}
-              </td>
-              <td>
-                <Button variant="primary" onClick={() => handleShowModal(user)}>
-                  Edit
-                </Button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </Table>
-      <Button variant="success" onClick={() => handleShowModal()}>
-        Add User
-      </Button>
+    <Container fluid style={{ marginTop: "10px" }}>
+      <div className="page-header">
+        <Row className="align-items-center">
+          <Col className="col-auto float-end ms-auto">
+            <Button
+              variant="secondary"
+              onClick={toggleAddModal}
+              style={{ backgroundColor: "#5bc0de", borderColor: "#5bc0de" }}
+            >
+              <i className="fa fa-plus"></i> Add New User
+            </Button>
+            <EmployeeModal show={showAddModal} onHide={setShowAddModal} />
+          </Col>
+        </Row>
+      </div>
 
-      <Modal show={showModal} onHide={handleCloseModal}>
-        <Modal.Header closeButton>
-          <Modal.Title>{selectedUser ? 'Edit User' : 'Add User'}</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <Form>
-            <Form.Group>
-              <Form.Label>Name</Form.Label>
-              <Form.Control
-                type="text"
-                value={newUser.name}
-                onChange={(e) => setNewUser({ ...newUser, name: e.target.value })}
-              />
-            </Form.Group>
-            <Form.Group>
-              <Form.Label>Email</Form.Label>
-              <Form.Control
-                type="email"
-                value={newUser.email}
-                onChange={(e) => setNewUser({ ...newUser, email: e.target.value })}
-              />
-            </Form.Group>
-            <Form.Group>
-              <Form.Label>Department</Form.Label>
-              <Form.Control
-                type="text"
-                value={newUser.department}
-                onChange={(e) => setNewUser({ ...newUser, department: e.target.value })}
-              />
-            </Form.Group>
-            <Form.Group>
-              <Form.Label>Role</Form.Label>
-              <Form.Control
-                as="select"
-                value={newUser.role}
-                onChange={(e) => setNewUser({ ...newUser, role: e.target.value })}
-              >
-                <option value="">Select a role</option>
-                {roles.map((role) => (
-                  <option key={role} value={role}>
-                    {role}
-                  </option>
-                ))}
-              </Form.Control>
-            </Form.Group>
-            <Form.Group>
-              <Form.Label>Permissions</Form.Label>
-              {permissions.map((permission) => (
-                <Form.Check
-                  key={permission.id}
-                  type="checkbox"
-                  id={`permission-${permission.id}`}
-                  label={permission.name}
-                  checked={newUser.permissions.includes(permission.id)}
-                  onChange={() => handlePermissionChange(permission.id)}
+      <div className="my-4">
+        <Row>
+          <Col sm={12} md={6}>
+            <Form.Control
+              type="text"
+              placeholder="Search Users..."
+              value={searchQuery}
+              onChange={handleSearch}
+              style={{ borderRadius: "20px", padding: "10px" }}
+            />
+          </Col>
+          <Col
+            sm={12}
+            md={6}
+            className="d-flex justify-content-end align-items-center"
+          >
+            <Button
+              variant="outline-secondary"
+              disabled={currentPage === 1}
+              onClick={handlePrevPage}
+              style={{ color: "#000" }}
+            >
+              <ArrowBack /> Previous
+            </Button>
+            <span
+              className="mx-3"
+              style={{ color: "#000" }}
+            >
+              Showing {indexOfFirstRecord + 1} -{" "}
+              {indexOfLastRecord > filteredUsers.length
+                ? filteredUsers.length
+                : indexOfLastRecord}{" "}
+              of {filteredUsers.length} users
+            </span>
+
+            <Button
+              variant="outline-secondary"
+              disabled={indexOfLastRecord >= filteredUsers.length}
+              onClick={handleNextPage}
+              style={{ color: "#000" }}
+            >
+              Next <ArrowForward />
+            </Button>
+          </Col>
+        </Row>
+      </div>
+
+      <Row xs={1} md={2} lg={3} xl={4}>
+        {currentRecords.map((user) => (
+          <Col key={user.id} className="mb-4">
+            <UserCard>
+              <Dropdown className="card-dropdown" align="end">
+                <Dropdown.Toggle
+                  as={MoreVert}
+                  id="dropdown-basic"
+                  className="position-absolute top-0 end-0 m-2"
                 />
-              ))}
-            </Form.Group>
-          </Form>
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={handleCloseModal}>
-            Cancel
-          </Button>
-          <Button variant="primary" onClick={() => handleSaveUser(newUser)}>
-            Save
-          </Button>
-        </Modal.Footer>
-      </Modal>
-    </div>
+                <Dropdown.Menu>
+                  <Dropdown.Item href={`/editUserAccess/${user.id}`}>
+                    <Edit className="me-2" /> Edit User Access
+                  </Dropdown.Item>
+                  <Dropdown.Item href={`/viewUserProfile/${user.id}`}>
+                    <i className="fa fa-eye me-2"></i> View User Profile
+                  </Dropdown.Item>
+                </Dropdown.Menu>
+              </Dropdown>
+              <Card.Body className="text-center">
+                <Card.Img
+                  variant="top"
+                  src={user.avatar}
+                  className="mx-auto mt-3"
+                  style={{ width: "80px", height: "80px", borderRadius: "50%" }}
+                />
+                <Card.Title>{user.name}</Card.Title>
+                <Card.Text>
+                  <em>{user.department}</em>
+                </Card.Text>
+                <Card.Text>
+                  <strong>Role:</strong> {user.role}
+                </Card.Text>
+              </Card.Body>
+            </UserCard>
+          </Col>
+        ))}
+      </Row>
+    </Container>
   );
 };
 

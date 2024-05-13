@@ -1,24 +1,8 @@
 import React, { useState } from "react";
-import {
-  Box,
-  Modal,
-  Typography,
-  TextField,
-  Button,
-  Form,
-  Grid,
-  Select,
-  MenuItem,
-  InputLabel,
-  FormControl,
-  Checkbox,
-  FormControlLabel,
-  FormGroup,
-  CircularProgress,
-} from "@mui/material";
-import { toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+import { Modal, Form, Button } from "react-bootstrap";
 import * as Yup from "yup";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const initialFormState = {
   // Personal Information
@@ -26,17 +10,14 @@ const initialFormState = {
   lastName: "",
   dateOfBirth: "",
   gender: "",
-
   // Contact Information
   address: "",
   email: "",
   phoneNumber: "",
-
   // Emergency Contact
   emergencyContactName: "",
   emergencyContactRelationship: "",
   emergencyContactPhone: "",
-
   // Employment Information
   employeeId: "", // This can be auto-generated
   jobTitle: "",
@@ -44,577 +25,563 @@ const initialFormState = {
   hireDate: "",
   employmentStatus: "",
   supervisor: "",
-
   // Professional Details
   qualifications: "",
   yearsOfExperience: "",
   specialization: "",
-
   // Account Information
   username: "",
   password: "", // This can be auto-generated
-
   // Payroll Information
   salary: "",
   paySchedule: "",
   bankAccountDetails: "",
   taxInformation: "",
-
   // Human Resources Information
   benefitsEligibility: "",
   vacationAccrualRate: "",
   sickLeaveAccrualRate: "",
   benefitsStartDate: "",
-
   // Additional Information
   resume: null,
   otherDocuments: [],
-
   // Role and Permissions
   role: "",
   permissions: [],
 };
 
-const EmployeeModal = ({ open, onClose }) => {
+const validationSchema = Yup.object().shape({
+  firstName: Yup.string().required("First name is required"),
+  lastName: Yup.string().required("Last name is required"),
+  dateOfBirth: Yup.date().required("Date of birth is required"),
+  gender: Yup.string().required("Gender is required"),
+  address: Yup.string().required("Address is required"),
+  email: Yup.string()
+    .email("Invalid email address")
+    .required("Email is required"),
+  phoneNumber: Yup.string().required("Phone number is required"),
+  emergencyContactName: Yup.string().required(
+    "Emergency contact name is required"
+  ),
+  emergencyContactRelationship: Yup.string().required(
+    "Emergency contact relationship is required"
+  ),
+  emergencyContactPhone: Yup.string().required(
+    "Emergency contact phone is required"
+  ),
+  jobTitle: Yup.string().required("Job title is required"),
+  department: Yup.string().required("Department is required"),
+  hireDate: Yup.date().required("Hire date is required"),
+  employmentStatus: Yup.string().required("Employment status is required"),
+  supervisor: Yup.string().required("Supervisor is required"),
+  qualifications: Yup.string().required("Qualifications are required"),
+  yearsOfExperience: Yup.number().required("Years of experience is required"),
+  specialization: Yup.string().required("Specialization is required"),
+  username: Yup.string().required("Username is required"),
+  salary: Yup.number().required("Salary is required"),
+  paySchedule: Yup.string().required("Pay schedule is required"),
+  bankAccountDetails: Yup.string().required(
+    "Bank account details are required"
+  ),
+  taxInformation: Yup.string().required("Tax information is required"),
+  benefitsEligibility: Yup.string().required(
+    "Benefits eligibility is required"
+  ),
+  vacationAccrualRate: Yup.number().required(
+    "Vacation accrual rate is required"
+  ),
+  sickLeaveAccrualRate: Yup.number().required(
+    "Sick leave accrual rate is required"
+  ),
+  benefitsStartDate: Yup.date().required("Benefits start date is required"),
+  role: Yup.string().required("Role is required"),
+});
+
+const EmployeeModal = ({ show, onHide }) => {
   const [formData, setFormData] = useState(initialFormState);
-  const [loading, setLoading] = useState(false);
+  const [validated, setValidated] = useState(false);
 
-  const handleInputChange = (e) => {
-    const { name, value, type, checked, files } = e.target;
-
-    if (type === "file") {
-      setFormData((prevData) => ({
-        ...prevData,
-        [name]: files,
-      }));
-    } else if (type === "checkbox") {
-      setFormData((prevData) => ({
-        ...prevData,
-        [name]: checked,
-      }));
-    } else {
-      setFormData((prevData) => ({
-        ...prevData,
-        [name]: value,
-      }));
-    }
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prevState) => ({ ...prevState, [name]: value }));
   };
 
-  const validationSchema = Yup.object().shape({
-    // Add your validation rules here
-  });
-
-  const validateFormWithYup = async () => {
-    try {
-      await validationSchema.validate(formData, { abortEarly: false });
-      return true;
-    } catch (errors) {
-      const firstErrorMessage = errors.inner[0].message;
-      toast.error(`Please fix the following error: ${firstErrorMessage}`);
-      return false;
-    }
-  };
-
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
+    const form = e.currentTarget;
 
-    setLoading(true);
-
-    const isValidForm = await validateFormWithYup();
-
-    if (!isValidForm) {
-      setLoading(false);
-      return;
-    }
-
-    try {
-      // Handle form submission logic here
-      console.log(formData);
-
-      // Reset the form after successful submission
-      setFormData(initialFormState);
-      toast.success("Employee added successfully!");
-    } catch (error) {
-      console.error("Error during form submission:", error);
-      toast.error("Error during form submission. Please try again.");
-    } finally {
-      setLoading(false);
-    }
+    validationSchema
+      .validate(formData, { abortEarly: false })
+      .then(() => {
+        setValidated(true);
+        // Handle form submission logic here
+        toast.success("New employee added successfully!");
+        onHide();
+      })
+      .catch((errors) => {
+        const errorMessages = errors.inner.map((error) => error.message);
+        errorMessages.forEach((message) => {
+          toast.error(message);
+        });
+      });
   };
 
   return (
-    <Modal open={open} onClose={onClose}>
-      <Box
-        sx={{
-          position: "absolute",
-          top: "50%",
-          left: "50%",
-          transform: "translate(-50%, -50%)",
-          bgcolor: "background.paper",
-          boxShadow: 24,
-          p: 4,
-          maxWidth: "80%",
-          maxHeight: "80%",
-          overflow: "auto",
-        }}
-      >
-        <Typography variant="h6" component="h2" gutterBottom>
-          Add New Employee
-        </Typography>
-        <form onSubmit={handleSubmit}>
-          <Grid container spacing={2}>
+    <>
+      <Modal show={show} onHide={onHide} size="xl">
+        <Modal.Header closeButton>
+          <Modal.Title>New Employee Form</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <Form noValidate validated={validated} onSubmit={handleSubmit}>
             {/* Personal Information */}
-            <Grid item xs={12}>
-              <Typography variant="subtitle1" gutterBottom>
-                Personal Information
-              </Typography>
-            </Grid>
-            <Grid item xs={6}>
-              <TextField
-                required
-                fullWidth
-                label="First Name"
+            <Form.Group controlId="formFirstName">
+              <Form.Label>First Name</Form.Label>
+              <Form.Control
+                type="text"
                 name="firstName"
                 value={formData.firstName}
-                onChange={handleInputChange}
-              />
-            </Grid>
-            <Grid item xs={6}>
-              <TextField
+                onChange={handleChange}
                 required
-                fullWidth
-                label="Last Name"
+              />
+              <Form.Control.Feedback type="invalid">
+                Please enter your first name.
+              </Form.Control.Feedback>
+            </Form.Group>
+
+            <Form.Group controlId="formLastName">
+              <Form.Label>Last Name</Form.Label>
+              <Form.Control
+                type="text"
                 name="lastName"
                 value={formData.lastName}
-                onChange={handleInputChange}
-              />
-            </Grid>
-            <Grid item xs={6}>
-              <TextField
+                onChange={handleChange}
                 required
-                fullWidth
-                label="Date of Birth"
-                name="dateOfBirth"
-                type="date"
-                value={formData.dateOfBirth}
-                onChange={handleInputChange}
-                InputLabelProps={{
-                  shrink: true,
-                }}
               />
-            </Grid>
-            <Grid item xs={6}>
-              <FormControl fullWidth>
-                <InputLabel id="gender-label">Gender</InputLabel>
-                <Select
-                  labelId="gender-label"
-                  required
-                  name="gender"
-                  value={formData.gender}
-                  onChange={handleInputChange}
-                >
-                  <MenuItem value="">Select Gender</MenuItem>
-                  <MenuItem value="male">Male</MenuItem>
-                  <MenuItem value="female">Female</MenuItem>
-                  <MenuItem value="other">Other</MenuItem>
-                </Select>
-              </FormControl>
-            </Grid>
+              <Form.Control.Feedback type="invalid">
+                Please enter your last name.
+              </Form.Control.Feedback>
+            </Form.Group>
+
+            <Form.Group controlId="formDateOfBirth">
+              <Form.Label>Date of Birth</Form.Label>
+              <Form.Control
+                type="date"
+                name="dateOfBirth"
+                value={formData.dateOfBirth}
+                onChange={handleChange}
+                required
+              />
+              <Form.Control.Feedback type="invalid">
+                Please enter your date of birth.
+              </Form.Control.Feedback>
+            </Form.Group>
+
+            <Form.Group controlId="formGender">
+              <Form.Label>Gender</Form.Label>
+              <Form.Control
+                type="text"
+                name="gender"
+                value={formData.gender}
+                onChange={handleChange}
+                required
+              />
+              <Form.Control.Feedback type="invalid">
+                Please enter your gender.
+              </Form.Control.Feedback>
+            </Form.Group>
 
             {/* Contact Information */}
-            <Grid item xs={12}>
-              <Typography variant="subtitle1" gutterBottom>
-                Contact Information
-              </Typography>
-            </Grid>
-            <Grid item xs={12}>
-              <TextField
-                required
-                fullWidth
-                label="Address"
+            <Form.Group controlId="formAddress">
+              <Form.Label>Address</Form.Label>
+              <Form.Control
+                type="text"
                 name="address"
                 value={formData.address}
-                onChange={handleInputChange}
-              />
-            </Grid>
-            <Grid item xs={6}>
-              <TextField
+                onChange={handleChange}
                 required
-                fullWidth
-                label="Email"
-                name="email"
+              />
+              <Form.Control.Feedback type="invalid">
+                Please enter your address.
+              </Form.Control.Feedback>
+            </Form.Group>
+
+            <Form.Group controlId="formEmail">
+              <Form.Label>Email</Form.Label>
+              <Form.Control
                 type="email"
+                name="email"
                 value={formData.email}
-                onChange={handleInputChange}
-              />
-            </Grid>
-            <Grid item xs={6}>
-              <TextField
+                onChange={handleChange}
                 required
-                fullWidth
-                label="Phone Number"
+              />
+              <Form.Control.Feedback type="invalid">
+                Please enter a valid email address.
+              </Form.Control.Feedback>
+            </Form.Group>
+
+            <Form.Group controlId="formPhoneNumber">
+              <Form.Label>Phone Number</Form.Label>
+              <Form.Control
+                type="text"
                 name="phoneNumber"
                 value={formData.phoneNumber}
-                onChange={handleInputChange}
+                onChange={handleChange}
+                required
               />
-            </Grid>
-
+              <Form.Control.Feedback type="invalid">
+                Please enter your phone number.
+              </Form.Control.Feedback>
+            </Form.Group>
             {/* Emergency Contact */}
-            <Grid item xs={12}>
-              <Typography variant="subtitle1" gutterBottom>
-                Emergency Contact
-              </Typography>
-            </Grid>
-            <Grid item xs={6}>
-              <TextField
-                fullWidth
-                label="Name"
+            <Form.Group controlId="formEmergencyContactName">
+              <Form.Label>Emergency Contact Name</Form.Label>
+              <Form.Control
+                type="text"
                 name="emergencyContactName"
                 value={formData.emergencyContactName}
-                onChange={handleInputChange}
+                onChange={handleChange}
+                required
               />
-            </Grid>
-            <Grid item xs={6}>
-              <TextField
-                fullWidth
-                label="Relationship"
+              <Form.Control.Feedback type="invalid">
+                Please enter the emergency contact name.
+              </Form.Control.Feedback>
+            </Form.Group>
+
+            <Form.Group controlId="formEmergencyContactRelationship">
+              <Form.Label>Emergency Contact Relationship</Form.Label>
+              <Form.Control
+                type="text"
                 name="emergencyContactRelationship"
                 value={formData.emergencyContactRelationship}
-                onChange={handleInputChange}
+                onChange={handleChange}
+                required
               />
-            </Grid>
-            <Grid item xs={6}>
-              <TextField
-                fullWidth
-                label="Phone Number"
+              <Form.Control.Feedback type="invalid">
+                Please enter the emergency contact relationship.
+              </Form.Control.Feedback>
+            </Form.Group>
+
+            <Form.Group controlId="formEmergencyContactPhone">
+              <Form.Label>Emergency Contact Phone</Form.Label>
+              <Form.Control
+                type="text"
                 name="emergencyContactPhone"
                 value={formData.emergencyContactPhone}
-                onChange={handleInputChange}
+                onChange={handleChange}
+                required
               />
-            </Grid>
+              <Form.Control.Feedback type="invalid">
+                Please enter the emergency contact phone number.
+              </Form.Control.Feedback>
+            </Form.Group>
 
             {/* Employment Information */}
-            <Grid item xs={12}>
-              <Typography variant="subtitle1" gutterBottom>
-                Employment Information /
-              </Typography>
-            </Grid>
-            <Grid item xs={6}>
-              <TextField
-                fullWidth
-                label="Job Title"
+            <Form.Group controlId="formJobTitle">
+              <Form.Label>Job Title</Form.Label>
+              <Form.Control
+                type="text"
                 name="jobTitle"
                 value={formData.jobTitle}
-                onChange={handleInputChange}
+                onChange={handleChange}
+                required
               />
-            </Grid>
-            <Grid item xs={6}>
-              <TextField
-                fullWidth
-                label="Department"
+              <Form.Control.Feedback type="invalid">
+                Please enter your job title.
+              </Form.Control.Feedback>
+            </Form.Group>
+
+            <Form.Group controlId="formDepartment">
+              <Form.Label>Department</Form.Label>
+              <Form.Control
+                type="text"
                 name="department"
                 value={formData.department}
-                onChange={handleInputChange}
+                onChange={handleChange}
+                required
               />
-            </Grid>
-            <Grid item xs={6}>
-              <TextField
-                fullWidth
-                label="Hire Date"
-                name="hireDate"
+              <Form.Control.Feedback type="invalid">
+                Please enter your department.
+              </Form.Control.Feedback>
+            </Form.Group>
+
+            <Form.Group controlId="formHireDate">
+              <Form.Label>Hire Date</Form.Label>
+              <Form.Control
                 type="date"
+                name="hireDate"
                 value={formData.hireDate}
-                onChange={handleInputChange}
-                InputLabelProps={{
-                  shrink: true,
-                }}
+                onChange={handleChange}
+                required
               />
-            </Grid>
-            <Grid item xs={6}>
-              <FormControl fullWidth>
-                <InputLabel id="employment-status-label">
-                  Employment Status
-                </InputLabel>
-                <Select
-                  labelId="employment-status-label"
-                  name="employmentStatus"
-                  value={formData.employmentStatus}
-                  onChange={handleInputChange}
-                >
-                  <MenuItem value="">Select Employment Status</MenuItem>
-                  <MenuItem value="full-time">Full-time</MenuItem>
-                  <MenuItem value="part-time">Part-time</MenuItem>
-                  <MenuItem value="contract">Contract</MenuItem>
-                </Select>
-              </FormControl>
-            </Grid>
-            <Grid item xs={6}>
-              <TextField
-                fullWidth
-                label="Supervisor"
+              <Form.Control.Feedback type="invalid">
+                Please enter your hire date.
+              </Form.Control.Feedback>
+            </Form.Group>
+
+            <Form.Group controlId="formEmploymentStatus">
+              <Form.Label>Employment Status</Form.Label>
+              <Form.Control
+                type="text"
+                name="employmentStatus"
+                value={formData.employmentStatus}
+                onChange={handleChange}
+                required
+              />
+              <Form.Control.Feedback type="invalid">
+                Please enter your employment status.
+              </Form.Control.Feedback>
+            </Form.Group>
+
+            <Form.Group controlId="formSupervisor">
+              <Form.Label>Supervisor</Form.Label>
+              <Form.Control
+                type="text"
                 name="supervisor"
                 value={formData.supervisor}
-                onChange={handleInputChange}
+                onChange={handleChange}
+                required
               />
-            </Grid>
+              <Form.Control.Feedback type="invalid">
+                Please enter your supervisor's name.
+              </Form.Control.Feedback>
+            </Form.Group>
 
             {/* Professional Details */}
-            <Grid item xs={12}>
-              <Typography variant="subtitle1" gutterBottom>
-                Professional Details
-              </Typography>
-            </Grid>
-            <Grid item xs={12}>
-              <TextField
-                fullWidth
-                label="Qualifications"
+            <Form.Group controlId="formQualifications">
+              <Form.Label>Qualifications</Form.Label>
+              <Form.Control
+                type="text"
                 name="qualifications"
                 value={formData.qualifications}
-                onChange={handleInputChange}
+                onChange={handleChange}
+                required
               />
-            </Grid>
-            <Grid item xs={6}>
-              <TextField
-                fullWidth
-                label="Years of Experience"
+              <Form.Control.Feedback type="invalid">
+                Please enter your qualifications.
+              </Form.Control.Feedback>
+            </Form.Group>
+
+            <Form.Group controlId="formYearsOfExperience">
+              <Form.Label>Years of Experience</Form.Label>
+              <Form.Control
+                type="number"
                 name="yearsOfExperience"
                 value={formData.yearsOfExperience}
-                onChange={handleInputChange}
+                onChange={handleChange}
+                required
               />
-            </Grid>
-            <Grid item xs={6}>
-              <TextField
-                fullWidth
-                label="Specialization"
+              <Form.Control.Feedback type="invalid">
+                Please enter your years of experience.
+              </Form.Control.Feedback>
+            </Form.Group>
+
+            <Form.Group controlId="formSpecialization">
+              <Form.Label>Specialization</Form.Label>
+              <Form.Control
+                type="text"
                 name="specialization"
                 value={formData.specialization}
-                onChange={handleInputChange}
+                onChange={handleChange}
+                required
               />
-            </Grid>
+              <Form.Control.Feedback type="invalid">
+                Please enter your specialization.
+              </Form.Control.Feedback>
+            </Form.Group>
 
             {/* Account Information */}
-            <Grid item xs={12}>
-              <Typography variant="subtitle1" gutterBottom>
-                Account Information
-              </Typography>
-            </Grid>
-            <Grid item xs={6}>
-              <TextField
-                fullWidth
-                label="Username"
+            <Form.Group controlId="formUsername">
+              <Form.Label>Username</Form.Label>
+              <Form.Control
+                type="text"
                 name="username"
                 value={formData.username}
-                onChange={handleInputChange}
+                onChange={handleChange}
+                required
               />
-            </Grid>
-            {/* Password field can be left blank as it will be auto-generated */}
+              <Form.Control.Feedback type="invalid">
+                Please enter a username.
+              </Form.Control.Feedback>
+            </Form.Group>
 
             {/* Payroll Information */}
-            <Grid item xs={12}>
-              <Typography variant="subtitle1" gutterBottom>
-                Payroll Information
-              </Typography>
-            </Grid>
-            <Grid item xs={6}>
-              <TextField
-                fullWidth
-                label="Salary"
+            <Form.Group controlId="formSalary">
+              <Form.Label>Salary</Form.Label>
+              <Form.Control
+                type="number"
                 name="salary"
                 value={formData.salary}
-                onChange={handleInputChange}
+                onChange={handleChange}
+                required
               />
-            </Grid>
-            <Grid item xs={6}>
-              <FormControl fullWidth>
-                <InputLabel id="pay-schedule-label">Pay Schedule</InputLabel>
-                <Select
-                  labelId="pay-schedule-label"
-                  name="paySchedule"
-                  value={formData.paySchedule}
-                  onChange={handleInputChange}
-                >
-                  <MenuItem value="">Select Pay Schedule</MenuItem>
-                  <MenuItem value="weekly">Weekly</MenuItem>
-                  <MenuItem value="bi-weekly">Bi-weekly</MenuItem>
-                  <MenuItem value="monthly">Monthly</MenuItem>
-                </Select>
-              </FormControl>
-            </Grid>
-            <Grid item xs={6}>
-              <TextField
-                fullWidth
-                label="Bank Account Details"
+              <Form.Control.Feedback type="invalid">
+                Please enter your salary.
+              </Form.Control.Feedback>
+            </Form.Group>
+
+            <Form.Group controlId="formPaySchedule">
+              <Form.Label>Pay Schedule</Form.Label>
+              <Form.Control
+                type="text"
+                name="paySchedule"
+                value={formData.paySchedule}
+                onChange={handleChange}
+                required
+              />
+              <Form.Control.Feedback type="invalid">
+                Please enter your pay schedule.
+              </Form.Control.Feedback>
+            </Form.Group>
+
+            <Form.Group controlId="formBankAccountDetails">
+              <Form.Label>Bank Account Details</Form.Label>
+              <Form.Control
+                type="text"
                 name="bankAccountDetails"
                 value={formData.bankAccountDetails}
-                onChange={handleInputChange}
+                onChange={handleChange}
+                required
               />
-            </Grid>
-            <Grid item xs={6}>
-              <TextField
-                fullWidth
-                label="Tax Information"
+              <Form.Control.Feedback type="invalid">
+                Please enter your bank account details.
+              </Form.Control.Feedback>
+            </Form.Group>
+
+            <Form.Group controlId="formTaxInformation">
+              <Form.Label>Tax Information</Form.Label>
+              <Form.Control
+                type="text"
                 name="taxInformation"
                 value={formData.taxInformation}
-                onChange={handleInputChange}
+                onChange={handleChange}
+                required
               />
-            </Grid>
+              <Form.Control.Feedback type="invalid">
+                Please enter your tax information.
+              </Form.Control.Feedback>
+            </Form.Group>
 
             {/* Human Resources Information */}
-            <Grid item xs={12}>
-              <Typography variant="subtitle1" gutterBottom>
-                Human Resources Information
-              </Typography>
-            </Grid>
-            <Grid item xs={6}>
-              <TextField
-                fullWidth
-                label="Benefits Eligibility"
+            <Form.Group controlId="formBenefitsEligibility">
+              <Form.Label>Benefits Eligibility</Form.Label>
+              <Form.Control
+                type="text"
                 name="benefitsEligibility"
                 value={formData.benefitsEligibility}
-                onChange={handleInputChange}
+                onChange={handleChange}
+                required
               />
-            </Grid>
-            <Grid item xs={6}>
-              <TextField
-                fullWidth
-                label="Vacation Accrual Rate"
+              <Form.Control.Feedback type="invalid">
+                Please enter your benefits eligibility.
+              </Form.Control.Feedback>
+            </Form.Group>
+
+            <Form.Group controlId="formVacationAccrualRate">
+              <Form.Label>Vacation Accrual Rate</Form.Label>
+              <Form.Control
+                type="number"
                 name="vacationAccrualRate"
                 value={formData.vacationAccrualRate}
-                onChange={handleInputChange}
+                onChange={handleChange}
+                required
               />
-            </Grid>
-            <Grid item xs={6}>
-              <TextField
-                fullWidth
-                label="Sick Leave Accrual Rate"
+              <Form.Control.Feedback type="invalid">
+                Please enter your vacation accrual rate.
+              </Form.Control.Feedback>
+            </Form.Group>
+
+            <Form.Group controlId="formSickLeaveAccrualRate">
+              <Form.Label>Sick Leave Accrual Rate</Form.Label>
+              <Form.Control
+                type="number"
                 name="sickLeaveAccrualRate"
                 value={formData.sickLeaveAccrualRate}
-                onChange={handleInputChange}
+                onChange={handleChange}
+                required
               />
-            </Grid>
-            <Grid item xs={6}>
-              <TextField
-                fullWidth
-                label="Benefits Start Date"
-                name="benefitsStartDate"
+              <Form.Control.Feedback type="invalid">
+                Please enter your sick leave accrual rate.
+              </Form.Control.Feedback>
+            </Form.Group>
+
+            <Form.Group controlId="formBenefitsStartDate">
+              <Form.Label>Benefits Start Date</Form.Label>
+              <Form.Control
                 type="date"
+                name="benefitsStartDate"
                 value={formData.benefitsStartDate}
-                onChange={handleInputChange}
-                InputLabelProps={{
-                  shrink: true,
-                }}
+                onChange={handleChange}
+                required
               />
-            </Grid>
+              <Form.Control.Feedback type="invalid">
+                Please enter your benefits start date.
+              </Form.Control.Feedback>
+            </Form.Group>
 
             {/* Additional Information */}
-            <Grid item xs={12}>
-              <Typography variant="subtitle1" gutterBottom>
-                Additional Information
-              </Typography>
-            </Grid>
-            <Grid item xs={6}>
-              <TextField
-                fullWidth
-                label="Resume"
+            <Form.Group controlId="formResume">
+              <Form.Label>Resume</Form.Label>
+              <Form.Control
+                type="file"
                 name="resume"
-                type="file"
-                onChange={handleInputChange}
-                InputLabelProps={{
-                  shrink: true,
-                }}
+                onChange={(e) =>
+                  setFormData({ ...formData, resume: e.target.files[0] })
+                }
               />
-            </Grid>
-            <Grid item xs={6}>
-              <TextField
-                fullWidth
-                label="Other Documents"
+            </Form.Group>
+
+            <Form.Group controlId="formOtherDocuments">
+              <Form.Label>Other Documents</Form.Label>
+              <Form.Control
+                type="file"
                 name="otherDocuments"
-                type="file"
                 multiple
-                onChange={handleInputChange}
-                InputLabelProps={{
-                  shrink: true,
-                }}
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    otherDocuments: Array.from(e.target.files),
+                  })
+                }
               />
-            </Grid>
+            </Form.Group>
 
             {/* Role and Permissions */}
-            <Grid item xs={12}>
-              <Typography variant="subtitle1" gutterBottom>
-                Role and Permissions
-              </Typography>
-            </Grid>
-            <Grid item xs={6}>
-              <FormControl fullWidth>
-                <InputLabel id="role-label">Role</InputLabel>
-                <Select
-                  labelId="role-label"
-                  name="role"
-                  value={formData.role}
-                  onChange={handleInputChange}
-                >
-                  <MenuItem value="">Select Role</MenuItem>
-                  {/* Add your roles here */}
-                  <MenuItem value="doctor">Doctor</MenuItem>
-                  <MenuItem value="nurse">Nurse</MenuItem>
-                  <MenuItem value="receptionist">Receptionist</MenuItem>
-                  {/* ... */}
-                </Select>
-              </FormControl>
-            </Grid>
-            <Grid item xs={6}>
-              <Form.Control component="fieldset">
-                <Form.Label component="legend">Permissions</Form.Label>
-                <FormGroup>
-                  {/* Add your permissions here */}
-                  <FormControlLabel
-                    control={
-                      <Checkbox
-                        name="permissions"
-                        value="viewPatientRecords"
-                        checked={formData.permissions.includes(
-                          "viewPatientRecords"
-                        )}
-                        onChange={handleInputChange}
-                      />
-                    }
-                    label="View Patient Records"
-                  />
-                  <FormControlLabel
-                    control={
-                      <Checkbox
-                        name="permissions"
-                        value="prescribeMedication"
-                        checked={formData.permissions.includes(
-                          "prescribeMedication"
-                        )}
-                        onChange={handleInputChange}
-                      />
-                    }
-                    label="Prescribe Medication"
-                  />
-                  {/* ... */}
-                </FormGroup>
-              </Form.Control>
-            </Grid>
-          </Grid>
+            <Form.Group controlId="formRole">
+              <Form.Label>Role</Form.Label>
+              <Form.Control
+                type="text"
+                name="role"
+                value={formData.role}
+                onChange={handleChange}
+                required
+              />
+              <Form.Control.Feedback type="invalid">
+                Please enter your role.
+              </Form.Control.Feedback>
+            </Form.Group>
 
-          <Box mt={2} display="flex" justifyContent="flex-end">
-            <Button
-              variant="contained"
-              color="primary"
-              type="submit"
-              disabled={loading}
-            >
-              {loading ? <CircularProgress size={24} /> : "Submit"}
+            <Form.Group controlId="formPermissions">
+              <Form.Label>Permissions</Form.Label>
+              <Form.Control
+                type="text"
+                name="permissions"
+                value={formData.permissions}
+                onChange={handleChange}
+                required
+              />
+              <Form.Control.Feedback type="invalid">
+                Please enter your permissions.
+              </Form.Control.Feedback>
+            </Form.Group>
+
+            <Button variant="primary" type="submit">
+              Submit
             </Button>
-            <Button variant="outlined" onClick={onClose} sx={{ ml: 2 }}>
-              Cancel
-            </Button>
-          </Box>
-        </form>
-      </Box>
-    </Modal>
+          </Form>
+        </Modal.Body>
+      </Modal>
+    </>
   );
 };
 

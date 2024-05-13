@@ -42,23 +42,20 @@ const WorkSchedule = () => {
     end: null,
     employees: [],
     duties: [],
-    wards: [],
+    workLocations: [],
     clockIn: null,
     clockOut: null,
   });
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [dutyInput, setDutyInput] = useState("");
-  const [wardInput, setWardInput] = useState("");
+  const [workLocationInput, setWorkLocationInput] = useState("");
   const [newDuty, setNewDuty] = useState([]);
-  const [newWard, setNewWard] = useState([]);
+  const [newWorkLocation, setNewWorkLocation] = useState([]);
 
-  // Fetch employees data from an API or database
   useEffect(() => {
-    // Replace with your API call or data fetching logic
     const fetchedEmployees = [
       { id: 1, name: "Jane Smith", department: "Nursing", role: "Nurse" },
       { id: 2, name: "John Doe", department: "Cleaning", role: "Cleaner" },
-      // Add more employees as needed
     ];
     setEmployees(fetchedEmployees);
   }, []);
@@ -69,18 +66,9 @@ const WorkSchedule = () => {
       end: event.end,
       employees: event.employees,
       duties: event.duties,
-      wards: event.wards,
+      workLocations: event.workLocations,
       clockIn: event.clockIn,
       clockOut: event.clockOut,
-    });
-    setShowShiftModal(true);
-  };
-
-  const handleSelectSlot = ({ start, end }) => {
-    setShiftDetails({
-      ...shiftDetails,
-      start,
-      end,
     });
     setShowShiftModal(true);
   };
@@ -91,12 +79,11 @@ const WorkSchedule = () => {
       end: shiftDetails.end,
       employees: shiftDetails.employees,
       duties: shiftDetails.duties,
-      wards: shiftDetails.wards,
+      workLocations: shiftDetails.workLocations,
       clockIn: shiftDetails.clockIn,
       clockOut: shiftDetails.clockOut,
     };
 
-    // Check for conflicting shifts or duties
     const hasConflict = events.some((event) => {
       return (
         event.employees.some((employee) =>
@@ -143,23 +130,23 @@ const WorkSchedule = () => {
     setNewDuty(newDuty.filter((d) => d !== duty));
   };
 
-  const handleWardAdd = () => {
-    if (wardInput.trim()) {
-      setNewWard([...newWard, wardInput.trim()]);
-      setWardInput("");
+  const handleWorkLocationAdd = () => {
+    if (workLocationInput.trim()) {
+      setNewWorkLocation([...newWorkLocation, workLocationInput.trim()]);
+      setWorkLocationInput("");
     }
   };
 
-  const handleWardRemove = (ward) => {
-    setNewWard(newWard.filter((w) => w !== ward));
+  const handleWorkLocationRemove = (workLocation) => {
+    setNewWorkLocation(newWorkLocation.filter((wl) => wl !== workLocation));
   };
 
   const handleDutyInputChange = (e) => {
     setDutyInput(e.target.value);
   };
 
-  const handleWardInputChange = (e) => {
-    setWardInput(e.target.value);
+  const handleWorkLocationInputChange = (e) => {
+    setWorkLocationInput(e.target.value);
   };
 
   const handleKeyDown = (e) => {
@@ -168,9 +155,9 @@ const WorkSchedule = () => {
         setNewDuty([...newDuty, dutyInput.trim()]);
         setDutyInput("");
       }
-      if (wardInput.trim()) {
-        setNewWard([...newWard, wardInput.trim()]);
-        setWardInput("");
+      if (workLocationInput.trim()) {
+        setNewWorkLocation([...newWorkLocation, workLocationInput.trim()]);
+        setWorkLocationInput("");
       }
     }
   };
@@ -180,7 +167,7 @@ const WorkSchedule = () => {
       <div>
         <h5>Shift</h5>
         <p>Duties: {event.duties.join(", ")}</p>
-        <p>Wards: {event.wards.join(", ")}</p>
+        <p>Work Locations: {event.workLocations.join(", ")}</p>
         <p>
           Employees:{" "}
           {event.employees.map((employee) => employee.name).join(", ")}
@@ -202,17 +189,23 @@ const WorkSchedule = () => {
           shiftsForSelectedDate.map((shift, index) => (
             <ListGroup.Item
               key={index}
-              style={index % 2 === 0 ? { backgroundColor: "#f2f2f2" } : {}}
+              style={{
+                backgroundColor: index % 2 === 0 ? "#f8f9fa" : "white",
+              }}
             >
               <Box
                 display="flex"
-                justifyContent="space-between"
                 alignItems="center"
+                justifyContent="space-between"
               >
                 <Typography>Shift</Typography>
-                <Typography variant="body2">{`${moment(shift.clockIn).format(
-                  "hh:mm A"
-                )} - ${moment(shift.clockOut).format("hh:mm A")}`}</Typography>
+                <Box display="flex" alignItems="center">
+                  <Typography variant="body2" className="mx-2">
+                    {`${moment(shift.clockIn).format("hh:mm A")} - ${moment(
+                      shift.clockOut
+                    ).format("hh:mm A")}`}
+                  </Typography>
+                </Box>
               </Box>
             </ListGroup.Item>
           ))
@@ -240,14 +233,18 @@ const WorkSchedule = () => {
             startAccessor="start"
             endAccessor="end"
             onSelectEvent={handleSelectEvent}
-            onSelectSlot={handleSelectSlot}
             views={["month", "week"]}
             components={{
               event: renderEventContent,
             }}
             selectable
             resizable
-            style={{ height: 500 }}
+            style={{
+              height: 500,
+              backgroundColor: moment().isSame(selectedDate, "day")
+                ? "white"
+                : "#F0F8FF", // Change background color for non-current dates
+            }}
             onNavigate={(date) => setSelectedDate(date)}
           />
         </Col>
@@ -257,7 +254,11 @@ const WorkSchedule = () => {
           <Button
             variant="primary"
             onClick={() => setShowShiftModal(true)}
-            style={{ marginTop: "1rem" }}
+            style={{
+              marginTop: "1rem",
+              backgroundColor: "#007bff",
+              borderColor: "#007bff",
+            }}
           >
             Add New Shift
           </Button>
@@ -333,16 +334,26 @@ const WorkSchedule = () => {
                   <Form.Label>Duties</Form.Label>
                   <ListGroup>
                     {newDuty.map((duty, index) => (
-                      <ListGroup.Item key={index}>
+                      <ListGroup.Item
+                        key={index}
+                        style={{
+                          backgroundColor:
+                            index % 2 === 0 ? "#f8f9fa" : "white",
+                        }}
+                      >
                         <Box
                           display="flex"
-                          justifyContent="space-between"
                           alignItems="center"
+                          justifyContent="space-between"
                         >
-                          <Typography>{duty}</Typography>
+                          <Typography variant="body1">{duty}</Typography>
                           <IconButton
                             onClick={() => handleDutyRemove(duty)}
-                            aria-label="Remove Duty"
+                            style={{
+                              cursor: "pointer",
+                              marginLeft: "0.5rem",
+                              color: "red",
+                            }}
                           >
                             <CloseIcon fontSize="small" />
                           </IconButton>
@@ -350,13 +361,13 @@ const WorkSchedule = () => {
                       </ListGroup.Item>
                     ))}
                     <ListItem button onClick={handleDutyAdd}>
-                      <ListItemText primary={dutyInput} />
+                      <ListItemText primary={dutyInput} style={{color:"black"}}/>
                       {dutyInput && (
                         <IconButton
                           onClick={handleDutyAdd}
                           aria-label="Add Duty"
                           edge="end"
-                          style={{ backgroundColor: "green" }}
+                          style={{ backgroundColor: "blue" }}
                         >
                           <CheckIcon fontSize="small" />
                         </IconButton>
@@ -372,33 +383,47 @@ const WorkSchedule = () => {
                   />
                 </Form.Group>
                 <Form.Group>
-                  <Form.Label>Wards</Form.Label>
+                  <Form.Label>Work Locations</Form.Label>
                   <ListGroup>
-                    {newWard.map((ward, index) => (
-                      <ListGroup.Item key={index}>
+                    {newWorkLocation.map((workLocation, index) => (
+                      <ListGroup.Item
+                        key={index}
+                        style={{
+                          backgroundColor:
+                            index % 2 === 0 ? "#f8f9fa" : "white",
+                        }}
+                      >
                         <Box
                           display="flex"
-                          justifyContent="space-between"
                           alignItems="center"
+                          justifyContent="space-between"
                         >
-                          <Typography>{ward}</Typography>
+                          <Typography variant="body1">
+                            {workLocation}
+                          </Typography>
                           <IconButton
-                            onClick={() => handleWardRemove(ward)}
-                            aria-label="Remove Ward"
+                            onClick={() =>
+                              handleWorkLocationRemove(workLocation)
+                            }
+                            style={{
+                              cursor: "pointer",
+                              marginLeft: "0.5rem",
+                              color: "red",
+                            }}
                           >
                             <CloseIcon fontSize="small" />
                           </IconButton>
                         </Box>
                       </ListGroup.Item>
                     ))}
-                    <ListItem button onClick={handleWardAdd}>
-                      <ListItemText primary={wardInput} />
-                      {wardInput && (
+                    <ListItem button onClick={handleWorkLocationAdd}>
+                      <ListItemText primary={workLocationInput} />
+                      {workLocationInput && (
                         <IconButton
-                          onClick={handleWardAdd}
-                          aria-label="Add Ward"
+                          onClick={handleWorkLocationAdd}
+                          aria-label="Add Work Location"
                           edge="end"
-                          style={{ backgroundColor: "green" }}
+                          style={{ color: "green" }}
                         >
                           <CheckIcon fontSize="small" />
                         </IconButton>
@@ -407,9 +432,9 @@ const WorkSchedule = () => {
                   </ListGroup>
                   <Form.Control
                     type="text"
-                    placeholder="Enter ward name"
-                    value={wardInput}
-                    onChange={handleWardInputChange}
+                    placeholder="Enter work location name"
+                    value={workLocationInput}
+                    onChange={handleWorkLocationInputChange}
                     onKeyDown={handleKeyDown}
                   />
                 </Form.Group>
@@ -427,11 +452,16 @@ const WorkSchedule = () => {
               </Form.Group>
               <ListGroup style={{ maxHeight: "200px", overflowY: "auto" }}>
                 {shiftDetails.employees.map((employee, index) => (
-                  <ListGroup.Item key={index}>
+                  <ListGroup.Item
+                    key={index}
+                    style={{
+                      backgroundColor: index % 2 === 0 ? "#f8f9fa" : "white",
+                    }}
+                  >
                     <Box
                       display="flex"
-                      justifyContent="space-between"
                       alignItems="center"
+                      justifyContent="space-between"
                     >
                       <ListItemAvatar>
                         <Avatar>{employee.name[0]}</Avatar>
@@ -440,7 +470,7 @@ const WorkSchedule = () => {
                       <IconButton
                         onClick={() => handleEmployeeRemove(employee)}
                         aria-label="Remove Employee"
-                        style={{ backgroundColor: "red" }}
+                        style={{ color: "red" }}
                       >
                         <CloseIcon fontSize="small" />
                       </IconButton>
@@ -452,10 +482,24 @@ const WorkSchedule = () => {
           </Row>
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="secondary" onClick={() => setShowShiftModal(false)}>
+          <Button
+            variant="secondary"
+            onClick={() => setShowShiftModal(false)}
+            style={{
+              backgroundColor: "#6c757d",
+              borderColor: "#6c757d",
+            }}
+          >
             Cancel
           </Button>
-          <Button variant="primary" onClick={handleShiftSubmit}>
+          <Button
+            variant="primary"
+            onClick={handleShiftSubmit}
+            style={{
+              backgroundColor: "#007bff",
+              borderColor: "#007bff",
+            }}
+          >
             Save Shift
           </Button>
         </Modal.Footer>

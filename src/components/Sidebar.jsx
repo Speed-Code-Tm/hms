@@ -126,16 +126,6 @@ const SideBar = () => {
             Triage & Assessment
           </MenuItem>
 
-          <MenuItem
-            component={
-              <Link to="/outpatient-management" onClick={handleActive}>
-                Outpatient Management
-              </Link>
-            }
-            icon={<OutpatientIcon />}
-          >
-            Outpatient Management
-          </MenuItem>
         </SubMenu>
         <MenuItem
           component={
@@ -205,34 +195,15 @@ const SideBar = () => {
         >
           <MenuItem
             component={
-              <Link to="/PatientManagement" onClick={handleActive}>
-                Patient Management Systems
+              <Link to="/patientCare" onClick={handleActive}>
+                Patient Care
               </Link>
             }
-            icon={<PatientManagementIcon />}
+            icon={<i className="fas fa-users"></i>}
           >
-            Patient Management Systems
+            Patient Care
           </MenuItem>
-          <MenuItem
-            component={
-              <Link to="/wardManagement" onClick={handleActive}>
-                Ward Management
-              </Link>
-            }
-            icon={<i className="fas fa-hospital"></i>}
-          >
-            Ward Management
-          </MenuItem>
-          <MenuItem
-            component={
-              <Link to="/shift-handover" onClick={handleActive}>
-                Shift Handover
-              </Link>
-            }
-            icon={<i className="fas fa-exchange-alt"></i>}
-          >
-            Shift Handover
-          </MenuItem>
+         
         </SubMenu>
         <SubMenu
           label="Doctor Management"
@@ -241,32 +212,32 @@ const SideBar = () => {
           <MenuItem
             component={
               <Link to="/physician-scheduling" onClick={handleActive}>
-                Physician Scheduling
+                Patient schedule
               </Link>
             }
             icon={<i className="fas fa-calendar-alt"></i>}
           >
-            Physician Scheduling
+           Patient schedule
           </MenuItem>
           <MenuItem
             component={
               <Link to="/clinic-management" onClick={handleActive}>
-                Clinic Management
+                Clinic Operations
               </Link>
             }
             icon={<i className="fas fa-clinic-medical"></i>}
           >
-            Clinic Management
+            Clinic Operations
           </MenuItem>
           <MenuItem
             component={
               <Link to="/order-management" onClick={handleActive}>
-                Order Management
+                Medical Orders
               </Link>
             }
             icon={<i className="fas fa-clipboard-list"></i>}
           >
-            Order Management
+            Medical Orders
           </MenuItem>
         </SubMenu>
         <SubMenu
@@ -310,64 +281,15 @@ const SideBar = () => {
         >
           <MenuItem
             component={
-              <Link to="/cardiology" onClick={handleActive}>
-                Cardiology
+              <Link to="/clinic-manager" onClick={handleActive}>
+               clinic-manager
               </Link>
             }
             icon={<i className="fas fa-heartbeat"></i>}
           >
-            Cardiology
+           clinic-manager
           </MenuItem>
-          <MenuItem
-            component={
-              <Link to="/oncology" onClick={handleActive}>
-                Oncology
-              </Link>
-            }
-            icon={<i className="fas fa-lungs"></i>}
-          >
-            Oncology
-          </MenuItem>
-          <MenuItem
-            component={
-              <Link to="/neurology" onClick={handleActive}>
-                Neurology
-              </Link>
-            }
-            icon={<i className="fas fa-brain"></i>}
-          >
-            Neurology
-          </MenuItem>
-          <MenuItem
-            component={
-              <Link to="/gastroenterology" onClick={handleActive}>
-                Gastroenterology
-              </Link>
-            }
-            icon={<i className="fas fa-stomach"></i>}
-          >
-            Gastroenterology
-          </MenuItem>
-          <MenuItem
-            component={
-              <Link to="/psychiatry" onClick={handleActive}>
-                Psychiatry
-              </Link>
-            }
-            icon={<i className="fas fa-brain"></i>}
-          >
-            Psychiatry
-          </MenuItem>
-          <MenuItem
-            component={
-              <Link to="/other-clinics" onClick={handleActive}>
-                Others
-              </Link>
-            }
-            icon={<i className="fas fa-ellipsis-h"></i>}
-          >
-            Others
-          </MenuItem>
+         
         </SubMenu>
         <SubMenu
           label="Surgery Management"
@@ -542,13 +464,13 @@ const SideBar = () => {
           </MenuItem>
           <MenuItem
             component={
-              <Link to="/security-management" onClick={handleActive}>
-                Security Management
+              <Link to="/Permissions" onClick={handleActive}>
+                Permissions
               </Link>
             }
             icon={<i className="fas fa-shield-alt"></i>}
           >
-            Security Management
+           Permissions
           </MenuItem>
         </SubMenu>
         <SubMenu label="Settings" icon={<i className="fas fa-cog"></i>}>

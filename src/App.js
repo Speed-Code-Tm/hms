@@ -21,6 +21,7 @@ import SideBar from './components/Sidebar';
 import VendorManagement from './pages/VendorManagement';
 import Loader from './components/Loader';
 import WorkSchedule from './components/Workschedule';
+import UserRoleMapping from './pages/UserRolesTable';
 function App() {
   return (
     <>
@@ -60,11 +61,13 @@ function App() {
               {/* FinancialManagement */}
               <Route path='/FinancialManagement' element={<FinancialManagement />} />
               {/* Patiet management Route */}
-              <Route path='/PatientManagement' element={<PatientManagement />} />
+              <Route path='/patientCare' element={<PatientManagement />} />
               {/**Route for ward management */}
               <Route path='/wardManagement' element={<Loader />} />
               {/**Route for work schedule */}
               <Route path='/DutyRota' element={<WorkSchedule />} />
+              {/**Route for user role mapping */}
+              <Route path='/Permissions' element={<UserRoleMapping />} />
               {/* Other routes */}
             </Routes>
           </div>

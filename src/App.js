@@ -62,11 +62,13 @@ function App() {
               {/* FinancialManagement */}
               <Route path='/FinancialManagement' element={<FinancialManagement />} />
               {/* Patiet management Route */}
-              <Route path='/PatientManagement' element={<PatientManagement />} />
+              <Route path='/patientCare' element={<PatientManagement />} />
               {/**Route for ward management */}
               <Route path='/wardManagement' element={<WardManagement />} />
               {/**Route for work schedule */}
               <Route path='/DutyRota' element={<WorkSchedule />} />
+              {/**Route for user role mapping */}
+              <Route path='/Permissions' element={<UserRoleMapping />} />
               {/* Other routes */}
             </Routes>
           </div>

@@ -1,73 +1,80 @@
 /* Header Styles */
 .rbc-header {
-    color: #333; /* Change text color */
-    font-size: 16px !important; /* Increase font size */
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 36px !important;
-    background: #17405d;
-  }
-  
-  /* Month Header Styles */
-  .rbc-toolbar-label {
-    font-weight: bold; /* Make month text bold */
-    color: #333; /* Change text color */
-  }
-  
-  /* Current Date Cell Styles */
-  .rbc-today {
-    background-color: #EF4444 !important; /* Orange background for current date */
-  }
-  
-  /* Time Slot Styles */
-  .rbc-time-slot {
-    color: #333; /* Change time slot text color */
-    z-index: 1;
-  }
-  
-  .rbc-time-slot:not(.rbc-today .rbc-time-slot) {
-    background-color: #eff4f7; /* Light background color for time slots */
-  }
-  
-  /* Event Styles */
-  .rbc-event,
-  .rbc-background-event {
-    z-index: 2;
-    padding: 0px !important;
-    border: none !important;
-  }
-  
-  .rbc-event-label {
-    display: none !important;
-  }
-  
-  .rbc-events-container {
-    width: 100% !important;
-  }
-  
-  /* Day Slot Styles */
-  .rbc-day-slot .rbc-time-slot:after {
-    content: "";
-    width: 100%;
-    border-top: 1px solid #fbb3ec; /* Border color between time slots */
-    display: block;
-  }
-  
-  /* Optional: Customize event colors */
-  .rbc-event {
-    background-color: #8bc34a; /* Green background for events */
-    color: #fff; /* White text color for events */
-    border-radius: 4px; /* Rounded corners for events */
-    padding: 4px; /* Padding for events */
-  }
-  /* Button Styles */
+  color: #333; /* Change text color */
+  font-size: 16px !important; /* Increase font size */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 36px !important;
+  background: #17405d;
+}
+
+/* Month Header Styles */
+.rbc-toolbar-label {
+  font-weight: bold; /* Make month text bold */
+  color: #333; /* Change text color */
+}
+
+/* Current Date Cell Styles */
+.rbc-today {
+  background-color: #ef4444 !important; /* Orange background for current date */
+}
+
+/* Time Slot Styles */
+.rbc-time-slot {
+  color: #333; /* Change time slot text color */
+  z-index: 1;
+}
+.rbc-time-slot:not(.rbc-today .rbc-time-slot) {
+  background-color: #eff4f7; /* Light background color for time slots */
+}
+
+/* Event Styles */
+.rbc-event,
+.rbc-background-event {
+  z-index: 2;
+  padding: 0px !important;
+  border: none !important;
+}
+.rbc-event-label {
+  display: none !important;
+}
+.rbc-events-container {
+  width: 100% !important;
+}
+
+/* Day Slot Styles */
+.rbc-day-slot .rbc-time-slot:after {
+  content: "";
+  width: 100%;
+  border-top: 1px solid #fbb3ec; /* Border color between time slots */
+  display: block;
+}
+
+/* Clicked Date Cell Styles */
+.rbc-day-slot .rbc-day-bg.rbc-day-bg-today {
+  background-color: #fbbf24; /* Change the background color for the clicked date cell */
+}
+
+/* Clicked Date Cell Text Styles */
+.rbc-day-slot .rbc-day-bg.rbc-day-bg-today .rbc-date-cell {
+  color: #333; /* Change the text color for the clicked date cell */
+}
+
+/* Optional: Customize event colors */
+.rbc-event {
+  background-color: #8bc34a; /* Green background for events */
+  color: #fff; /* White text color for events */
+  border-radius: 4px; /* Rounded corners for events */
+  padding: 4px; /* Padding for events */
+}
+
+/* Button Styles */
 .btn {
-    background-color: #17405d; /* Background color for buttons */
-    color: #fff; /* Text color for buttons */
-    border: none; /* Remove button borders */
-  }
-  
-  .btn:hover {
-    background-color: #0d2e41; /* Darker background color on hover */
-  }
+  background-color: #17405d; /* Background color for buttons */
+  color: #fff; /* Text color for buttons */
+  border: none; /* Remove button borders */
+}
+.btn:hover {
+  background-color: #0d2e41; /* Darker background color on hover */
+}

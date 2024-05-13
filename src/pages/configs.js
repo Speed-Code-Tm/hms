@@ -311,3 +311,35 @@ export const  retrieveBeds = async () =>{
     throw error
   }
 }
+
+export const addExpense = async (expense) =>{
+  try {
+    const expensesRef = collection(db, 'expenses')
+
+    await addDoc(expensesRef, expense )
+
+  } catch (error) {
+    throw error
+  }
+}
+
+export const retrieveExpenses = async () =>{
+  try {
+    const expenseCollection = collection(db, 'expenses')
+    
+
+    const expenseSnapshot = await getDocs(expenseCollection);
+  
+    const expenseData = expenseSnapshot.docs.map(doc => {
+        
+        const data = doc.data();
+
+        return { id: doc.id, ...data };
+    });
+
+    return expenseData
+  } catch (error) {
+    throw error
+    
+  }
+}

@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import ReusableTable from './ReusableTable';
-import { Button, Dropdown, Tabs, Tab, Modal, Form, Badge } from 'react-bootstrap';
+import { Button, Dropdown, Tabs, Tab, Modal, Form, Badge, Container } from 'react-bootstrap';
 import styled from 'styled-components';
+import Expenses from '../components/financials/Expenses';
 
 // Mock data for procurement items, department budgets, employee wages, and projections
 const procurementItems = [
@@ -51,16 +52,7 @@ const FinancialManagement = () => {
         <Badge variant={value === 'Approved' ? 'success' : 'warning'}>{value}</Badge>
       ),
     },
-    {
-      Header: 'Actions',
-      accessor: 'actions',
-      Cell: ({ row }) => (
-        <ProcurementItemActionDropdown
-          row={row}
-          handleApprovalModalOpen={handleApprovalModalOpen}
-        />
-      ),
-    },
+   
   ];
 
   // Define the columns for the department budgets table
@@ -128,37 +120,33 @@ const FinancialManagement = () => {
   };
 
   return (
-    <div>
+    <Container>
       <h2>Financial Management</h2>
 
-      <Tabs defaultActiveKey="procurement">
-        <Tab eventKey="procurement" title="Procurement">
-          <ReusableTable
-            columns={procurementItemsColumns}
-            data={procurementItems}
-            initialState={initialState}
-          />
+      <Tabs defaultActiveKey="expenses">
+        <Tab eventKey="expenses" title="Expenses">
+          <Expenses activeTab={'expenses'}/>
         </Tab>
         <Tab eventKey="budgets" title="Department Budgets">
-          <ReusableTable
+          {/* <ReusableTable
             columns={departmentBudgetsColumns}
             data={departmentBudgets}
             initialState={initialState}
-          />
+          /> */}
         </Tab>
         <Tab eventKey="wages" title="Employee Wages">
-          <ReusableTable
+          {/* <ReusableTable
             columns={employeeWagesColumns}
             data={employeeWages}
             initialState={initialState}
-          />
+          /> */}
         </Tab>
         <Tab eventKey="projections" title="Projections">
-          <ReusableTable
+          {/* <ReusableTable
             columns={projectionsColumns}
             data={projections}
             initialState={initialState}
-          />
+          /> */}
         </Tab>
       </Tabs>
 
@@ -178,7 +166,7 @@ const FinancialManagement = () => {
           </Button>
         </Modal.Footer>
       </Modal>
-    </div>
+    </Container>
   );
 };
 

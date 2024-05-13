@@ -23,6 +23,7 @@ import Loader from './components/Loader';
 import WorkSchedule from './components/Workschedule';
 import WardManagement from './pages/WardManagement';
 import { ToastContainer } from 'react-toastify';
+import UserRoleMapping from './pages/UserRolesTable';
 function App() {
   return (
     <>

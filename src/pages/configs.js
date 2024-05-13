@@ -1,5 +1,7 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
+import firebase from 'firebase/app';
+import 'firebase/firestore';
 import { getAnalytics } from "firebase/analytics";
 import { getFirestore, collection, doc, setDoc, addDoc, getDocs, updateDoc, deleteDoc } from "firebase/firestore";
 // TODO: Add SDKs for Firebase products that you want to use
@@ -9,6 +11,7 @@ import { getFirestore, collection, doc, setDoc, addDoc, getDocs, updateDoc, dele
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import moment from "moment/moment";
 
 const firebaseConfig = {
     apiKey: "AIzaSyClrrTa3zFjkX5Qg85F5V9GtTxRyqL7cLM",
@@ -133,12 +136,47 @@ export const updateVitalSigns = async (hospitalVisitId, vitalSigns) => {
   }
 
 
-  // request an item from procurement
+  // create prescription to  be moved to doctor
+
+  export const addPrescription = async (prescription) => {
+    try {
+      const prescriptionsRef = collection(db, 'prescriptions');
+      await addDoc(prescriptionsRef, prescription);
+      console.log('Prescription added successfully');
+    } catch (error) {
+      console.error('Error adding prescription:', error);
+      throw error; 
+    }
+  };
 
 
+  //retrieve all prescriptions
 
+  export const retrievePrescriptions = async () => {
+    try {
+      const prescriptionsRef = collection(db, 'prescriptions');
+      const querySnapshot = await getDocs(prescriptionsRef);
+      
+      let prescriptions = [];
+      querySnapshot.forEach((doc) => {
 
-  // retrieve 
+        prescriptions.push({ id: doc.id, ...doc.data() });
+      });
+      console.log(prescriptions);
+
+      prescriptions = prescriptions.map(prescription=>{
+        
+      const formattedDate = moment(prescription.prescriptionDate.seconds * 1000).format('MM/DD/YYYY, h:mm:ss A');
+    return { ...prescription, prescriptionDate:formattedDate };
+    })
+      
+      return prescriptions;
+    } catch (error) {
+      console.error('Error fetching prescriptions:', error);
+      throw error; 
+    }
+  };
+
 
 
 

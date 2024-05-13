@@ -53,7 +53,7 @@ const Pharmacy = () => {
           >
             <Tab eventKey="prescriptions" title="Prescriptions">
               {/* {renderPrescriptionsContent()} */}
-              <Prescriptions/>
+              <Prescriptions  activeTab={'prescriptions'}/>
             </Tab>
             <Tab eventKey="ward-orders" title="Ward Orders">
               {renderWardOrdersContent()}

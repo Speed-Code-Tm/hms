@@ -241,3 +241,73 @@ export const updateVitalSigns = async (hospitalVisitId, vitalSigns) => {
       console.log(error);
     }
   }
+
+
+  //inpatient management
+
+  //1 ward management
+
+  export const addWard = async(ward) =>{
+    try {
+      const wardsRef = collection(db, 'wards')
+
+      await addDoc(wardsRef,ward)
+   
+      
+    } catch (error) {
+      throw error
+    }
+  }
+
+  export const addBed  = async (bed) =>{
+    try {
+      const bedsRef = collection(db, 'beds')
+
+      await addDoc(bedsRef,bed)
+    } catch (error) {
+      throw error
+    }
+  }
+
+export const  retrieveWards = async () =>{
+  try{
+
+    const wardsCollection = collection(db, 'wards')
+    
+
+    const wardsSnapshot = await getDocs(wardsCollection);
+  
+    const wardsData = wardsSnapshot.docs.map(doc => {
+        
+        const data = doc.data();
+
+        return { id: doc.id, ...data };
+    });
+
+    return wardsData
+  }catch(error){
+    throw error
+  }
+}
+
+
+export const  retrieveBeds = async () =>{
+  try{
+
+    const bedCollection = collection(db, 'beds')
+    
+
+    const bedsSnapshot = await getDocs(bedCollection);
+  
+    const bedData = bedsSnapshot.docs.map(doc => {
+        
+        const data = doc.data();
+
+        return { id: doc.id, ...data };
+    });
+
+    return bedData
+  }catch(error){
+    throw error
+  }
+}

@@ -200,19 +200,19 @@ const SideBar = () => {
           Inpatient Management
         </MenuItem>
         <SubMenu
-          label="Nursing Management"
+          label="Inpatient Management"
           icon={<i className="fas fa-user-nurse"></i>}
         >
-          <MenuItem
+          {/* <MenuItem
             component={
               <Link to="/PatientManagement" onClick={handleActive}>
-                Patient Management Systems
+               Ward Management
               </Link>
             }
             icon={<PatientManagementIcon />}
           >
             Patient Management Systems
-          </MenuItem>
+          </MenuItem> */}
           <MenuItem
             component={
               <Link to="/wardManagement" onClick={handleActive}>

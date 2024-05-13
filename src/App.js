@@ -21,6 +21,8 @@ import SideBar from './components/Sidebar';
 import VendorManagement from './pages/VendorManagement';
 import Loader from './components/Loader';
 import WorkSchedule from './components/Workschedule';
+import WardManagement from './pages/WardManagement';
+import { ToastContainer } from 'react-toastify';
 function App() {
   return (
     <>
@@ -62,7 +64,7 @@ function App() {
               {/* Patiet management Route */}
               <Route path='/PatientManagement' element={<PatientManagement />} />
               {/**Route for ward management */}
-              <Route path='/wardManagement' element={<Loader />} />
+              <Route path='/wardManagement' element={<WardManagement />} />
               {/**Route for work schedule */}
               <Route path='/DutyRota' element={<WorkSchedule />} />
               {/* Other routes */}
@@ -71,6 +73,7 @@ function App() {
         </div>
         {/* <Footer /> */}
       </Router>
+      <ToastContainer/>
     </>
   );
 }

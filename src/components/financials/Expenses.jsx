@@ -93,10 +93,11 @@ const Expenses = ({activeTab}) => {
        }
       };
     const expenseColumns = [
-        {name:"Expense", accessor:'category'},
-        {name:"Department", accessor:'department'},
-        {name:'Amount', accessor:'amount'}
-        
+        {Header:"Expense", accessor:'category'},
+        {Header:"Department", accessor:'department'},
+        {Header:'Amount', accessor:'amount'},
+        {Header:'CreatedAt', accessor:'createdAt'}
+
     ]
 
     
@@ -163,7 +164,7 @@ const Expenses = ({activeTab}) => {
             </Form>
         </ReusableModal>
         
-      <div className="d-flex justify-content-between">
+      <div className="d-flex justify-content-between py-3">
       <Button onClick={()=>setShowModal(true)}>Add Expense Category</Button>
       </div>
 

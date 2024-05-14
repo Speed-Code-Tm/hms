@@ -219,12 +219,7 @@ const WorkSchedule = () => {
   };
 
   return (
-    <Container>
-      <Row>
-        <Col>
-          <h2>Work Schedule</h2>
-        </Col>
-      </Row>
+    <Container fluid style={{marginTop:'20px'}}>
       <Row>
         <Col md={9}>
           <Calendar

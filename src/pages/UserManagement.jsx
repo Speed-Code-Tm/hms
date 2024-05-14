@@ -173,7 +173,7 @@ const UserManagement = () => {
                   <Dropdown.Item href={`/editUserAccess/${user.id}`}>
                     <Edit className="me-2" /> Edit User Access
                   </Dropdown.Item>
-                  <Dropdown.Item href={`/viewUserProfile/${user.id}`}>
+                  <Dropdown.Item href={`/UserProfile/${user.id}`}>
                     <i className="fa fa-eye me-2"></i> View User Profile
                   </Dropdown.Item>
                 </Dropdown.Menu>

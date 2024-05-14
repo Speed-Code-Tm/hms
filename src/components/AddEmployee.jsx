@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Modal, Form, Button } from "react-bootstrap";
+import { Modal, Form, Button, Row, Col } from "react-bootstrap";
 import * as Yup from "yup";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -24,7 +24,6 @@ const initialFormState = {
   department: "",
   hireDate: "",
   employmentStatus: "",
-  supervisor: "",
   // Professional Details
   qualifications: "",
   yearsOfExperience: "",
@@ -37,17 +36,6 @@ const initialFormState = {
   paySchedule: "",
   bankAccountDetails: "",
   taxInformation: "",
-  // Human Resources Information
-  benefitsEligibility: "",
-  vacationAccrualRate: "",
-  sickLeaveAccrualRate: "",
-  benefitsStartDate: "",
-  // Additional Information
-  resume: null,
-  otherDocuments: [],
-  // Role and Permissions
-  role: "",
-  permissions: [],
 };
 
 const validationSchema = Yup.object().shape({
@@ -73,7 +61,6 @@ const validationSchema = Yup.object().shape({
   department: Yup.string().required("Department is required"),
   hireDate: Yup.date().required("Hire date is required"),
   employmentStatus: Yup.string().required("Employment status is required"),
-  supervisor: Yup.string().required("Supervisor is required"),
   qualifications: Yup.string().required("Qualifications are required"),
   yearsOfExperience: Yup.number().required("Years of experience is required"),
   specialization: Yup.string().required("Specialization is required"),
@@ -84,17 +71,6 @@ const validationSchema = Yup.object().shape({
     "Bank account details are required"
   ),
   taxInformation: Yup.string().required("Tax information is required"),
-  benefitsEligibility: Yup.string().required(
-    "Benefits eligibility is required"
-  ),
-  vacationAccrualRate: Yup.number().required(
-    "Vacation accrual rate is required"
-  ),
-  sickLeaveAccrualRate: Yup.number().required(
-    "Sick leave accrual rate is required"
-  ),
-  benefitsStartDate: Yup.date().required("Benefits start date is required"),
-  role: Yup.string().required("Role is required"),
 });
 
 const EmployeeModal = ({ show, onHide }) => {
@@ -126,461 +102,373 @@ const EmployeeModal = ({ show, onHide }) => {
       });
   };
 
+  const genderOptions = ["Male", "Female", "Other"];
+
   return (
     <>
-      <Modal show={show} onHide={onHide} size="xl">
+      <Modal show={show} onHide={onHide} size="lg" centered>
         <Modal.Header closeButton>
           <Modal.Title>New Employee Form</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <Form noValidate validated={validated} onSubmit={handleSubmit}>
-            {/* Personal Information */}
-            <Form.Group controlId="formFirstName">
-              <Form.Label>First Name</Form.Label>
-              <Form.Control
-                type="text"
-                name="firstName"
-                value={formData.firstName}
-                onChange={handleChange}
-                required
-              />
-              <Form.Control.Feedback type="invalid">
-                Please enter your first name.
-              </Form.Control.Feedback>
-            </Form.Group>
+            <Row className="mb-3">
+              <Col>
+                {/* Personal Information */}
+                <Form.Group controlId="formFirstName" className="mb-3">
+                  <Form.Label>First Name</Form.Label>
+                  <Form.Control
+                    type="text"
+                    name="firstName"
+                    value={formData.firstName}
+                    onChange={handleChange}
+                    required
+                  />
+                  <Form.Control.Feedback type="invalid">
+                    Please enter your first name.
+                  </Form.Control.Feedback>
+                </Form.Group>
 
-            <Form.Group controlId="formLastName">
-              <Form.Label>Last Name</Form.Label>
-              <Form.Control
-                type="text"
-                name="lastName"
-                value={formData.lastName}
-                onChange={handleChange}
-                required
-              />
-              <Form.Control.Feedback type="invalid">
-                Please enter your last name.
-              </Form.Control.Feedback>
-            </Form.Group>
+                <Form.Group controlId="formLastName" className="mb-3">
+                  <Form.Label>Last Name</Form.Label>
+                  <Form.Control
+                    type="text"
+                    name="lastName"
+                    value={formData.lastName}
+                    onChange={handleChange}
+                    required
+                  />
+                  <Form.Control.Feedback type="invalid">
+                    Please enter your last name.
+                  </Form.Control.Feedback>
+                </Form.Group>
 
-            <Form.Group controlId="formDateOfBirth">
-              <Form.Label>Date of Birth</Form.Label>
-              <Form.Control
-                type="date"
-                name="dateOfBirth"
-                value={formData.dateOfBirth}
-                onChange={handleChange}
-                required
-              />
-              <Form.Control.Feedback type="invalid">
-                Please enter your date of birth.
-              </Form.Control.Feedback>
-            </Form.Group>
+                <Form.Group controlId="formDateOfBirth" className="mb-3">
+                  <Form.Label>Date of Birth</Form.Label>
+                  <Form.Control
+                    type="date"
+                    name="dateOfBirth"
+                    value={formData.dateOfBirth}
+                    onChange={handleChange}
+                    required
+                  />
+                  <Form.Control.Feedback type="invalid">
+                    Please enter your date of birth.
+                  </Form.Control.Feedback>
+                </Form.Group>
 
-            <Form.Group controlId="formGender">
-              <Form.Label>Gender</Form.Label>
-              <Form.Control
-                type="text"
-                name="gender"
-                value={formData.gender}
-                onChange={handleChange}
-                required
-              />
-              <Form.Control.Feedback type="invalid">
-                Please enter your gender.
-              </Form.Control.Feedback>
-            </Form.Group>
+                <Form.Group controlId="formGender" className="mb-3">
+                  <Form.Label>Gender</Form.Label>
+                  <Form.Select
+                    name="gender"
+                    value={formData.gender}
+                    onChange={handleChange}
+                    required
+                  >
+                    <option value="">Select Gender</option>
+                    {genderOptions.map((option) => (
+                      <option key={option} value={option}>
+                        {option}
+                      </option>
+                    ))}
+                  </Form.Select>
+                  <Form.Control.Feedback type="invalid">
+                    Please select your gender.
+                  </Form.Control.Feedback>
+                </Form.Group>
+              </Col>
+              <Col>
+                {/* Contact Information */}
+                <Form.Group controlId="formAddress" className="mb-3">
+                  <Form.Label>Address</Form.Label>
+                  <Form.Control
+                    type="text"
+                    name="address"
+                    value={formData.address}
+                    onChange={handleChange}
+                    required
+                  />
+                  <Form.Control.Feedback type="invalid">
+                    Please enter your address.
+                  </Form.Control.Feedback>
+                </Form.Group>
 
-            {/* Contact Information */}
-            <Form.Group controlId="formAddress">
-              <Form.Label>Address</Form.Label>
-              <Form.Control
-                type="text"
-                name="address"
-                value={formData.address}
-                onChange={handleChange}
-                required
-              />
-              <Form.Control.Feedback type="invalid">
-                Please enter your address.
-              </Form.Control.Feedback>
-            </Form.Group>
+                <Form.Group controlId="formEmail" className="mb-3">
+                  <Form.Label>Email</Form.Label>
+                  <Form.Control
+                    type="email"
+                    name="email"
+                    value={formData.email}
+                    onChange={handleChange}
+                    required
+                  />
+                  <Form.Control.Feedback type="invalid">
+                    Please enter a valid email address.
+                  </Form.Control.Feedback>
+                </Form.Group>
 
-            <Form.Group controlId="formEmail">
-              <Form.Label>Email</Form.Label>
-              <Form.Control
-                type="email"
-                name="email"
-                value={formData.email}
-                onChange={handleChange}
-                required
-              />
-              <Form.Control.Feedback type="invalid">
-                Please enter a valid email address.
-              </Form.Control.Feedback>
-            </Form.Group>
+                <Form.Group controlId="formPhoneNumber" className="mb-3">
+                  <Form.Label>Phone Number</Form.Label>
+                  <Form.Control
+                    type="text"
+                    name="phoneNumber"
+                    value={formData.phoneNumber}
+                    onChange={handleChange}
+                    required
+                  />
+                  <Form.Control.Feedback type="invalid">
+                    Please enter your phone number.
+                  </Form.Control.Feedback>
+                </Form.Group>
+              </Col>
+            </Row>
+            <Row className="mb-3">
+              <Col>
+                {/* Emergency Contact */}
+                <Form.Group
+                  controlId="formEmergencyContactName"
+                  className="mb-3"
+                >
+                  <Form.Label>Emergency Contact Name</Form.Label>
+                  <Form.Control
+                    type="text"
+                    name="emergencyContactName"
+                    value={formData.emergencyContactName}
+                    onChange={handleChange}
+                    required
+                  />
+                  <Form.Control.Feedback type="invalid">
+                    Please enter the emergency contact name.
+                  </Form.Control.Feedback>
+                </Form.Group>
 
-            <Form.Group controlId="formPhoneNumber">
-              <Form.Label>Phone Number</Form.Label>
-              <Form.Control
-                type="text"
-                name="phoneNumber"
-                value={formData.phoneNumber}
-                onChange={handleChange}
-                required
-              />
-              <Form.Control.Feedback type="invalid">
-                Please enter your phone number.
-              </Form.Control.Feedback>
-            </Form.Group>
-            {/* Emergency Contact */}
-            <Form.Group controlId="formEmergencyContactName">
-              <Form.Label>Emergency Contact Name</Form.Label>
-              <Form.Control
-                type="text"
-                name="emergencyContactName"
-                value={formData.emergencyContactName}
-                onChange={handleChange}
-                required
-              />
-              <Form.Control.Feedback type="invalid">
-                Please enter the emergency contact name.
-              </Form.Control.Feedback>
-            </Form.Group>
+                <Form.Group
+                  controlId="formEmergencyContactRelationship"
+                  className="mb-3"
+                >
+                  <Form.Label>Emergency Contact Relationship</Form.Label>
+                  <Form.Control
+                    type="text"
+                    name="emergencyContactRelationship"
+                    value={formData.emergencyContactRelationship}
+                    onChange={handleChange}
+                    required
+                  />
+                  <Form.Control.Feedback type="invalid">
+                    Please enter the emergency contact relationship.
+                  </Form.Control.Feedback>
+                </Form.Group>
 
-            <Form.Group controlId="formEmergencyContactRelationship">
-              <Form.Label>Emergency Contact Relationship</Form.Label>
-              <Form.Control
-                type="text"
-                name="emergencyContactRelationship"
-                value={formData.emergencyContactRelationship}
-                onChange={handleChange}
-                required
-              />
-              <Form.Control.Feedback type="invalid">
-                Please enter the emergency contact relationship.
-              </Form.Control.Feedback>
-            </Form.Group>
+                <Form.Group
+                  controlId="formEmergencyContactPhone"
+                  className="mb-3"
+                >
+                  <Form.Label>Emergency Contact Phone</Form.Label>
+                  <Form.Control
+                    type="text"
+                    name="emergencyContactPhone"
+                    value={formData.emergencyContactPhone}
+                    onChange={handleChange}
+                    required
+                  />
+                  <Form.Control.Feedback type="invalid">
+                    Please enter the emergency contact phone number.
+                  </Form.Control.Feedback>
+                </Form.Group>
+              </Col>
+              <Col>
+                {/* Employment Information */}
+                <Form.Group controlId="formJobTitle" className="mb-3">
+                  <Form.Label>Job Title</Form.Label>
+                  <Form.Control
+                    type="text"
+                    name="jobTitle"
+                    value={formData.jobTitle}
+                    onChange={handleChange}
+                    required
+                  />
+                  <Form.Control.Feedback type="invalid">
+                    Please enter your job title.
+                  </Form.Control.Feedback>
+                </Form.Group>
 
-            <Form.Group controlId="formEmergencyContactPhone">
-              <Form.Label>Emergency Contact Phone</Form.Label>
-              <Form.Control
-                type="text"
-                name="emergencyContactPhone"
-                value={formData.emergencyContactPhone}
-                onChange={handleChange}
-                required
-              />
-              <Form.Control.Feedback type="invalid">
-                Please enter the emergency contact phone number.
-              </Form.Control.Feedback>
-            </Form.Group>
+                <Form.Group controlId="formDepartment" className="mb-3">
+                  <Form.Label>Department</Form.Label>
+                  <Form.Control
+                    type="text"
+                    name="department"
+                    value={formData.department}
+                    onChange={handleChange}
+                    required
+                  />
+                  <Form.Control.Feedback type="invalid">
+                    Please enter your department.
+                  </Form.Control.Feedback>
+                </Form.Group>
 
-            {/* Employment Information */}
-            <Form.Group controlId="formJobTitle">
-              <Form.Label>Job Title</Form.Label>
-              <Form.Control
-                type="text"
-                name="jobTitle"
-                value={formData.jobTitle}
-                onChange={handleChange}
-                required
-              />
-              <Form.Control.Feedback type="invalid">
-                Please enter your job title.
-              </Form.Control.Feedback>
-            </Form.Group>
+                <Form.Group controlId="formHireDate" className="mb-3">
+                  <Form.Label>Hire Date</Form.Label>
+                  <Form.Control
+                    type="date"
+                    name="hireDate"
+                    value={formData.hireDate}
+                    onChange={handleChange}
+                    required
+                  />
+                  <Form.Control.Feedback type="invalid">
+                    Please enter your hire date.
+                  </Form.Control.Feedback>
+                </Form.Group>
 
-            <Form.Group controlId="formDepartment">
-              <Form.Label>Department</Form.Label>
-              <Form.Control
-                type="text"
-                name="department"
-                value={formData.department}
-                onChange={handleChange}
-                required
-              />
-              <Form.Control.Feedback type="invalid">
-                Please enter your department.
-              </Form.Control.Feedback>
-            </Form.Group>
+                <Form.Group controlId="formEmploymentStatus" className="mb-3">
+                  <Form.Label>Employment Status</Form.Label>
+                  <Form.Control
+                    type="text"
+                    name="employmentStatus"
+                    value={formData.employmentStatus}
+                    onChange={handleChange}
+                    required
+                  />
+                  <Form.Control.Feedback type="invalid">
+                    Please enter your employment status.
+                  </Form.Control.Feedback>
+                </Form.Group>
+              </Col>
+            </Row>
 
-            <Form.Group controlId="formHireDate">
-              <Form.Label>Hire Date</Form.Label>
-              <Form.Control
-                type="date"
-                name="hireDate"
-                value={formData.hireDate}
-                onChange={handleChange}
-                required
-              />
-              <Form.Control.Feedback type="invalid">
-                Please enter your hire date.
-              </Form.Control.Feedback>
-            </Form.Group>
+            <Row className="mb-3">
+              <Col>
+                {/* Professional Details */}
+                <Form.Group controlId="formQualifications" className="mb-3">
+                  <Form.Label>Qualifications</Form.Label>
+                  <Form.Control
+                    type="text"
+                    name="qualifications"
+                    value={formData.qualifications}
+                    onChange={handleChange}
+                    required
+                  />
+                  <Form.Control.Feedback type="invalid">
+                    Please enter your qualifications.
+                  </Form.Control.Feedback>
+                </Form.Group>
 
-            <Form.Group controlId="formEmploymentStatus">
-              <Form.Label>Employment Status</Form.Label>
-              <Form.Control
-                type="text"
-                name="employmentStatus"
-                value={formData.employmentStatus}
-                onChange={handleChange}
-                required
-              />
-              <Form.Control.Feedback type="invalid">
-                Please enter your employment status.
-              </Form.Control.Feedback>
-            </Form.Group>
+                <Form.Group controlId="formYearsOfExperience" className="mb-3">
+                  <Form.Label>Years of Experience</Form.Label>
+                  <Form.Control
+                    type="number"
+                    name="yearsOfExperience"
+                    value={formData.yearsOfExperience}
+                    onChange={handleChange}
+                    required
+                  />
+                  <Form.Control.Feedback type="invalid">
+                    Please enter your years of experience.
+                  </Form.Control.Feedback>
+                </Form.Group>
 
-            <Form.Group controlId="formSupervisor">
-              <Form.Label>Supervisor</Form.Label>
-              <Form.Control
-                type="text"
-                name="supervisor"
-                value={formData.supervisor}
-                onChange={handleChange}
-                required
-              />
-              <Form.Control.Feedback type="invalid">
-                Please enter your supervisor's name.
-              </Form.Control.Feedback>
-            </Form.Group>
+                <Form.Group controlId="formSpecialization" className="mb-3">
+                  <Form.Label>Specialization</Form.Label>
+                  <Form.Control
+                    type="text"
+                    name="specialization"
+                    value={formData.specialization}
+                    onChange={handleChange}
+                    required
+                  />
+                  <Form.Control.Feedback type="invalid">
+                    Please enter your specialization.
+                  </Form.Control.Feedback>
+                </Form.Group>
+              </Col>
+              <Col>
+                {/* Payroll Information */}
+                <Form.Group controlId="formSalary" className="mb-3">
+                  <Form.Label>Salary</Form.Label>
+                  <Form.Control
+                    type="number"
+                    name="salary"
+                    value={formData.salary}
+                    onChange={handleChange}
+                    required
+                  />
+                  <Form.Control.Feedback type="invalid">
+                    Please enter your salary.
+                  </Form.Control.Feedback>
+                </Form.Group>
 
-            {/* Professional Details */}
-            <Form.Group controlId="formQualifications">
-              <Form.Label>Qualifications</Form.Label>
-              <Form.Control
-                type="text"
-                name="qualifications"
-                value={formData.qualifications}
-                onChange={handleChange}
-                required
-              />
-              <Form.Control.Feedback type="invalid">
-                Please enter your qualifications.
-              </Form.Control.Feedback>
-            </Form.Group>
+                <Form.Group controlId="formBankAccountDetails" className="mb-3">
+                  <Form.Label>Bank Account Details</Form.Label>
+                  <Form.Control
+                    type="text"
+                    name="bankAccountDetails"
+                    value={formData.bankAccountDetails}
+                    onChange={handleChange}
+                    required
+                  />
+                  <Form.Control.Feedback type="invalid">
+                    Please enter your bank account details.
+                  </Form.Control.Feedback>
+                </Form.Group>
 
-            <Form.Group controlId="formYearsOfExperience">
-              <Form.Label>Years of Experience</Form.Label>
-              <Form.Control
-                type="number"
-                name="yearsOfExperience"
-                value={formData.yearsOfExperience}
-                onChange={handleChange}
-                required
-              />
-              <Form.Control.Feedback type="invalid">
-                Please enter your years of experience.
-              </Form.Control.Feedback>
-            </Form.Group>
+                <Form.Group controlId="formTaxInformation" className="mb-3">
+                  <Form.Label>Tax Information</Form.Label>
+                  <Form.Control
+                    type="text"
+                    name="taxInformation"
+                    value={formData.taxInformation}
+                    onChange={handleChange}
+                    required
+                  />
+                  <Form.Control.Feedback type="invalid">
+                    Please enter your tax information.
+                  </Form.Control.Feedback>
+                </Form.Group>
+              </Col>
+            </Row>
 
-            <Form.Group controlId="formSpecialization">
-              <Form.Label>Specialization</Form.Label>
-              <Form.Control
-                type="text"
-                name="specialization"
-                value={formData.specialization}
-                onChange={handleChange}
-                required
-              />
-              <Form.Control.Feedback type="invalid">
-                Please enter your specialization.
-              </Form.Control.Feedback>
-            </Form.Group>
+            <Row className="mb-3">
+              <Col>
+                {/* Additional Information */}
+                <Form.Group controlId="formResume" className="mb-3">
+                  <Form.Label>Resume</Form.Label>
+                  <Form.Control
+                    type="file"
+                    name="resume"
+                    onChange={(e) =>
+                      setFormData({ ...formData, resume: e.target.files[0] })
+                    }
+                  />
+                </Form.Group>
 
-            {/* Account Information */}
-            <Form.Group controlId="formUsername">
-              <Form.Label>Username</Form.Label>
-              <Form.Control
-                type="text"
-                name="username"
-                value={formData.username}
-                onChange={handleChange}
-                required
-              />
-              <Form.Control.Feedback type="invalid">
-                Please enter a username.
-              </Form.Control.Feedback>
-            </Form.Group>
-
-            {/* Payroll Information */}
-            <Form.Group controlId="formSalary">
-              <Form.Label>Salary</Form.Label>
-              <Form.Control
-                type="number"
-                name="salary"
-                value={formData.salary}
-                onChange={handleChange}
-                required
-              />
-              <Form.Control.Feedback type="invalid">
-                Please enter your salary.
-              </Form.Control.Feedback>
-            </Form.Group>
-
-            <Form.Group controlId="formPaySchedule">
-              <Form.Label>Pay Schedule</Form.Label>
-              <Form.Control
-                type="text"
-                name="paySchedule"
-                value={formData.paySchedule}
-                onChange={handleChange}
-                required
-              />
-              <Form.Control.Feedback type="invalid">
-                Please enter your pay schedule.
-              </Form.Control.Feedback>
-            </Form.Group>
-
-            <Form.Group controlId="formBankAccountDetails">
-              <Form.Label>Bank Account Details</Form.Label>
-              <Form.Control
-                type="text"
-                name="bankAccountDetails"
-                value={formData.bankAccountDetails}
-                onChange={handleChange}
-                required
-              />
-              <Form.Control.Feedback type="invalid">
-                Please enter your bank account details.
-              </Form.Control.Feedback>
-            </Form.Group>
-
-            <Form.Group controlId="formTaxInformation">
-              <Form.Label>Tax Information</Form.Label>
-              <Form.Control
-                type="text"
-                name="taxInformation"
-                value={formData.taxInformation}
-                onChange={handleChange}
-                required
-              />
-              <Form.Control.Feedback type="invalid">
-                Please enter your tax information.
-              </Form.Control.Feedback>
-            </Form.Group>
-
-            {/* Human Resources Information */}
-            <Form.Group controlId="formBenefitsEligibility">
-              <Form.Label>Benefits Eligibility</Form.Label>
-              <Form.Control
-                type="text"
-                name="benefitsEligibility"
-                value={formData.benefitsEligibility}
-                onChange={handleChange}
-                required
-              />
-              <Form.Control.Feedback type="invalid">
-                Please enter your benefits eligibility.
-              </Form.Control.Feedback>
-            </Form.Group>
-
-            <Form.Group controlId="formVacationAccrualRate">
-              <Form.Label>Vacation Accrual Rate</Form.Label>
-              <Form.Control
-                type="number"
-                name="vacationAccrualRate"
-                value={formData.vacationAccrualRate}
-                onChange={handleChange}
-                required
-              />
-              <Form.Control.Feedback type="invalid">
-                Please enter your vacation accrual rate.
-              </Form.Control.Feedback>
-            </Form.Group>
-
-            <Form.Group controlId="formSickLeaveAccrualRate">
-              <Form.Label>Sick Leave Accrual Rate</Form.Label>
-              <Form.Control
-                type="number"
-                name="sickLeaveAccrualRate"
-                value={formData.sickLeaveAccrualRate}
-                onChange={handleChange}
-                required
-              />
-              <Form.Control.Feedback type="invalid">
-                Please enter your sick leave accrual rate.
-              </Form.Control.Feedback>
-            </Form.Group>
-
-            <Form.Group controlId="formBenefitsStartDate">
-              <Form.Label>Benefits Start Date</Form.Label>
-              <Form.Control
-                type="date"
-                name="benefitsStartDate"
-                value={formData.benefitsStartDate}
-                onChange={handleChange}
-                required
-              />
-              <Form.Control.Feedback type="invalid">
-                Please enter your benefits start date.
-              </Form.Control.Feedback>
-            </Form.Group>
-
-            {/* Additional Information */}
-            <Form.Group controlId="formResume">
-              <Form.Label>Resume</Form.Label>
-              <Form.Control
-                type="file"
-                name="resume"
-                onChange={(e) =>
-                  setFormData({ ...formData, resume: e.target.files[0] })
-                }
-              />
-            </Form.Group>
-
-            <Form.Group controlId="formOtherDocuments">
-              <Form.Label>Other Documents</Form.Label>
-              <Form.Control
-                type="file"
-                name="otherDocuments"
-                multiple
-                onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    otherDocuments: Array.from(e.target.files),
-                  })
-                }
-              />
-            </Form.Group>
-
-            {/* Role and Permissions */}
-            <Form.Group controlId="formRole">
-              <Form.Label>Role</Form.Label>
-              <Form.Control
-                type="text"
-                name="role"
-                value={formData.role}
-                onChange={handleChange}
-                required
-              />
-              <Form.Control.Feedback type="invalid">
-                Please enter your role.
-              </Form.Control.Feedback>
-            </Form.Group>
-
-            <Form.Group controlId="formPermissions">
-              <Form.Label>Permissions</Form.Label>
-              <Form.Control
-                type="text"
-                name="permissions"
-                value={formData.permissions}
-                onChange={handleChange}
-                required
-              />
-              <Form.Control.Feedback type="invalid">
-                Please enter your permissions.
-              </Form.Control.Feedback>
-            </Form.Group>
-
-            <Button variant="primary" type="submit">
-              Submit
-            </Button>
+                <Form.Group controlId="formOtherDocuments" className="mb-3">
+                  <Form.Label>Other Documents</Form.Label>
+                  <Form.Control
+                    type="file"
+                    name="otherDocuments"
+                    multiple
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        otherDocuments: Array.from(e.target.files),
+                      })
+                    }
+                  />
+                </Form.Group>
+              </Col>
+            </Row>
           </Form>
         </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={onHide}>
+            Close
+          </Button>
+          <Button variant="primary" type="submit" onClick={handleSubmit}>
+            Submit
+          </Button>
+        </Modal.Footer>
       </Modal>
+      <ToastContainer />
     </>
   );
 };

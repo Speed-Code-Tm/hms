@@ -120,9 +120,7 @@ const FinancialManagement = () => {
   };
 
   return (
-    <Container>
-      <h2>Financial Management</h2>
-
+    <Container Fluid style={{marginTop:"20px"}}>
       <Tabs defaultActiveKey="expenses">
         <Tab eventKey="expenses" title="Expenses">
           <Expenses activeTab={'expenses'}/>

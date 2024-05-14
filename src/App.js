@@ -24,6 +24,9 @@ import WorkSchedule from './components/Workschedule';
 import WardManagement from './pages/WardManagement';
 import { ToastContainer } from 'react-toastify';
 import UserRoleMapping from './pages/UserRolesTable';
+import 'react-toastify/dist/ReactToastify.css';
+import EmployeeProfile from './components/userProfile';
+
 function App() {
   return (
     <>
@@ -44,6 +47,8 @@ function App() {
               <Route path="/TriageAssessment" element={<TriageAssessment />} />
               {/* Patient Profile Route */}
               <Route path="/PatientProfile" element={<PatientProfile />} />
+              {/* User Profile Route */}
+              <Route path="/UserProfile/:id" element={<EmployeeProfile />} />
               {/* imaging dashboard */}
               <Route path='/ImagingDashboard' element={<ImagingDashboard />} />
               {/* Laboratory route */}

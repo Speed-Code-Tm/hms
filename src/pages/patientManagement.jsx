@@ -19,6 +19,7 @@ import DoctorsNotes from "../components/DoctorsNotes";
 import OrderMedicine from "../components/OrderMedicine";
 import OrderLabTest from "../components/OrderLabTest"; 
 import OrderImaging from "../components/orderImaging";
+import PatientProfile from "./patientProfile"
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
@@ -120,6 +121,11 @@ const PatientManagement = () => {
               onClick={() => console.log("Discharge Patient")}
             >
               <FaBed /> Discharge Patient
+            </Dropdown.Item>
+            <Dropdown.Item
+              href="/PatientProfile"
+            >
+              <FaBed /> Patient Profile
             </Dropdown.Item>
           </DropdownButton>
         )}

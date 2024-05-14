@@ -343,3 +343,43 @@ export const retrieveExpenses = async () =>{
     
   }
 }
+
+export const addBudget = async (budget) =>{
+
+  try {
+    const budgetRef = collection(db, 'budgets')
+    console.log(budget);
+  await addDoc(budgetRef, budget)
+  } catch (error) {
+     throw error
+  } 
+
+}
+
+
+export const retrieveBudgets = async () =>{
+  try {
+    const budgetCollection = collection(db, 'budgets')
+
+    const budgetSnapshot = await getDocs(budgetCollection);
+  
+    let budgetData = budgetSnapshot.docs.map(doc => {
+        
+        const data = doc.data();
+
+        return { id: doc.id, ...data };
+    });
+
+    budgetData = budgetData.map(item=>{
+        console.log(item);
+      const formattedStartDate = moment(item.startDate.seconds * 1000).format('MM/DD/YYYY');
+      const formattedEndDate = moment(item.endDate.seconds * 1000).format('MM/DD/YYYY');
+
+    return { ...item, startDate:formattedStartDate,endDate:formattedEndDate };
+    })
+
+    return budgetData
+  } catch (error) {
+    throw error
+  }
+}

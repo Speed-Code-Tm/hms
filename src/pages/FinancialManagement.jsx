@@ -3,6 +3,7 @@ import ReusableTable from './ReusableTable';
 import { Button, Dropdown, Tabs, Tab, Modal, Form, Badge, Container } from 'react-bootstrap';
 import styled from 'styled-components';
 import Expenses from '../components/financials/Expenses';
+import DepartmentBudget from '../components/financials/DepartmentBudget';
 
 // Mock data for procurement items, department budgets, employee wages, and projections
 const procurementItems = [
@@ -30,6 +31,7 @@ const projections = [
 ];
 
 const FinancialManagement = () => {
+  const [activeTab,setActiveTab] = useState()
   const [initialState, setInitialState] = useState({
     pageIndex: 0,
     pageSize: 5,
@@ -124,15 +126,18 @@ const FinancialManagement = () => {
       <h2>Financial Management</h2>
 
       <Tabs defaultActiveKey="expenses">
-        <Tab eventKey="expenses" title="Expenses">
+        <Tab eventKey="expenses" title="Expenses"
+         activeKey={activeTab}
+         onSelect={(key) => setActiveTab(key)}
+        
+        >
           <Expenses activeTab={'expenses'}/>
         </Tab>
         <Tab eventKey="budgets" title="Department Budgets">
-          {/* <ReusableTable
-            columns={departmentBudgetsColumns}
-            data={departmentBudgets}
-            initialState={initialState}
-          /> */}
+
+          <DepartmentBudget activeTab='budgets'/>
+         
+         
         </Tab>
         <Tab eventKey="wages" title="Employee Wages">
           {/* <ReusableTable

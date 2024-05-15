@@ -95,7 +95,7 @@ const InventoryTab = () => {
           <h4>Gauze Pads</h4>
         </Card.Header>
         <Card.Body>
-          <ProgressBar now={65} label={`65%`} />
+          <ProgressBar now={65} label={"65%"} />
         </Card.Body>
       </Card>
       {/* Add more inventory items here */}

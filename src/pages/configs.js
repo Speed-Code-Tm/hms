@@ -383,3 +383,17 @@ export const retrieveBudgets = async () =>{
     throw error
   }
 }
+
+
+// lab management 
+
+export const addLabTest = async(labtest) =>{
+  try{
+    const testsCatalogueRef = collection(db, 'testsCatalogue')
+
+    await addDoc(testsCatalogueRef, labtest)
+
+  }catch(error){
+    throw error
+  }
+}

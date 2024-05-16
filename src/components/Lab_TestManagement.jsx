@@ -17,7 +17,8 @@ import {
 import { Formik, Form as FormikForm, Field } from "formik";
 import { FaSearch, FaPlus, FaEdit, FaSave, FaTimes } from "react-icons/fa";
 import styled from "styled-components";
-
+import * as Yup from 'yup'
+import { toast } from "react-toastify";
 const TestManagement = () => {
   const [tests, setTests] = useState([
     {
@@ -125,6 +126,49 @@ const TestManagement = () => {
 
   const { globalFilter, pageIndex, pageSize } = state;
 
+  const testValidationSchema =  Yup.object().shape({
+    name: Yup.string().required('Test Name is required'),
+    price: Yup.number()
+      .typeError('Test Price must be a number')
+      .required('Test Price is required')
+      .positive('Test Price must be a positive number'),
+    testType: Yup.string().required('Test Type is required'),
+    specimenType: Yup.string()
+      .required('Specimen Type is required')
+  });
+
+ 
+
+  const handleSubmit  = async (values) =>{
+
+    console.log(values)
+
+    try {
+
+      await testValidationSchema.validate(values,{abortEarly:false})
+
+      await addLabTest(values)
+
+      toast.success('Test added')
+      
+    } catch (error) {
+      if (error.inner && error.inner.length > 0) {
+        const firstErrorMessage = error.inner[0].message;
+        toast.error(`Please fix the following error: ${firstErrorMessage}`);
+      } else {
+        toast.error(
+          "An unknown validation error occurred. Please check the form data."
+        );
+      } 
+      
+    }
+
+
+
+  }
+
+
+
   return (
     <div>
       <TableContainer>
@@ -226,21 +270,9 @@ const TestManagement = () => {
           setSelectedTest(null);
         }}
         test={selectedTest}
-        handleSubmit={(values) => {
-          const updatedTests = tests.map((t) => {
-            if (t.id === selectedTest?.id) {
-              return values;
-            }
-            return t;
-          });
-          if (!selectedTest) {
-            const newTest = { id: tests.length + 1, ...values };
-            updatedTests.push(newTest);
-          }
-          setTests(updatedTests);
-          setShowTestModal(false);
-          setSelectedTest(null);
-        }}
+        handleSubmit={handleSubmit}
+        // tests={tests}
+        // setSelectedTest={setSelectedTest}
       />
     </div>
   );
@@ -294,7 +326,7 @@ const TestModal = ({ show, onHide, test, handleSubmit }) => {
       backdrop="static"
       keyboard={false}
     >
-      <Modal.Header style={{ backgroundColor: "#f8d7da", position: "relative" }}>
+      <Modal.Header style={{  position: "relative" }}>
         <Modal.Title style={{ textAlign: "center", flex: 1 }}>
           {test ? "Edit Test" : "Add New Test"}
         </Modal.Title>

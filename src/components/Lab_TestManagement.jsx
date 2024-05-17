@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import {
   useTable,
   useGlobalFilter,
@@ -19,6 +19,7 @@ import { FaSearch, FaPlus, FaEdit, FaSave, FaTimes } from "react-icons/fa";
 import styled from "styled-components";
 import * as Yup from 'yup'
 import { toast } from "react-toastify";
+import { addLabTest, retrieveLabTestCatalogue } from "../pages/configs";
 const TestManagement = () => {
   const [tests, setTests] = useState([
     {
@@ -57,7 +58,7 @@ const TestManagement = () => {
 
   const [showTestModal, setShowTestModal] = useState(false);
   const [selectedTest, setSelectedTest] = useState(null);
-
+  const [loading,setLoading] = useState(false)
   const TEST_COLUMNS = [
     {
       Header: "Test Name",
@@ -150,6 +151,9 @@ const TestManagement = () => {
       await addLabTest(values)
 
       toast.success('Test added')
+
+      setShowTestModal(false)
+      fetchLabTestCatalogue()
       
     } catch (error) {
       if (error.inner && error.inner.length > 0) {
@@ -163,10 +167,18 @@ const TestManagement = () => {
       
     }
 
-
-
   }
 
+  async function fetchLabTestCatalogue(){
+      const testsCatalogueData = await retrieveLabTestCatalogue()
+      setTests(testsCatalogueData)
+  }
+
+
+  useEffect(()=>{
+
+  fetchLabTestCatalogue()
+}, [])
 
 
   return (
@@ -271,6 +283,8 @@ const TestManagement = () => {
         }}
         test={selectedTest}
         handleSubmit={handleSubmit}
+        loading={loading}
+        setLoading={setLoading}
         // tests={tests}
         // setSelectedTest={setSelectedTest}
       />
@@ -391,7 +405,8 @@ const TestModal = ({ show, onHide, test, handleSubmit }) => {
                 Cancel
               </Button>
               <Button variant="primary" type="submit" disabled={isSubmitting}>
-                <FaSave /> {test ? "Save Changes" : "Add Test"}
+                <FaSave />{test && isSubmitting ? 'saving' : (test ? "Save Changes" : (isSubmitting ? "submitting" : "Add Test"))}
+
               </Button>
             </Modal.Footer>
           </FormikForm>

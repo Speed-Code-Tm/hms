@@ -1,7 +1,6 @@
 // Import the functions you need from the SDKs you need
-import { initializeApp } from "firebase/app";
-import firebase from 'firebase/app';
-import 'firebase/firestore';
+import  firebase from 'firebase/compat/app';
+import 'firebase/compat/firestore';
 import { getAnalytics } from "firebase/analytics";
 import { getFirestore, collection, doc, setDoc, addDoc, getDocs, updateDoc, deleteDoc } from "firebase/firestore";
 // TODO: Add SDKs for Firebase products that you want to use
@@ -13,6 +12,9 @@ import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import moment from "moment/moment";
 
+
+
+
 const firebaseConfig = {
     apiKey: "AIzaSyClrrTa3zFjkX5Qg85F5V9GtTxRyqL7cLM",
     authDomain: "hmsk-5be24.firebaseapp.com",
@@ -23,10 +25,29 @@ const firebaseConfig = {
     measurementId: "G-6WYRMK8FC7"
 };
 // Initialize Firebase
-const app = initializeApp(firebaseConfig);
+const app = firebase.initializeApp(firebaseConfig);
 export const db = getFirestore(app);
 
 export default firebaseConfig;
+
+//function to get the id of a collection
+const hospitalRef = firebase.firestore().collection('Client_Hospitals').doc('ynrFkJkgKLVweVrHTKJF');
+
+
+async function getCollectionId(hospitalRef, collectionName){
+  const querySnapshot = await hospitalRef.collection(collectionName).get();
+  if (!querySnapshot.empty) {
+    // Assuming there is only one document in the Procurement collection
+    const collectionDoc = querySnapshot.docs[0];
+    const collectionId = collectionDoc.id
+    return collectionId;
+  } else {
+    throw new Error(`No ${collectionName} document found`);
+  }
+}
+
+
+
 
 //crud functions
 
@@ -106,8 +127,12 @@ export const updateVitalSigns = async (hospitalVisitId, vitalSigns) => {
 
   export const addPharmacyInventoryItem = async(item) =>{
     try {
-      const pharmacyInventoryRef = collection(db, 'pharmacyInventory')
-      await addDoc( pharmacyInventoryRef, item)
+      const pharmacyId = await getCollectionId(hospitalRef, 'Pharmacy')
+
+      const pharmacyInventoryRef = hospitalRef.collection('Pharmacy').doc(pharmacyId).collection('pharmacyInventory');
+     
+      await pharmacyInventoryRef.add(item)
+    
       
     } catch (error) {
       return error
@@ -117,8 +142,11 @@ export const updateVitalSigns = async (hospitalVisitId, vitalSigns) => {
 
   export const retrievePharmacyInventory  = async () =>{
     try{
-      const pharmacyInventoryRef = collection(db, 'pharmacyInventory')
-      
+
+      const pharmacyId = await getCollectionId(hospitalRef, 'Pharmacy')
+
+      const pharmacyInventoryRef = hospitalRef.collection('Pharmacy').doc(pharmacyId).collection('pharmacyInventory');
+              
       const pharmacyInventorySnapshot = await getDocs(pharmacyInventoryRef);
 
       const pharmacyInventoryData = pharmacyInventorySnapshot.docs.map(doc => {
@@ -140,8 +168,10 @@ export const updateVitalSigns = async (hospitalVisitId, vitalSigns) => {
 
   export const addPrescription = async (prescription) => {
     try {
-      const prescriptionsRef = collection(db, 'prescriptions');
-      await addDoc(prescriptionsRef, prescription);
+      const pharmacyId = await getCollectionId(hospitalRef, 'Pharmacy')
+
+      const prescriptionsRef = hospitalRef.collection('Pharmacy').doc(pharmacyId).collection('prescriptions')
+      await prescriptionsRef.add(prescription);
       console.log('Prescription added successfully');
     } catch (error) {
       console.error('Error adding prescription:', error);
@@ -149,12 +179,13 @@ export const updateVitalSigns = async (hospitalVisitId, vitalSigns) => {
     }
   };
 
-
   //retrieve all prescriptions
 
   export const retrievePrescriptions = async () => {
     try {
-      const prescriptionsRef = collection(db, 'prescriptions');
+      const pharmacyId = await getCollectionId(hospitalRef, 'Pharmacy')
+
+      const prescriptionsRef = hospitalRef.collection('Pharmacy').doc(pharmacyId).collection('prescriptions')
       const querySnapshot = await getDocs(prescriptionsRef);
       
       let prescriptions = [];
@@ -166,7 +197,7 @@ export const updateVitalSigns = async (hospitalVisitId, vitalSigns) => {
 
       prescriptions = prescriptions.map(prescription=>{
         
-      const formattedDate = moment(prescription.prescriptionDate.seconds * 1000).format('MM/DD/YYYY, h:mm:ss A');
+      const formattedDate = moment(prescription?.prescriptionDate?.seconds * 1000).format('MM/DD/YYYY, h:mm:ss A');
     return { ...prescription, prescriptionDate:formattedDate };
     })
       
@@ -187,7 +218,13 @@ export const updateVitalSigns = async (hospitalVisitId, vitalSigns) => {
 
   export const retrieveInventoryItems= async() =>{
     try {
-      const inventoryRef = collection(db, 'inventory')
+
+      const procurementId =  await getCollectionId(hospitalRef, 'Procurement')
+    
+       
+    
+      const inventoryRef = hospitalRef.collection('Procurement').doc(procurementId).collection('inventory');
+      
       
       const inventorySnapshot = await getDocs(inventoryRef);
   
@@ -211,8 +248,15 @@ export const updateVitalSigns = async (hospitalVisitId, vitalSigns) => {
  export const requestItem = async (item, department) =>{
 
     try {
-    const departmentNeedsRef = collection(db, 'departmentNeeds')
-    await addDoc(departmentNeedsRef,{...item,department:department})
+    // const departmentNeedsRef = collection(db, 'departmentNeeds')
+
+    // get parent collection document id
+    const procurementId =  await getCollectionId(hospitalRef, 'Procurement')
+    
+    const departmentNeedsRef = hospitalRef.collection('Procurement').doc(procurementId).collection('departmentNeeds');
+    
+    
+      await departmentNeedsRef.add({...item,department:department})
       
     } catch (error) {
       console.log(error);
@@ -224,8 +268,11 @@ export const updateVitalSigns = async (hospitalVisitId, vitalSigns) => {
 
   export const retrieveDepartmentNeeds = async () =>{
     try {
-      const departmentNeedsRef = collection(db, 'departmentNeeds')
-      
+     
+      const procurementId = await getCollectionId(hospitalRef, 'Procurement')
+
+      const departmentNeedsRef = hospitalRef.collection('Procurement').doc(procurementId).collection('departmentNeeds');
+         
       const departmentNeedsSnapshot = await getDocs(departmentNeedsRef);
   
       const departmentNeedsData = departmentNeedsSnapshot.docs.map(doc => {
@@ -249,10 +296,11 @@ export const updateVitalSigns = async (hospitalVisitId, vitalSigns) => {
 
   export const addWard = async(ward) =>{
     try {
-      const wardsRef = collection(db, 'wards')
+      const inpatientId = await getCollectionId(hospitalRef, 'Inpatient')
 
-      await addDoc(wardsRef,ward)
-   
+    const wardRef = hospitalRef.collection('Inpatient').doc(inpatientId).collection('wards');
+  
+      await wardRef.add(ward)
       
     } catch (error) {
       throw error
@@ -261,9 +309,11 @@ export const updateVitalSigns = async (hospitalVisitId, vitalSigns) => {
 
   export const addBed  = async (bed) =>{
     try {
-      const bedsRef = collection(db, 'beds')
+      const inpatientId = await getCollectionId(hospitalRef, 'Inpatient')
 
-      await addDoc(bedsRef,bed)
+    const bedRef = hospitalRef.collection('Inpatient').doc(inpatientId).collection('beds');
+  
+      await bedRef.add(bed)
     } catch (error) {
       throw error
     }
@@ -272,10 +322,11 @@ export const updateVitalSigns = async (hospitalVisitId, vitalSigns) => {
 export const  retrieveWards = async () =>{
   try{
 
-    const wardsCollection = collection(db, 'wards')
-    
+    const inpatientId = await getCollectionId(hospitalRef, 'Inpatient')
 
-    const wardsSnapshot = await getDocs(wardsCollection);
+    const wardRef = hospitalRef.collection('Inpatient').doc(inpatientId).collection('wards');
+  
+    const wardsSnapshot = await getDocs(wardRef);
   
     const wardsData = wardsSnapshot.docs.map(doc => {
         
@@ -294,10 +345,11 @@ export const  retrieveWards = async () =>{
 export const  retrieveBeds = async () =>{
   try{
 
-    const bedCollection = collection(db, 'beds')
-    
+    const inpatientId = await getCollectionId(hospitalRef, 'Inpatient')
 
-    const bedsSnapshot = await getDocs(bedCollection);
+    const bedRef = hospitalRef.collection('Inpatient').doc(inpatientId).collection('beds');
+  
+    const bedsSnapshot = await getDocs(bedRef);
   
     const bedData = bedsSnapshot.docs.map(doc => {
         
@@ -314,9 +366,12 @@ export const  retrieveBeds = async () =>{
 
 export const addExpense = async (expense) =>{
   try {
-    const expensesRef = collection(db, 'expenses')
+    const accountId = await getCollectionId(hospitalRef, 'Financials')
 
-    await addDoc(expensesRef, expense )
+    const expensesRef = hospitalRef.collection('Financials').doc(accountsId).collection('expenses');
+  
+  
+    await expensesRef.add(expense)
 
   } catch (error) {
     throw error
@@ -325,10 +380,12 @@ export const addExpense = async (expense) =>{
 
 export const retrieveExpenses = async () =>{
   try {
-    const expenseCollection = collection(db, 'expenses')
-    
+    const accountsId = await getCollectionId(hospitalRef, 'Financials')
 
-    const expenseSnapshot = await getDocs(expenseCollection);
+    const expensesRef = hospitalRef.collection('Financials').doc(accountsId).collection('expenses');
+   
+
+    const expenseSnapshot = await getDocs(expensesRef);
   
     const expenseData = expenseSnapshot.docs.map(doc => {
         
@@ -347,9 +404,13 @@ export const retrieveExpenses = async () =>{
 export const addBudget = async (budget) =>{
 
   try {
-    const budgetRef = collection(db, 'budgets')
-    console.log(budget);
-  await addDoc(budgetRef, budget)
+
+
+    const accountsId = await getCollectionId(hospitalRef, 'Financials')
+
+    const budgetsRef = hospitalRef.collection('Financials').doc(accountsId).collection('budgets');
+   
+  budgetsRef.add(budget)
   } catch (error) {
      throw error
   } 
@@ -359,9 +420,11 @@ export const addBudget = async (budget) =>{
 
 export const retrieveBudgets = async () =>{
   try {
-    const budgetCollection = collection(db, 'budgets')
+    const accountsId = await getCollectionId(hospitalRef, 'Financials')
 
-    const budgetSnapshot = await getDocs(budgetCollection);
+    const budgetsRef = hospitalRef.collection('Financials').doc(accountsId).collection('budgets');
+   
+    const budgetSnapshot = await getDocs(budgetsRef);
   
     let budgetData = budgetSnapshot.docs.map(doc => {
         
@@ -389,11 +452,33 @@ export const retrieveBudgets = async () =>{
 
 export const addLabTest = async(labtest) =>{
   try{
-    const testsCatalogueRef = collection(db, 'testsCatalogue')
+    const laboratoryId = await getCollectionId(hospitalRef, 'Laboratory')
 
-    await addDoc(testsCatalogueRef, labtest)
+    const testsCatalogueRef = hospitalRef.collection('Laboratory').doc(laboratoryId).collection('testsCatalogue');
+   
+    await testsCatalogueRef.add(labtest)
 
   }catch(error){
     throw error
   }
+}
+
+
+export const retrieveLabTestCatalogue = async () =>{
+
+  const laboratoryId = await getCollectionId(hospitalRef, 'Laboratory')
+
+  const testsCatalogueRef = hospitalRef.collection('Laboratory').doc(laboratoryId).collection('testsCatalogue');
+ 
+  const testsCatalogueSnapshot = await getDocs(testsCatalogueRef, db)
+
+  let testsCatalogueData = testsCatalogueSnapshot.docs.map(doc => {
+        
+    const data = doc.data();
+
+    return { id: doc.id, ...data };
+});
+
+return testsCatalogueData
+
 }

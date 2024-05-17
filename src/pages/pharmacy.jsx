@@ -6,6 +6,7 @@ import { Container, Row, Col } from 'react-bootstrap';
 import Prescriptions from './pharmacy_patient_prescriptions'
 import MainInventory from './MainInventory';
 import MedicineInventory from '../components/pharmacy/Inventory';
+import WardOrders from '../components/pharmacy/WardOrders';
 
 const Pharmacy = () => {
   const [activeTab, setActiveTab] = useState('prescriptions');
@@ -42,7 +43,7 @@ const Pharmacy = () => {
   };
 
   return (
-    <Container>
+    <Container className='py-3'>
       <Row>
         <Col>
           <Tabs
@@ -52,11 +53,11 @@ const Pharmacy = () => {
             className="justify-content-center"
           >
             <Tab eventKey="prescriptions" title="Prescriptions">
-              {/* {renderPrescriptionsContent()} */}
+              
               <Prescriptions  activeTab={'prescriptions'}/>
             </Tab>
             <Tab eventKey="ward-orders" title="Ward Orders">
-              {renderWardOrdersContent()}
+             <WardOrders/>
             </Tab>
             <Tab eventKey="medicine" title="Medicine">
               <MedicineInventory activeTab='medicine'/>

@@ -165,7 +165,7 @@ const Expenses = ({activeTab}) => {
         </ReusableModal>
         
       <div className="d-flex justify-content-between py-3">
-      <Button onClick={()=>setShowModal(true)}>Add Expense Category</Button>
+      <Button onClick={()=>setShowModal(true)}>Add Expense</Button>
       </div>
 
       <ReusableTable

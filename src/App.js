@@ -26,6 +26,7 @@ import { ToastContainer } from 'react-toastify';
 import UserRoleMapping from './pages/UserRolesTable';
 import 'react-toastify/dist/ReactToastify.css';
 import EmployeeProfile from './components/userProfile';
+import RegistrationForm from './pages/HospitalRegistration';
 
 function App() {
   return (
@@ -38,7 +39,7 @@ function App() {
             {/* <Loader /> Render the Loader component here */}
             <Routes>
               {/* Home Route */}
-              <Route path="/" element={<Dashboard />} />
+              <Route path="/" element={<RegistrationForm />} />
               {/* Dashboard Route */}
               <Route path="/dashboard" element={<Dashboard />} />
               {/* registration route */}

@@ -15,7 +15,7 @@ import {
   Space,
 } from "antd";
 import { EditFilled } from "@ant-design/icons";
-import moment from 'moment';
+import moment from "moment";
 
 const { TabPane } = Tabs;
 
@@ -37,7 +37,12 @@ const mockEmployee = {
 
 const EmployeeProfile = ({ employee = mockEmployee }) => {
   const [editing, setEditing] = useState(false);
-  const [formData, setFormData] = useState(employee);
+  const [formData, setFormData] = useState({
+    ...employee,
+    dateJoined: moment(employee.dateJoined, "YYYY-MM-DD", true).isValid()
+      ? moment(employee.dateJoined, "YYYY-MM-DD")
+      : null,
+  });
 
   // Error handling for undefined data
   if (!employee) {
@@ -64,10 +69,9 @@ const EmployeeProfile = ({ employee = mockEmployee }) => {
   };
 
   const onChange = (date, dateString) => {
-    console.log(date, dateString);
     setFormData({
       ...formData,
-      dateJoined: dateString, // Update dateJoined in formData
+      dateJoined: date, // Update dateJoined in formData with the moment object
     });
   };
 
@@ -107,14 +111,26 @@ const EmployeeProfile = ({ employee = mockEmployee }) => {
               size="small"
               bordered
               dataSource={Object.entries(formData).filter(
-                ([key]) => !["avatar", "name", "department", "role", "dateJoined"].includes(key)
+                ([key]) =>
+                  ![
+                    "avatar",
+                    "name",
+                    "department",
+                    "role",
+                    "dateJoined",
+                  ].includes(key)
               )}
               renderItem={([key, value]) => (
                 <List.Item>
                   <List.Item.Meta
                     title={
                       <strong>
-                        {key.replace(/[A-Z]/g, (letter) => ` ${letter.toLowerCase()}`).trim()}
+                        {key
+                          .replace(
+                            /[A-Z]/g,
+                            (letter) => ` ${letter.toLowerCase()}`
+                          )
+                          .trim()}
                         :
                       </strong>
                     }
@@ -130,25 +146,25 @@ const EmployeeProfile = ({ employee = mockEmployee }) => {
       {/* Styled Tabs Section */}
       <Tabs
         defaultActiveKey="1"
-        tabBarStyle={{ fontWeight: "bold", fontSize: "1.1em" }}
+        tabBarStyle={{ fontWeight: "bold", fontSize: "5.1em" }}
       >
         <TabPane
-          tab={<span style={{ color: "#1890ff" }}>Attendance</span>}
+          tab={<span style={{ color: "#15A362" }}>Attendance</span>}
           key="1"
         >
           {/* Attendance content */}
         </TabPane>
-        <TabPane tab={<span style={{ color: "#1890ff" }}>Leaves</span>} key="2">
+        <TabPane tab={<span style={{ color: "#15A362" }}>Leaves</span>} key="2">
           {/* Leaves content */}
         </TabPane>
         <TabPane
-          tab={<span style={{ color: "#1890ff" }}>Roles and Permissions</span>}
+          tab={<span style={{ color: "#15A362" }}>Roles and Permissions</span>}
           key="3"
         >
           {/* Roles and Permissions content */}
         </TabPane>
         <TabPane
-          tab={<span style={{ color: "#1890ff" }}>Bank and Tax Info</span>}
+          tab={<span style={{ color: "#15A362" }}>Bank and Tax Info</span>}
           key="4"
         >
           {/* Bank and Tax Info content */}
@@ -162,14 +178,16 @@ const EmployeeProfile = ({ employee = mockEmployee }) => {
         onOk={handleUpdate}
         onCancel={handleCancel}
         okText="Update"
-        cancelText="Cancel" // Change cancel button text color to red
-        cancelButtonProps={{ style: { backgroundColor: 'red', borderColor: 'red' } }} // Set cancel button background color to red
-        maskClosable={false} // 1. Prevent modal from closing when clicked outside of it
+        cancelText="Cancel"
+        cancelButtonProps={{
+          style: { backgroundColor: "red", borderColor: "red" },
+        }}
+        maskClosable={false}
       >
         <Form
           labelCol={{ span: 6 }}
-          wrapperCol={{ span: 18 }}
-          initialValues={formData}>
+          initialValues={formData}
+        >
           <Form.Item
             label="Name"
             name="name"
@@ -194,19 +212,7 @@ const EmployeeProfile = ({ employee = mockEmployee }) => {
             <Input />
           </Form.Item>
 
-          <Form.Item
-            label="Date Joined"
-            name="dateJoined"
-            rules={[
-              { required: true, message: "Please select the date joined" },
-            ]}
-          >
-            <Space direction="vertical">
-              <DatePicker onChange={onChange} defaultValue={moment(employee.dateJoined, "YYYY-MM-DD")} /> 
-              {/* Set defaultValue to initial dateJoined */}
-            </Space>
-          </Form.Item>
-
+          
           <Form.Item
             label="Email"
             name="email"
@@ -218,9 +224,21 @@ const EmployeeProfile = ({ employee = mockEmployee }) => {
             <Input />
           </Form.Item>
 
-          {/* Add more form fields as needed */}
+          <Form.Item
+            label="Date Joined"
+            name="dateJoined"
+            rules={[
+              { required: true, message: "Please select the date joined" },
+            ]}
+          >
+            <DatePicker
+              onChange={onChange}
+              defaultValue={formData.dateJoined}
+              
+            />
+          </Form.Item>
 
-         
+          {/* Add more form fields as needed */}
         </Form>
       </Modal>
     </Card>

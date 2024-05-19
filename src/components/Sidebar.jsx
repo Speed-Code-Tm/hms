@@ -1,22 +1,35 @@
 import LogoutRoundedIcon from "@mui/icons-material/LogoutRounded";
 import PersonAddIcon from "@mui/icons-material/PersonAdd";
-import OutpatientIcon from "@mui/icons-material/Accessible";
-import MedicalRecordsIcon from "@mui/icons-material/Newspaper";
-import PatientManagementIcon from "@mui/icons-material/ManageAccounts";
-import VideoIcon from "@mui/icons-material/VideoChat";
-import CashRegisterIcon from "@mui/icons-material/Paid";
-
 import { Sidebar, Menu, MenuItem, SubMenu } from "react-pro-sidebar";
 import { Link } from "react-router-dom";
-import "../index.css";
 import React, { useState } from "react";
-
 import logoImage from "./logo.png";
+import { styled } from "@mui/material/styles";
+
+const CustomMenuItem = styled(MenuItem)(({ theme }) => ({
+  "& .MuiSvgIcon-root, & .fas": {
+    color: "#899bbd",
+    transition: "color 0.3s",
+  },
+  "&:hover .MuiSvgIcon-root, &:hover .fas": {
+    color: "#4154f1",
+  },
+  "&.active .MuiSvgIcon-root, &.active .fas": {
+    color: "#4154f1",
+  },
+}));
 
 const SideBar = () => {
   const [activePage, setActivePage] = useState(null);
+  const [expandedSubMenu, setExpandedSubMenu] = useState(null);
 
-  function handleActive(event) {
+  const handleSubMenuClick = (submenu) => {
+    setExpandedSubMenu((prevSubmenu) =>
+      prevSubmenu === submenu ? null : submenu
+    );
+  };
+
+  const handleActive = (event) => {
     const target = event.currentTarget;
     if (activePage !== target) {
       if (activePage) {
@@ -25,37 +38,43 @@ const SideBar = () => {
       target.classList.add("active");
       setActivePage(target);
     }
-  }
+  };
 
   const menuItemStyles = {
     root: {
       fontSize: "14px",
-      fontWeight: 500,
+      fontWeight: 600,
     },
     icon: {
-      color: "#63b3ed",
+      color: "#899bbd",
+      "&:hover, &.active": {
+        color: "#4154f1",
+      },
     },
     SubMenuExpandIcon: {
-      color: "#a0aec0",
+      color: "#899bbd",
+      "&:hover, &.active": {
+        color: "#4154f1",
+      },
     },
-    subMenuContent: () => ({
-      backgroundColor: "#2d3748",
-    }),
-    label: () => ({
+    subMenuContent: {
+      backgroundColor: "#fff",
+    },
+    label: {
       fontWeight: 600,
-    }),
+    },
     button: {
-      color: "#e2e8f0",
+      color: "#012970",
       fontSize: "0.9rem",
       fontWeight: "600",
       transition: "color 0.3s ease, background-color 0.3s ease",
       "&:hover": {
-        color: "#e2e8f0",
-        backgroundColor: "#4a5568",
+        color: "#4154f1",
+        backgroundColor: "#f6f9ff",
       },
       "&.active": {
-        backgroundColor: "#63b3ed",
-        color: "#1a202c",
+        backgroundColor: "#f6f9ff",
+        color: "#4154f1",
       },
       textDecoration: "none",
     },
@@ -64,13 +83,15 @@ const SideBar = () => {
   return (
     <Sidebar
       className="app"
-      backgroundColor="#1a202c"
+      backgroundColor="#fff"
       rootStyles={{
-        color: "#e2e8f0",
+        color: "#012970",
       }}
       style={{
-        borderRight: "1px solid #2d3748",
-        boxShadow: "0 0 10px rgba(0, 0, 0, 0.1)",
+        borderRight: "none",
+        boxShadow: "0px 0px 20px rgba(1, 41, 112, 0.1)",
+        overflowY: "auto",
+        maxHeight: "100vh",
       }}
     >
       <div
@@ -86,12 +107,12 @@ const SideBar = () => {
           alt="Logo"
           style={{ width: "80px", height: "80px" }}
         />
-        <h3 style={{ color: "#63b3ed", marginTop: "0.5rem" }}>
+        <h3 style={{ color: "#4154f1", marginTop: "0.5rem" }}>
           Hospital System
         </h3>
       </div>
       <Menu menuItemStyles={menuItemStyles}>
-        <MenuItem
+        <CustomMenuItem
           component={
             <Link to="/dashboard" onClick={handleActive}>
               Dashboard
@@ -100,12 +121,14 @@ const SideBar = () => {
           icon={<i className="fas fa-tachometer-alt"></i>}
         >
           Dashboard
-        </MenuItem>
+        </CustomMenuItem>
         <SubMenu
           label="Patient Reception"
           icon={<i className="fas fa-user-nurse"></i>}
+          open={expandedSubMenu === "Patient Reception"}
+          onOpenChange={() => handleSubMenuClick("Patient Reception")}
         >
-          <MenuItem
+          <CustomMenuItem
             component={
               <Link to="/registration" onClick={handleActive}>
                 Patient Registration
@@ -114,8 +137,8 @@ const SideBar = () => {
             icon={<PersonAddIcon />}
           >
             Patient Registration
-          </MenuItem>
-          <MenuItem
+          </CustomMenuItem>
+          <CustomMenuItem
             component={
               <Link to="/TriageAssessment" onClick={handleActive}>
                 Triage & Assessment
@@ -124,10 +147,9 @@ const SideBar = () => {
             icon={<i className="fas fa-clipboard-list"></i>}
           >
             Triage & Assessment
-          </MenuItem>
-
+          </CustomMenuItem>
         </SubMenu>
-        <MenuItem
+        <CustomMenuItem
           component={
             <Link to="/electronic-health-records" onClick={handleActive}>
               Electronic Health Records
@@ -136,8 +158,8 @@ const SideBar = () => {
           icon={<i className="fas fa-stethoscope"></i>}
         >
           Electronic Health Records
-        </MenuItem>
-        <MenuItem
+        </CustomMenuItem>
+        <CustomMenuItem
           component={
             <Link to="/TeleMedicine" onClick={handleActive}>
               Telemedicine System
@@ -146,9 +168,14 @@ const SideBar = () => {
           icon={<i className="fas fa-mobile-alt"></i>}
         >
           Telemedicine System
-        </MenuItem>
-        <SubMenu label="Diagnostics" icon={<i className="fas fa-vial"></i>}>
-          <MenuItem
+        </CustomMenuItem>
+        <SubMenu
+          label="Diagnostics"
+          icon={<i className="fas fa-vial"></i>}
+          open={expandedSubMenu === "Diagnostics"}
+          onOpenChange={() => handleSubMenuClick("Diagnostics")}
+        >
+          <CustomMenuItem
             component={
               <Link to="/ImagingDashboard" onClick={handleActive}>
                 Imaging
@@ -157,8 +184,8 @@ const SideBar = () => {
             icon={<i className="fas fa-x-ray"></i>}
           >
             Imaging
-          </MenuItem>
-          <MenuItem
+          </CustomMenuItem>
+          <CustomMenuItem
             component={
               <Link to="/Laboratory" onClick={handleActive}>
                 Laboratory
@@ -167,9 +194,9 @@ const SideBar = () => {
             icon={<i className="fas fa-flask"></i>}
           >
             Laboratory
-          </MenuItem>
+          </CustomMenuItem>
         </SubMenu>
-        <MenuItem
+        <CustomMenuItem
           component={
             <Link to="/Pharmacy" onClick={handleActive}>
               Pharmacy Management
@@ -178,8 +205,8 @@ const SideBar = () => {
           icon={<i className="fas fa-pills"></i>}
         >
           Pharmacy Management
-        </MenuItem>
-        <MenuItem
+        </CustomMenuItem>
+        <CustomMenuItem
           component={
             <Link to="/InpatientManagement" onClick={handleActive}>
               Inpatient Management
@@ -188,12 +215,14 @@ const SideBar = () => {
           icon={<i className="fas fa-procedures"></i>}
         >
           Inpatient Management
-        </MenuItem>
+        </CustomMenuItem>
         <SubMenu
           label="Inpatient Management"
           icon={<i className="fas fa-user-nurse"></i>}
+          open={expandedSubMenu === "Inpatient Management"}
+          onOpenChange={() => handleSubMenuClick("Inpatient Management")}
         >
-           <MenuItem
+          <CustomMenuItem
             component={
               <Link to="/patientCare" onClick={handleActive}>
                 Patient Care
@@ -202,14 +231,15 @@ const SideBar = () => {
             icon={<i className="fas fa-users"></i>}
           >
             Patient Care
-          </MenuItem>
-         
+          </CustomMenuItem>
         </SubMenu>
         <SubMenu
           label="Doctor Management"
           icon={<i className="fas fa-user-md"></i>}
+          open={expandedSubMenu === "Doctor Management"}
+          onOpenChange={() => handleSubMenuClick("Doctor Management")}
         >
-          <MenuItem
+          <CustomMenuItem
             component={
               <Link to="/physician-scheduling" onClick={handleActive}>
                 Patient schedule
@@ -217,9 +247,9 @@ const SideBar = () => {
             }
             icon={<i className="fas fa-calendar-alt"></i>}
           >
-           Patient schedule
-          </MenuItem>
-          <MenuItem
+            Patient schedule
+          </CustomMenuItem>
+          <CustomMenuItem
             component={
               <Link to="/clinic-management" onClick={handleActive}>
                 Clinic Operations
@@ -228,8 +258,8 @@ const SideBar = () => {
             icon={<i className="fas fa-clinic-medical"></i>}
           >
             Clinic Operations
-          </MenuItem>
-          <MenuItem
+          </CustomMenuItem>
+          <CustomMenuItem
             component={
               <Link to="/order-management" onClick={handleActive}>
                 Medical Orders
@@ -238,13 +268,15 @@ const SideBar = () => {
             icon={<i className="fas fa-clipboard-list"></i>}
           >
             Medical Orders
-          </MenuItem>
+          </CustomMenuItem>
         </SubMenu>
         <SubMenu
           label="Financial Management"
           icon={<i className="fas fa-money-bill-wave"></i>}
+          open={expandedSubMenu === "Financial Management"}
+          onOpenChange={() => handleSubMenuClick("Financial Management")}
         >
-          <MenuItem
+          <CustomMenuItem
             component={
               <Link to="/FinancialManagement" onClick={handleActive}>
                 Budgeting
@@ -253,8 +285,8 @@ const SideBar = () => {
             icon={<i className="fas fa-file-invoice-dollar"></i>}
           >
             Budgeting
-          </MenuItem>
-          <MenuItem
+          </CustomMenuItem>
+          <CustomMenuItem
             component={
               <Link to="/collections-denials" onClick={handleActive}>
                 Collections & Denials Management
@@ -263,8 +295,8 @@ const SideBar = () => {
             icon={<i className="fas fa-hand-holding-usd"></i>}
           >
             Collections & Denials Management
-          </MenuItem>
-          <MenuItem
+          </CustomMenuItem>
+          <CustomMenuItem
             component={
               <Link to="/reporting-analytics" onClick={handleActive}>
                 Reporting & Analytics
@@ -273,29 +305,32 @@ const SideBar = () => {
             icon={<i className="fas fa-chart-line"></i>}
           >
             Reporting & Analytics
-          </MenuItem>
+          </CustomMenuItem>
         </SubMenu>
         <SubMenu
           label="Specialty Clinics"
           icon={<i className="fas fa-clinic-medical"></i>}
+          open={expandedSubMenu === "Specialty Clinics"}
+          onOpenChange={() => handleSubMenuClick("Specialty Clinics")}
         >
-          <MenuItem
+          <CustomMenuItem
             component={
               <Link to="/clinic-manager" onClick={handleActive}>
-               clinic-manager
+                clinic-manager
               </Link>
             }
             icon={<i className="fas fa-heartbeat"></i>}
           >
-           clinic-manager
-          </MenuItem>
-         
+            clinic-manager
+          </CustomMenuItem>
         </SubMenu>
         <SubMenu
           label="Surgery Management"
           icon={<i className="fas fa-procedures"></i>}
+          open={expandedSubMenu === "Surgery Management"}
+          onOpenChange={() => handleSubMenuClick("Surgery Management")}
         >
-          <MenuItem
+          <CustomMenuItem
             component={
               <Link to="/or-scheduling" onClick={handleActive}>
                 OR Scheduling
@@ -304,8 +339,8 @@ const SideBar = () => {
             icon={<i className="fas fa-calendar-alt"></i>}
           >
             OR Scheduling
-          </MenuItem>
-          <MenuItem
+          </CustomMenuItem>
+          <CustomMenuItem
             component={
               <Link to="/pre-operative-management" onClick={handleActive}>
                 Pre-Operative Management
@@ -314,8 +349,8 @@ const SideBar = () => {
             icon={<i className="fas fa-file-medical-alt"></i>}
           >
             Pre-Operative Management
-          </MenuItem>
-          <MenuItem
+          </CustomMenuItem>
+          <CustomMenuItem
             component={
               <Link to="/post-operative-management" onClick={handleActive}>
                 Post-Operative Management
@@ -324,13 +359,15 @@ const SideBar = () => {
             icon={<i className="fas fa-file-medical"></i>}
           >
             Post-Operative Management
-          </MenuItem>
+          </CustomMenuItem>
         </SubMenu>
         <SubMenu
           label="Supply Chain Management"
           icon={<i className="fas fa-truck"></i>}
+          open={expandedSubMenu === "Supply Chain Management"}
+          onOpenChange={() => handleSubMenuClick("Supply Chain Management")}
         >
-          <MenuItem
+          <CustomMenuItem
             component={
               <Link to="/Procurement" onClick={handleActive}>
                 Inventory Management
@@ -339,8 +376,8 @@ const SideBar = () => {
             icon={<i className="fas fa-clipboard-list-check"></i>}
           >
             Inventory Management
-          </MenuItem>
-          <MenuItem
+          </CustomMenuItem>
+          <CustomMenuItem
             component={
               <Link to="/purchasing-ordering" onClick={handleActive}>
                 Purchasing & Ordering
@@ -349,8 +386,8 @@ const SideBar = () => {
             icon={<i className="fas fa-shopping-cart"></i>}
           >
             Purchasing & Ordering
-          </MenuItem>
-          <MenuItem
+          </CustomMenuItem>
+          <CustomMenuItem
             component={
               <Link to="/receiving-vendor-management" onClick={handleActive}>
                 Receiving & Vendor Management
@@ -359,13 +396,15 @@ const SideBar = () => {
             icon={<i className="fas fa-truck-loading"></i>}
           >
             Receiving & Vendor Management
-          </MenuItem>
+          </CustomMenuItem>
         </SubMenu>
         <SubMenu
           label="Human Resources"
           icon={<i className="fas fa-users"></i>}
+          open={expandedSubMenu === "Human Resources"}
+          onOpenChange={() => handleSubMenuClick("Human Resources")}
         >
-          <MenuItem
+          <CustomMenuItem
             component={
               <Link to="/" onClick={handleActive}>
                 Employee Management
@@ -374,8 +413,8 @@ const SideBar = () => {
             icon={<i className="fas fa-users-cog"></i>}
           >
             Employee Management
-          </MenuItem>
-          <MenuItem
+          </CustomMenuItem>
+          <CustomMenuItem
             component={
               <Link to="/payroll" onClick={handleActive}>
                 Payroll
@@ -384,8 +423,8 @@ const SideBar = () => {
             icon={<i className="fas fa-money-bill-wave"></i>}
           >
             Payroll
-          </MenuItem>
-          <MenuItem
+          </CustomMenuItem>
+          <CustomMenuItem
             component={
               <Link to="/benefits-administration" onClick={handleActive}>
                 Benefits Administration
@@ -394,8 +433,8 @@ const SideBar = () => {
             icon={<i className="fas fa-briefcase"></i>}
           >
             Benefits Administration
-          </MenuItem>
-          <MenuItem
+          </CustomMenuItem>
+          <CustomMenuItem
             component={
               <Link to="/department-management" onClick={handleActive}>
                 Department Management
@@ -404,13 +443,13 @@ const SideBar = () => {
             icon={<i className="fas fa-building"></i>}
           >
             Department Management
-          </MenuItem>
+          </CustomMenuItem>
         </SubMenu>
         <SubMenu
           label="Department Management"
           icon={<i className="fas fa-chart-bar"></i>}
         >
-          <MenuItem
+          <CustomMenuItem
             component={
               <Link to="/clinical-reports" onClick={handleActive}>
                 Clinical Reports
@@ -419,8 +458,8 @@ const SideBar = () => {
             icon={<i className="fas fa-file-medical-alt"></i>}
           >
             Clinical Reports
-          </MenuItem>
-          <MenuItem
+          </CustomMenuItem>
+          <CustomMenuItem
             component={
               <Link to="/financial-reports" onClick={handleActive}>
                 Financial Reports
@@ -429,8 +468,8 @@ const SideBar = () => {
             icon={<i className="fas fa-file-invoice-dollar"></i>}
           >
             Financial Reports
-          </MenuItem>
-          <MenuItem
+          </CustomMenuItem>
+          <CustomMenuItem
             component={
               <Link to="/DutyRota" onClick={handleActive}>
                 Operational Reports
@@ -439,10 +478,15 @@ const SideBar = () => {
             icon={<i className="fas fa-chart-pie"></i>}
           >
             Duty Rota
-          </MenuItem>
+          </CustomMenuItem>
         </SubMenu>
-        <SubMenu label="Administration" icon={<i className="fas fa-cogs"></i>}>
-          <MenuItem
+        <SubMenu
+          label="Administration"
+          icon={<i className="fas fa-cogs"></i>}
+          open={expandedSubMenu === "Administration"}
+          onOpenChange={() => handleSubMenuClick("Administration")}
+        >
+          <CustomMenuItem
             component={
               <Link to="/system-configuration" onClick={handleActive}>
                 System Configuration
@@ -451,8 +495,8 @@ const SideBar = () => {
             icon={<i className="fas fa-cogs"></i>}
           >
             System Configuration
-          </MenuItem>
-          <MenuItem
+          </CustomMenuItem>
+          <CustomMenuItem
             component={
               <Link to="/UserManagement" onClick={handleActive}>
                 User Management
@@ -461,8 +505,8 @@ const SideBar = () => {
             icon={<i className="fas fa-users-cog"></i>}
           >
             User Management
-          </MenuItem>
-          <MenuItem
+          </CustomMenuItem>
+          <CustomMenuItem
             component={
               <Link to="/Permissions" onClick={handleActive}>
                 Permissions
@@ -470,11 +514,14 @@ const SideBar = () => {
             }
             icon={<i className="fas fa-shield-alt"></i>}
           >
-           Permissions
-          </MenuItem>
+            Permissions
+          </CustomMenuItem>
         </SubMenu>
-        <SubMenu label="Settings" icon={<i className="fas fa-cog"></i>}>
-          <MenuItem
+        <SubMenu label="Settings" 
+        icon={<i className="fas fa-cog"></i>}
+        open={expandedSubMenu === "Settings"}
+        onOpenChange={() => handleSubMenuClick("Settings")}>
+          <CustomMenuItem
             component={
               <Link to="/facility-settings" onClick={handleActive}>
                 Facility Settings
@@ -483,8 +530,8 @@ const SideBar = () => {
             icon={<i className="fas fa-building"></i>}
           >
             Facility Settings
-          </MenuItem>
-          <MenuItem
+          </CustomMenuItem>
+          <CustomMenuItem
             component={
               <Link to="/user-preferences" onClick={handleActive}>
                 User Preferences
@@ -493,18 +540,9 @@ const SideBar = () => {
             icon={<i className="fas fa-user-cog"></i>}
           >
             User Preferences
-          </MenuItem>
+          </CustomMenuItem>
         </SubMenu>
-        <MenuItem
-          component={
-            <Link to="/logout" onClick={handleActive}>
-              Logout
-            </Link>
-          }
-          icon={<LogoutRoundedIcon />}
-        >
-          Logout
-        </MenuItem>
+        
       </Menu>
     </Sidebar>
   );

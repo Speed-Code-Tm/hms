@@ -5,7 +5,7 @@ import reportWebVitals from './reportWebVitals';
 import { initializeApp } from 'firebase/app';
 import 'firebase/database'; // Import the specific Firebase services you need
 import firebaseConfig from './pages/configs'; // Import the Firebase configuration
-
+import './index.css'
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 

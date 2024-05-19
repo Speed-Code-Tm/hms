@@ -6,7 +6,7 @@ import TestManagement from "../components/Lab_TestManagement";
 import TasksAndReminders from "../components/Lab_TasksAndReminders";
 
 const LaboratoryManagement = () => {
-  const [activeTab, setActiveTab] = useState("patientManagement");
+  const [activeTab, setActiveTab] = useState("labTestOrders");
 
   const handleTabChange = (tab) => {
     setActiveTab(tab);
@@ -17,7 +17,7 @@ const LaboratoryManagement = () => {
       <Row>
         <Col>
           <TabbedInterface activeTab={activeTab} onTabChange={handleTabChange}>
-            <Tab eventKey="patientManagement" title="Patient Management">
+            <Tab eventKey="labTestOrders" title="Lab Test Orders">
               <PatientManagement />
             </Tab>
             <Tab eventKey="testManagement" title="Test Management">

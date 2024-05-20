@@ -8,11 +8,12 @@ import OrderItem from '../components/OrderItem';
 import * as Yup from 'yup';
 import { toast } from 'react-toastify';
 import { initializeApp } from "firebase/app";
-import firebaseConfig from "./configs"; // Import your Firebase configuration
+import firebaseConfig,{addVendor, deleteVendor, deleteVendorItem, retrieveVendorItems, retrieveVendors, updateVendor} from "./configs"; // Import your Firebase configuration
 
 import { addDoc, collection, getDocs,deleteDoc, doc,getFirestore, query, where } from 'firebase/firestore';
 
 import "react-toastify/dist/ReactToastify.css";
+import ConfirmationModal from '../components/ConfirmationModal';
 
 const app = initializeApp(firebaseConfig); // Initialize Firebase app
 const db = getFirestore(app); // Get Firestore instance
@@ -29,13 +30,11 @@ const VendorManagement = () => {
     const [showOrderModal,setShowOrderModal] = useState(false)
     const [data,setData] = useState([])
     const [vendorItems,setVendorItems] = useState([])
-   
+    const [confirmDelete,setShowConfirmDelete] = useState(false)
     const [loading,setLoading] = useState(false)
-
     const [selectedItem,setSelectedItem] = useState()
-
-    const vendorsRef = collection(db, 'vendors')
-
+    const [selectedVendor,setSelectedVendor] = useState()
+    const [itemDeletionConfirmation,setShowItemDeletionConfirmation] = useState(false)
     const [formData,setFormData] = useState({
       name:'',
       category:'',
@@ -64,24 +63,44 @@ const vendorValidationSchema = Yup.object().shape({
 });
 
 
+const handleUpdate =  (item) =>{
+  setSelectedItem(item)
+  setShowSuppliesModal(true)
+}
+
 
 const handleSubmit = async (e) =>{
   try {
 
     e.preventDefault()
     setLoading(true)
+    let message
 
     await vendorValidationSchema.validate(formData, { abortEarly: false });
 
-    await addDoc(vendorsRef, formData)
+    if(selectedVendor){
 
-        setFormData({
-          name: '',
-          category: '',
-          phoneNumber: '',
-          email: ''
-      });
-      setShowModal(false);
+      await updateVendor(selectedVendor.id, formData)
+
+      setSelectedVendor(null)
+      message = "Vendor updated"
+    }else{
+      await addVendor(formData)
+   
+     
+    message="Vendor added"
+    }
+
+    setFormData({
+      name: '',
+      category: '',
+      phoneNumber: '',
+      email: ''
+  });
+
+    toast.success(message)
+   handleModalClose()
+   fetchVendors()
 
   } catch (errors) {
     if (errors.inner && errors.inner.length > 0) {
@@ -98,6 +117,26 @@ const handleSubmit = async (e) =>{
   }
 }
 
+
+const handleDelete = (item) =>{
+  setShowItemDeletionConfirmation(true)
+  setSelectedItem(item)
+
+}
+
+const confirmItemDeletion  = async () =>{
+    try{
+
+      setShowItemDeletionConfirmation(false)
+
+      await deleteVendorItem(selectedItem.id)
+
+      fetchVendorItems()
+    
+    }catch(error){
+      console.log(error);
+    }
+}
    
       
     const vendorColumns = [
@@ -127,6 +166,22 @@ const handleSubmit = async (e) =>{
       "IT Supplies"
     ];
     
+    const handleRowClick = (vendor, action) =>{
+      setSelectedVendor(vendor)
+
+      if(action === 'update'){
+        setShowModal(true)
+
+      }else{
+        setShowConfirmDelete(true)
+      }
+    }
+
+
+    const closeConfirmationModal = () =>{
+      setShowConfirmDelete(false)
+      setSelectedVendor(null)
+    }
     
     const handleAddVendor = () => {
         setShowModal(true);
@@ -134,14 +189,32 @@ const handleSubmit = async (e) =>{
     
     const handleModalClose = () => {
         setShowModal(false);
+
+        if(selectedVendor){
+          setSelectedVendor(null)
+        }
     };
     
     const closeModal = () => {
         
         setShowSuppliesModal(false)
         setShowOrderModal(false)
+        setSelectedItem(null)
+        setShowItemDeletionConfirmation(false)
     };
 
+
+    const unlistVendor = async () =>{
+      try {
+        await deleteVendor(selectedVendor?.id)
+
+        fetchVendors()
+        
+        setShowConfirmDelete(false)
+      } catch (error) {
+        console.log(error);
+      }
+    }
     
     const initialState = {
         pageIndex: 0,
@@ -150,33 +223,15 @@ const handleSubmit = async (e) =>{
 
 
     const fetchVendors = async () => {
-      const vendorsCollection = collection(db, 'vendors');
-      const vendorsSnapshot = await getDocs(vendorsCollection);
-      const vendorsData = vendorsSnapshot.docs.map(doc => ({
-          id: doc.id,
-          ...doc.data(),
-      }));
+      const vendorsData = await retrieveVendors()
       setData(vendorsData);
   };
 
 
   const fetchVendorItems = async () => {
-    const vendorItemsCollection = collection(db, 'vendorItems');
-    const vendorsCollection = collection(db, 'vendors');
-
-    const vendorItemsSnapshot = await getDocs(vendorItemsCollection);
-    const vendorItemsData = vendorItemsSnapshot.docs.map(async (doc) => {
-      const vendorItemData ={ id:doc.id,...doc.data()};
-      const vendorQuery = query(
-        vendorsCollection,
-        where('__name__', '==', vendorItemData.vendorId)
-      );
-      const vendorSnapshot = await getDocs(vendorQuery);
-      const vendorData = vendorSnapshot.docs[0]?.data();
-      return { ...vendorItemData, vendor: vendorData?.name || 'Unknown Vendor' };
-    });
-    const resolvedVendorItems = await Promise.all(vendorItemsData);
-    setVendorItems(resolvedVendorItems);
+   
+    const vendorItemsData = await retrieveVendorItems()
+    setVendorItems(vendorItemsData);
     
 };
 
@@ -197,10 +252,21 @@ useEffect(() => {
   }
 }, [activeTab]);
 
+useEffect(()=>{
+  if(selectedVendor){
+    setFormData({
+      name:selectedVendor?.name,
+      category:selectedVendor?.category,
+      phoneNumber:selectedVendor?.phoneNumber,
+      email:selectedVendor?.email
+    })
+  }
+},[selectedVendor])
+
 
 
     return (
-        <Container>
+        <Container className='py-3'>
             <Row>
                 <Col>
                     <Tabs activeKey={activeTab} onSelect={(key) => setActiveTab(key)} className="justify-content-center">
@@ -208,17 +274,20 @@ useEffect(() => {
                             <Button variant="primary" onClick={handleAddVendor} className='mb-3 mt-2' >
                                 Add Vendor
                             </Button>
-                            <ReusableTable columns={vendorColumns} data={data} initialState={initialState}
+                            <ReusableTable 
+                            columns={vendorColumns} 
+                            data={data} 
+                            initialState={initialState}
                             
                             ActionDropdown={({ row }) => (
                               <div>
                                 {/* add a drop down button menu wth icons and functions */}
                                 <DropdownButton dropup="true" id="dropdown-basic-button" title="Actions">
                                 
-                                  <Dropdown.Item href="#/action-1" >
-                                   Edit
+                                  <Dropdown.Item href="#/action-1" onClick={()=> handleRowClick(row.original, 'update')} >
+                                  Update
                                   </Dropdown.Item>
-                                  <Dropdown.Item href="#/action-2">
+                                  <Dropdown.Item href="#/action-2" onClick={()=> handleRowClick(row.original, 'delete')}>
                                   Delete
                                   </Dropdown.Item>
                                  
@@ -239,12 +308,11 @@ useEffect(() => {
                                 <DropdownButton dropup="true" id="dropdown-basic-button" title="Actions">
                                 <Dropdown.Item href="#/action-1" onClick={()=>handleItemOrder(row.original)}>
                                  Order
+                                  </Dropdown.Item>                           
+                                  <Dropdown.Item href="#/action-1" onClick={()=>handleUpdate(row.original)} >
+                                  Update
                                   </Dropdown.Item>
-                                
-                                  <Dropdown.Item href="#/action-1" >
-                                   Edit
-                                  </Dropdown.Item>
-                                  <Dropdown.Item href="#/action-2">
+                                  <Dropdown.Item href="#/action-2" onClick={()=>handleDelete(row.original)}> 
                                   Delete
                                   </Dropdown.Item>
                                  
@@ -257,8 +325,25 @@ useEffect(() => {
                 </Col>
             </Row>
 
+            {/* vendor deletion confirm modal  */}
+
+            <ConfirmationModal
+        show={confirmDelete}
+        handleClose={closeConfirmationModal}
+        handleConfirm={unlistVendor}
+        message="Are you sure you want to delete this vendor?"
+      />
+
+  {/* vendor item deletion confirm modal  */}
+
+  <ConfirmationModal
+        show={itemDeletionConfirmation}
+        handleClose={closeModal}
+        handleConfirm={confirmItemDeletion}
+        message="Are you sure you want to delete this item?"
+      />
             {/* Modal for adding a new vendor */}
-            <ReusableModal show={showModal} title="Add Vendor" onHide={()=>setShowModal(false)}>
+            <ReusableModal show={showModal} title={selectedVendor?"Update Vendor" :"Add Vendor"} onHide={handleModalClose}>
                     <Form> 
                       
                         <Form.Group controlId="vendorName" className='mb-3'>
@@ -321,8 +406,8 @@ useEffect(() => {
 
                 {/* add new vendor item modal */}
 
-                <ReusableModal show={showSuppliesModal} title="Add Vendor Item" onHide={()=> setShowSuppliesModal(false)}>
-            <AddVendorItem  onClose={closeModal}/>
+                <ReusableModal show={showSuppliesModal} title={selectedItem ? "Update Vendor Item":"Add Vendor Item"} onHide={()=> setShowSuppliesModal(false)}>
+            <AddVendorItem selectedItem={selectedItem} refetch={fetchVendorItems}  onClose={closeModal}/>
           </ReusableModal>
 
 {/* order item modal */}

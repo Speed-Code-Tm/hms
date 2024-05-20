@@ -4,7 +4,7 @@ import { toast } from 'react-toastify';
 import styled from 'styled-components';
 import { addDoc, collection, getDocs,deleteDoc, doc, getFirestore } from 'firebase/firestore';
 import * as Yup from 'yup';
-import firebaseConfig from '../pages/configs';
+import firebaseConfig, { addVendorItem, retrieveVendorItems, retrieveVendors, updateVendorItem } from '../pages/configs';
 import { initializeApp } from 'firebase/app';
 const app = initializeApp(firebaseConfig); // Initialize Firebase app
 
@@ -14,7 +14,7 @@ width: 200px;
 `;
 
 
-const AddVendorItem = ({onClose}) => {
+const AddVendorItem = ({onClose,selectedItem, refetch }) => {
 
     const [loading,setLoading] = useState(false)
     const [vendors,setVendors] = useState([])
@@ -48,13 +48,10 @@ const AddVendorItem = ({onClose}) => {
         
         const fetchVendors = async () => {
           try {
-            const vendorsCollection = collection(db, 'vendors');
-            const vendorsSnapshot = await getDocs(vendorsCollection);
-            const vendorsList = vendorsSnapshot.docs.map(doc => ({
-              id: doc.id,
-              name: doc.data().name,
-            }));
-            setVendors(vendorsList);
+
+            const vendorData = await retrieveVendors()
+            
+            setVendors(vendorData);
           } catch (error) {
             console.error('Error fetching vendors:', error);
           }
@@ -74,15 +71,20 @@ const AddVendorItem = ({onClose}) => {
       const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
+        let message
         try {
             
           await vendorItemValidationSchema.validate(formData, { abortEarly: false });
     
-          
-          const vendorItemsCollection = collection(db, 'vendorItems');
-          await addDoc(vendorItemsCollection, formData);
-    
-          
+          if(selectedItem){
+            message = "Vendor Item updated"
+
+            await updateVendorItem(selectedItem.id, formData)
+          }else{
+          await addVendorItem(formData)
+          message ="Vendor item added"
+          }
+            
           setFormData({
             vendorId: '',
             itemName: '',
@@ -95,6 +97,8 @@ const AddVendorItem = ({onClose}) => {
          onClose()
          
           setLoading(false);
+          toast.success(message)
+          refetch()
         } catch (errors) {
             console.log(errors)
           if (errors.inner && errors.inner.length > 0) {
@@ -110,7 +114,14 @@ const AddVendorItem = ({onClose}) => {
         }
       };
     
-    
+
+      useEffect(()=>{
+        if(selectedItem){
+          setFormData({
+            ...selectedItem
+            });
+        }
+      },[selectedItem])
 
 
   return (

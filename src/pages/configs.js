@@ -214,14 +214,169 @@ export const updateVitalSigns = async (hospitalVisitId, vitalSigns) => {
 
   //main inventory
 
+  //vendor management
+
+  // fetch vendors
+
+  export const retrieveVendors =  async () =>{
+
+    try{
+      const procurementId =  await getCollectionId(hospitalRef, 'Procurement')
+    
+      const vendorsRef = hospitalRef.collection('Procurement').doc(procurementId).collection('vendors');
+  
+   const vendorsSnapshot = await getDocs(vendorsRef);
+    const vendorsData = vendorsSnapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data(),
+    }));
+
+    return vendorsData
+    }catch(error){
+      throw error
+    }
+
+   
+  }
+
+  //add vendor
+
+
+  export const addVendor  = async (vendor) =>{
+    try{
+      const procurementId =  await getCollectionId(hospitalRef, 'Procurement')
+    
+      const vendorRef = hospitalRef.collection('Procurement').doc(procurementId).collection('vendors');
+  
+      vendorRef.add(vendor)
+  
+
+    }catch(error){
+
+      throw error
+    }    
+    
+  }
+
+
+  //update vendor
+
+  export const updateVendor = async (vendorId, formData) =>{
+    try{
+      const procurementId = await getCollectionId(hospitalRef, 'Procurement');
+      const vendorRef = hospitalRef.collection('Procurement').doc(procurementId).collection('vendors').doc(vendorId);
+      await vendorRef.update(formData);
+      console.log('Vendor updated successfully');
+    }catch(error){
+      throw error
+    }
+  }
+
+  //delete vendor
+
+  export const deleteVendor = async (vendorId) =>{
+    try{
+      const procurementId = await getCollectionId(hospitalRef, 'Procurement');
+    const vendorRef = hospitalRef.collection('Procurement').doc(procurementId).collection('vendors').doc(vendorId);
+    const vendorItemsRef = hospitalRef.collection('Procurement').doc(procurementId).collection('vendorItems').where('vendorId', '==', vendorId);
+
+    const batch = firebase.firestore().batch();
+
+    // Get all vendorItems linked to the vendor
+    const snapshot = await vendorItemsRef.get();
+    snapshot.forEach(doc => {
+      batch.delete(doc.ref);
+    });
+
+    // Delete the vendor doc
+    batch.delete(vendorRef);
+
+    // Commit batch
+    await batch.commit();
+    }
+    catch(error){
+     throw error
+    }
+  }
+
+  //add vendor item
+
+  export const addVendorItem = async (vendorItem) =>{
+    try{
+      const procurementId = await getCollectionId(hospitalRef, 'Procurement');
+      const vendorItemRef = hospitalRef.collection('Procurement').doc(procurementId).collection('vendorSupplies')
+      
+      vendorItemRef.add(vendorItem)
+    }catch(error){
+      throw error
+    }
+  }
+
+  //update vendor item
+
+  export const updateVendorItem = async (itemId,formData) =>{
+    try{
+      const procurementId = await getCollectionId(hospitalRef, 'Procurement');
+    const vendorItemRef = hospitalRef.collection('Procurement').doc(procurementId).collection('vendorSupplies').doc(itemId);
+
+    await vendorItemRef.update(formData);
+
+    }catch(error){
+      throw error
+    }
+  }
+
+
+  //delete vendor item
+
+  export const deleteVendorItem =  async(item)=>{
+   try {
+    const procurementId = await getCollectionId(hospitalRef, 'Procurement');
+    const vendorItemsRef = hospitalRef.collection('Procurement').doc(procurementId).collection('vendorSupplies').doc(item);
+
+    await vendorItemsRef.delete();
+   } catch (error) {
+    throw error
+   }
+  }
+
+
+
+  // retrieve vendor items
+
+  export const retrieveVendorItems  = async () =>{
+
+    try{
+        const procurementId = await getCollectionId(hospitalRef, 'Procurement');
+        const vendorItemsCollection = hospitalRef.collection('Procurement').doc(procurementId).collection('vendorSupplies');
+        const vendorsCollection = hospitalRef.collection('Procurement').doc(procurementId).collection('vendors');
+    
+        const vendorItemsSnapshot = await vendorItemsCollection.get();
+        const vendorItemsData = await Promise.all(
+          vendorItemsSnapshot.docs.map(async (doc) => {
+            const vendorItemData = { id: doc.id, ...doc.data() };
+            const vendorQuery = vendorsCollection.where('__name__', '==', vendorItemData.vendorId);
+            const vendorSnapshot = await vendorQuery.get();
+            const vendorData = vendorSnapshot.docs[0]?.data();
+            return { ...vendorItemData, vendor: vendorData?.name || 'Unknown Vendor' };
+          })
+        );
+    
+        return vendorItemsData;
+    }catch(error){
+      throw error
+    }
+  }
+
+
+
+
   //retrieving data from the main inventory
 
   export const retrieveInventoryItems= async() =>{
     try {
 
       const procurementId =  await getCollectionId(hospitalRef, 'Procurement')
-    
-       
     
       const inventoryRef = hospitalRef.collection('Procurement').doc(procurementId).collection('inventory');
       
@@ -366,7 +521,7 @@ export const  retrieveBeds = async () =>{
 
 export const addExpense = async (expense) =>{
   try {
-    const accountId = await getCollectionId(hospitalRef, 'Financials')
+    const accountsId = await getCollectionId(hospitalRef, 'Financials')
 
     const expensesRef = hospitalRef.collection('Financials').doc(accountsId).collection('expenses');
   

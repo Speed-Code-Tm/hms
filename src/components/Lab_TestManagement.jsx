@@ -416,8 +416,8 @@ const TestModal = ({ show, onHide, test, handleSubmit }) => {
       backdrop="static"
       keyboard={false}
     >
-      <Modal.Header style={{  position: "relative" }}>
-        <Modal.Title style={{ textAlign: "center", flex: 1 }}>
+      <Modal.Header className="bg-primary" style={{  position: "relative" }}>
+        <Modal.Title  style={{ textAlign: "center", color:'white',flex: 1 }}>
           {test ? "Update Test" : "Add New Test"}
         </Modal.Title>
         <CloseButton variant="danger" onClick={onHide}>

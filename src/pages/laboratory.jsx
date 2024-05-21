@@ -5,7 +5,7 @@ import PatientManagement from "../components/Lab_PatientManagement";
 import TestManagement from "../components/Lab_TestManagement";
 import TasksAndReminders from "../components/Lab_TasksAndReminders";
 import { useEffect } from "react";
-import { retrieveLabTestCatalogue } from "./configs";
+import { retrieveLabOrders, retrieveLabTestCatalogue } from "./configs";
 
 const LaboratoryManagement = () => {
   const [activeTab, setActiveTab] = useState("labTestOrders");
@@ -23,22 +23,27 @@ const LaboratoryManagement = () => {
     setTestCatalogue(testsCatalogueData)
 }
 
+async function fetchLabTestOrders() {
+  const labOrdersData = await retrieveLabOrders()
+  setTestOrders(labOrdersData)
+}
+
 
   useEffect(()=>{
     console.log(activeTab);
     if(activeTab === 'labTestOrders'){
-
+        fetchLabTestOrders()
     }else if(activeTab === 'testManagement'){
       fetchLabTestCatalogue()
     }
   },[activeTab])
   return (
-    <Container>
+    <Container className="py-3">
       <Row>
         <Col>
           <TabbedInterface activeTab={activeTab} onSelect={handleTabChange}>
             <Tab eventKey="labTestOrders" title="Lab Test Orders">
-              <PatientManagement />
+              <PatientManagement testOrders={testOrders} />
             </Tab>
             <Tab eventKey="testManagement" title="Test Management">
               <TestManagement testCatalogue={testCatalogue}  refetch={fetchLabTestCatalogue}/>

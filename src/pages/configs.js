@@ -668,3 +668,53 @@ export const retrieveLabTestCatalogue = async () =>{
 return testsCatalogueData
 
 }
+
+//retrieve lab orders
+
+export const retrieveLabOrders = async () =>{
+  try {
+    const laboratoryId = await getCollectionId(hospitalRef, 'Laboratory')
+
+    const labOrdersRef = hospitalRef.collection('Laboratory').doc(laboratoryId).collection('labTestOrders');
+ 
+    const labOrdersSnapshot = await labOrdersRef.get()
+
+   const labOrdersData = labOrdersSnapshot.docs.map(doc=>{
+      const data = doc.data();
+
+    return { id: doc.id, ...data };
+    })
+    
+    return labOrdersData
+  } catch (error) {
+    throw error
+  }
+}
+
+//update lab result 
+
+export const updateLabTestResult  = async (orderId,labresult) =>{
+  try{
+    const laboratoryId = await getCollectionId(hospitalRef, 'Laboratory')
+
+    const labOrderRef = hospitalRef.collection('Laboratory').doc(laboratoryId).collection('labTestOrders').doc(orderId);
+ 
+    labOrderRef.update(labresult)
+  }catch(error){
+    throw error
+  }
+}
+
+//drop labtest
+
+export const deleteLabTest  = async (orderId) =>{
+  try{
+    const laboratoryId = await getCollectionId(hospitalRef, 'Laboratory')
+
+    const labOrderRef = hospitalRef.collection('Laboratory').doc(laboratoryId).collection('labTestOrders').doc(orderId);
+ 
+    labOrderRef.delete()
+  }catch(error){
+    throw error
+  }
+}

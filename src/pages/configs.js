@@ -618,7 +618,38 @@ export const addLabTest = async(labtest) =>{
   }
 }
 
+//update labtest
 
+export const updateLabTest  = async(testId,labtest) =>{
+  try {
+    const laboratoryId = await getCollectionId(hospitalRef, 'Laboratory')
+
+  const testRef = hospitalRef.collection('Laboratory').doc(laboratoryId).collection('testsCatalogue').doc(testId);
+ 
+  await testRef.update(labtest)
+  } catch (error) {
+    throw error
+  }
+  
+}
+
+// delete test catalogue
+
+export const deleteTestCatalogue = async (testId) =>{
+  try {
+    const laboratoryId = await getCollectionId(hospitalRef, 'Laboratory')
+
+    const testRef = hospitalRef.collection('Laboratory').doc(laboratoryId).collection('testsCatalogue').doc(testId);
+  
+    await testRef.delete()
+  } catch (error) {
+    throw error
+  }
+}
+
+
+
+//retrieve test catalogues
 export const retrieveLabTestCatalogue = async () =>{
 
   const laboratoryId = await getCollectionId(hospitalRef, 'Laboratory')

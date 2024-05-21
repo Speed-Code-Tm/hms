@@ -4,24 +4,44 @@ import styled from "styled-components";
 import PatientManagement from "../components/Lab_PatientManagement";
 import TestManagement from "../components/Lab_TestManagement";
 import TasksAndReminders from "../components/Lab_TasksAndReminders";
+import { useEffect } from "react";
+import { retrieveLabTestCatalogue } from "./configs";
 
 const LaboratoryManagement = () => {
   const [activeTab, setActiveTab] = useState("labTestOrders");
-
+  const [testCatalogue,setTestCatalogue] = useState([])
+  const [testOrders,setTestOrders] = useState([])
   const handleTabChange = (tab) => {
     setActiveTab(tab);
+    console.log(tab);
   };
 
+
+  async function fetchLabTestCatalogue(){
+    const testsCatalogueData = await retrieveLabTestCatalogue()
+    console.log(testsCatalogueData);
+    setTestCatalogue(testsCatalogueData)
+}
+
+
+  useEffect(()=>{
+    console.log(activeTab);
+    if(activeTab === 'labTestOrders'){
+
+    }else if(activeTab === 'testManagement'){
+      fetchLabTestCatalogue()
+    }
+  },[activeTab])
   return (
     <Container>
       <Row>
         <Col>
-          <TabbedInterface activeTab={activeTab} onTabChange={handleTabChange}>
+          <TabbedInterface activeTab={activeTab} onSelect={handleTabChange}>
             <Tab eventKey="labTestOrders" title="Lab Test Orders">
               <PatientManagement />
             </Tab>
             <Tab eventKey="testManagement" title="Test Management">
-              <TestManagement />
+              <TestManagement testCatalogue={testCatalogue}  refetch={fetchLabTestCatalogue}/>
             </Tab>
             <Tab eventKey="tasksAndReminders" title="Tasks and Reminders">
               <TasksAndReminders />

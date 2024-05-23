@@ -4,7 +4,7 @@ import LocalHospitalIcon from '@mui/icons-material/LocalHospital';
 import { Sidebar, Menu, MenuItem, SubMenu } from "react-pro-sidebar";
 import { Link } from "react-router-dom";
 import React, { useState } from "react";
-import logoImage from "./logo.png";
+import logoImage from "./logo.svg";
 import { styled } from "@mui/material/styles";
 import Hotel  from "@mui/icons-material/Hotel";
 
@@ -107,11 +107,11 @@ const SideBar = () => {
         <img
           src={logoImage}
           alt="Logo"
-          style={{ width: "80px", height: "80px" }}
+          style={{ width: "200px", height: "150px" }}
         />
-        <h3 style={{ color: "#4154f1", marginTop: "0.5rem" }}>
-          Hospital System
-        </h3>
+        {/* <h3 style={{ color: "#4154f1", marginTop: "0.5rem" }}> */}
+        {/* Hospital System
+        </h3> */}
       </div>
       <Menu menuItemStyles={menuItemStyles}>
         <CustomMenuItem
@@ -219,10 +219,10 @@ const SideBar = () => {
           Inpatient Management
         </CustomMenuItem>
         <SubMenu
-          label="Inpatient Management"
+          label="Nursing Care"
           icon={<i className="fas fa-user-nurse"></i>}
-          open={expandedSubMenu === "Inpatient Management"}
-          onOpenChange={() => handleSubMenuClick("Inpatient Management")}
+          open={expandedSubMenu === "Nursing Care"}
+          onOpenChange={() => handleSubMenuClick("Nursing Care")}
         >
           <CustomMenuItem
             component={
@@ -254,7 +254,7 @@ const SideBar = () => {
         >
           <CustomMenuItem
             component={
-              <Link to="/physician-scheduling" onClick={handleActive}>
+              <Link to="/patientCare" onClick={handleActive}>
                 Patient schedule
               </Link>
             }
@@ -281,6 +281,23 @@ const SideBar = () => {
             icon={<i className="fas fa-clipboard-list"></i>}
           >
             Medical Orders
+          </CustomMenuItem>
+        </SubMenu>
+        <SubMenu
+          label="Specialty Clinics"
+          icon={<i className="fas fa-clinic-medical"></i>}
+          open={expandedSubMenu === "Specialty Clinics"}
+          onOpenChange={() => handleSubMenuClick("Specialty Clinics")}
+        >
+          <CustomMenuItem
+            component={
+              <Link to="/patientCare" onClick={handleActive}>
+                clinic-manager
+              </Link>
+            }
+            icon={<i className="fas fa-heartbeat"></i>}
+          >
+            clinic-manager
           </CustomMenuItem>
         </SubMenu>
         <SubMenu
@@ -320,23 +337,7 @@ const SideBar = () => {
             Reporting & Analytics
           </CustomMenuItem>
         </SubMenu>
-        <SubMenu
-          label="Specialty Clinics"
-          icon={<i className="fas fa-clinic-medical"></i>}
-          open={expandedSubMenu === "Specialty Clinics"}
-          onOpenChange={() => handleSubMenuClick("Specialty Clinics")}
-        >
-          <CustomMenuItem
-            component={
-              <Link to="/clinic-manager" onClick={handleActive}>
-                clinic-manager
-              </Link>
-            }
-            icon={<i className="fas fa-heartbeat"></i>}
-          >
-            clinic-manager
-          </CustomMenuItem>
-        </SubMenu>
+       
         <SubMenu
           label="Surgery Management"
           icon={<i className="fas fa-procedures"></i>}
@@ -461,6 +462,8 @@ const SideBar = () => {
         <SubMenu
           label="Department Management"
           icon={<i className="fas fa-chart-bar"></i>}
+          open={expandedSubMenu === "Department Management"}
+          onOpenChange={() => handleSubMenuClick("Department Management")}
         >
           <CustomMenuItem
             component={
@@ -530,10 +533,12 @@ const SideBar = () => {
             Permissions
           </CustomMenuItem>
         </SubMenu>
-        <SubMenu label="Settings" 
-        icon={<i className="fas fa-cog"></i>}
-        open={expandedSubMenu === "Settings"}
-        onOpenChange={() => handleSubMenuClick("Settings")}>
+        <SubMenu
+          label="Settings"
+          icon={<i className="fas fa-cog"></i>}
+          open={expandedSubMenu === "Settings"}
+          onOpenChange={() => handleSubMenuClick("Settings")}
+        >
           <CustomMenuItem
             component={
               <Link to="/facility-settings" onClick={handleActive}>
@@ -555,7 +560,6 @@ const SideBar = () => {
             User Preferences
           </CustomMenuItem>
         </SubMenu>
-        
       </Menu>
     </Sidebar>
   );

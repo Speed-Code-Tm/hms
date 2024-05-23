@@ -7,6 +7,7 @@ import firebaseConfig from "../pages/configs";
 import ReusableTable from "./ReusableTable";
 import {
   FaNotesMedical,
+  FaHeartbeat,
   FaUserNurse,
   FaCapsules,
   FaFlask,
@@ -19,6 +20,7 @@ import DoctorsNotes from "../components/DoctorsNotes";
 import OrderMedicine from "../components/OrderMedicine";
 import OrderLabTest from "../components/OrderLabTest"; 
 import OrderImaging from "../components/orderImaging";
+import VitalSigns from "../components/AddVitals";
 import PatientProfile from "./patientProfile"
 import ReusableModal from "../components/ReusableModal";
 import PatientAdmission from "../components/inpatient/PatientAdmission";
@@ -33,12 +35,18 @@ const PatientManagement = () => {
   const [showOrderMedicine, setShowOrderMedicine] = useState(false);
   const [showOrderImaging, setShowOrderImaging] = useState(false); 
   const [showOrderLabTest, setShowOrderLabTest] = useState(false); 
+<<<<<<< HEAD
   const [showAdmissionModal,setShowAdmissionModal] = useState(false)
+=======
+  const [showVitalSigns, setShowVitalSigns] = useState(false);
+
+>>>>>>> 55fa784cc3c1084c20396db2a09d47b1c4091cb3
   const toggleDoctorsNotes = () => setShowDoctorsNotes(!showDoctorsNotes);
   const toggleNursingNotes = () => setShowNursingNotes(!showNursingNotes);
   const toggleOrderMedicine = () => setShowOrderMedicine(!showOrderMedicine);
   const toggleOrderImaging = () => setShowOrderImaging(!showOrderImaging); 
   const toggleOrderLabTest = () => setShowOrderLabTest(!showOrderLabTest); 
+  const toggleVitalSigns = () => setShowVitalSigns(!showVitalSigns);
 
   const handleCloseModal = () =>{
     setShowAdmissionModal(false)
@@ -120,10 +128,13 @@ const PatientManagement = () => {
             id={`actions-dropdown-${row.id}`}
             title="Actions"
           >
-            <Dropdown.Item href="#/action-1" onClick={toggleNursingNotes}>
+            <Dropdown.Item  onClick={toggleVitalSigns}>
+              <FaHeartbeat /> View Vitals
+            </Dropdown.Item>
+            <Dropdown.Item  onClick={toggleNursingNotes}>
               <FaUserNurse /> Add Nursing Notes
             </Dropdown.Item>
-            <Dropdown.Item href="#/action-2" onClick={toggleDoctorsNotes}>
+            <Dropdown.Item  onClick={toggleDoctorsNotes}>
               <FaNotesMedical /> Add Doctor's Notes
             </Dropdown.Item>
             <Dropdown.Item href="#/action-3" onClick={toggleOrderMedicine}>
@@ -170,6 +181,11 @@ const PatientManagement = () => {
       <OrderLabTest
         show={showOrderLabTest}
         onHide={() => setShowOrderLabTest(false)}
+        // patientName={/* Pass the patient name here */}
+      />
+      < VitalSigns
+        show={showVitalSigns}
+        onHide={() => setShowVitalSigns(false)}
         // patientName={/* Pass the patient name here */}
       />
       <ToastContainer limit={5} />

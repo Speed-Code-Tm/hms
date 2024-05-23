@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from "react";
-import { Container, DropdownButton, Dropdown } from "react-bootstrap";
+import { Container, DropdownButton, Dropdown, Button } from "react-bootstrap";
 import styled from "styled-components";
 import { initializeApp } from "firebase/app";
 import { getFirestore, collection, getDocs } from "firebase/firestore";
@@ -20,6 +20,8 @@ import OrderMedicine from "../components/OrderMedicine";
 import OrderLabTest from "../components/OrderLabTest"; 
 import OrderImaging from "../components/orderImaging";
 import PatientProfile from "./patientProfile"
+import ReusableModal from "../components/ReusableModal";
+import PatientAdmission from "../components/inpatient/PatientAdmission";
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
@@ -31,12 +33,17 @@ const PatientManagement = () => {
   const [showOrderMedicine, setShowOrderMedicine] = useState(false);
   const [showOrderImaging, setShowOrderImaging] = useState(false); 
   const [showOrderLabTest, setShowOrderLabTest] = useState(false); 
-
+  const [showAdmissionModal,setShowAdmissionModal] = useState(false)
   const toggleDoctorsNotes = () => setShowDoctorsNotes(!showDoctorsNotes);
   const toggleNursingNotes = () => setShowNursingNotes(!showNursingNotes);
   const toggleOrderMedicine = () => setShowOrderMedicine(!showOrderMedicine);
   const toggleOrderImaging = () => setShowOrderImaging(!showOrderImaging); 
   const toggleOrderLabTest = () => setShowOrderLabTest(!showOrderLabTest); 
+
+  const handleCloseModal = () =>{
+    setShowAdmissionModal(false)
+  }
+
 
   useEffect(() => {
     const fetchData = async () => {
@@ -90,7 +97,19 @@ const PatientManagement = () => {
   const columns = useMemo(() => COLUMNS, []);
 
   return (
-    <Container className="patient-management-container">
+    <Container className="patient-management-container py-3">
+        <h2>Inpatient Management</h2>
+        <div className="py-3 d-flex justify-content-end">
+            <Button onClick={()=>setShowAdmissionModal(true)}>Admit Patient</Button>
+          </div>
+
+{/* patient admision modal */}
+
+<ReusableModal show={showAdmissionModal} onHide={handleCloseModal}  title={"Admit Patient"}>
+
+<PatientAdmission/>
+</ReusableModal>
+
       <ReusableTable
         columns={columns}
         data={data}

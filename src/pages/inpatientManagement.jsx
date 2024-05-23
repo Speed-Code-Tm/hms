@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import ReusableTable from './ReusableTable';
-import { Button, Dropdown, Tabs, Tab, Modal, Form } from 'react-bootstrap';
+import { Button, Dropdown, Tabs, Tab, Modal, Form, Container } from 'react-bootstrap';
 
 // Mock data for patients and wards
 const patients = [
@@ -20,6 +20,7 @@ const InpatientManagement = () => {
     pageIndex: 0,
     pageSize: 5,
   });
+  
 
   const [showAddWardModal, setShowAddWardModal] = useState(false);
   const [newWardName, setNewWardName] = useState('');
@@ -43,6 +44,8 @@ const InpatientManagement = () => {
     { Header: 'Empty Beds', accessor: 'emptyBeds' },
     { Header: 'Nurses', accessor: 'nurses', Cell: ({ value }) => value.join(', ') },
   ];
+
+
 
   // Define the action dropdown component for patient rows
   const PatientActionDropdown = ({ row }) => {
@@ -89,11 +92,12 @@ const InpatientManagement = () => {
   };
 
   return (
-    <div>
-      <h2>Inpatient Management</h2>
+    <Container className='py-3'>
+      <h2>Ward Management</h2>
 
       <Tabs defaultActiveKey="patients">
         <Tab eventKey="patients" title="Patients">
+         
           <ReusableTable
             columns={patientColumns}
             data={patients}
@@ -102,7 +106,7 @@ const InpatientManagement = () => {
           />
         </Tab>
         <Tab eventKey="wards" title="Wards">
-          <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '1rem' }}>
+          <div className="py-3 d-flex justify-content-end" >
             <Button variant="primary" onClick={handleAddWardModalOpen}>
               Add New Ward
             </Button>
@@ -146,12 +150,15 @@ const InpatientManagement = () => {
           <Button variant="secondary" onClick={handleAddWardModalClose}>
             Cancel
           </Button>
-          <Button variant="primary" onClick={handleAddWard}>
+          <div className="py-3">
+          <Button variant="primary"  onClick={handleAddWard}>
             Add Ward
           </Button>
+          </div>
+         
         </Modal.Footer>
       </Modal>
-    </div>
+    </Container>
   );
 };
 

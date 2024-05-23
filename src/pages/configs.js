@@ -544,9 +544,15 @@ export const retrieveExpenses = async () =>{
   
     const expenseData = expenseSnapshot.docs.map(doc => {
         
-        const data = doc.data();
-
-        return { id: doc.id, ...data };
+      const data = doc.data();
+  
+      let createdAt = data?.createdAt?.seconds 
+        ? new Date(data.createdAt.seconds * 1000).toLocaleString() 
+        : "";
+    
+      console.log(createdAt);
+    
+      return { id: doc.id, ...data, createdAt };
     });
 
     return expenseData
@@ -555,6 +561,42 @@ export const retrieveExpenses = async () =>{
     
   }
 }
+
+//update expense
+
+export const updateExpense = async (expenseId,expense) =>{
+  try{
+    const accountsId = await getCollectionId(hospitalRef, 'Financials')
+
+    const expensesRef = hospitalRef.collection('Financials').doc(accountsId).collection('expenses').doc(expenseId);
+  
+  
+    await expensesRef.update(expense)
+
+  }catch(error){
+    throw error
+  }
+ 
+
+}
+
+//remove expense
+
+export const deleteExpense = async (expenseId) =>{
+  try{
+    const accountsId = await getCollectionId(hospitalRef, 'Financials')
+
+    const expenseRef = hospitalRef.collection('Financials').doc(accountsId).collection('expenses').doc(expenseId);
+  
+    await expenseRef.delete()
+
+  }catch(error){
+    throw error
+  }
+ 
+
+}
+
 
 export const addBudget = async (budget) =>{
 
@@ -590,8 +632,8 @@ export const retrieveBudgets = async () =>{
 
     budgetData = budgetData.map(item=>{
         console.log(item);
-      const formattedStartDate = moment(item.startDate.seconds * 1000).format('MM/DD/YYYY');
-      const formattedEndDate = moment(item.endDate.seconds * 1000).format('MM/DD/YYYY');
+      const formattedStartDate = moment(item?.startDate?.seconds * 1000).format('MM/DD/YYYY');
+      const formattedEndDate = moment(item?.endDate?.seconds * 1000).format('MM/DD/YYYY');
 
     return { ...item, startDate:formattedStartDate,endDate:formattedEndDate };
     })
@@ -601,6 +643,43 @@ export const retrieveBudgets = async () =>{
     throw error
   }
 }
+
+//update budget
+
+export const updateBudget = async (budgetId,budget) =>{
+  try{
+    const accountsId = await getCollectionId(hospitalRef, 'Financials')
+
+    const budgetsRef = hospitalRef.collection('Financials').doc(accountsId).collection('budgets').doc(budgetId);
+  
+  
+    await budgetsRef.update(budget)
+
+  }catch(error){
+    throw error
+  }
+ 
+
+}
+
+//remove budget
+
+export const deleteBudget = async (budgetId) =>{
+  try{
+    const accountsId = await getCollectionId(hospitalRef, 'Financials')
+
+    const budgetRef = hospitalRef.collection('Financials').doc(accountsId).collection('budgets').doc(budgetId);
+  
+    await budgetRef.delete()
+
+  }catch(error){
+    throw error
+  }
+ 
+
+}
+
+
 
 
 // lab management 
@@ -718,3 +797,66 @@ export const deleteLabTest  = async (orderId) =>{
     throw error
   }
 }
+
+
+// search patient
+
+export const searchPatients = (query, page = 1, pageSize = 10) => {
+
+  const mockPatients = [
+    {
+      id: '1',
+      patientId: 'P001',
+      name: 'John Doe',
+      nationalId: 'NID001',
+      age: 30,
+      address: '123 Main St, Anytown, USA',
+      contactNumber: '123-456-7890',
+    },
+    {
+      id: '2',
+      patientId: 'P002',
+      name: 'Jane Smith',
+      nationalId: 'NID002',
+      age: 25,
+      address: '456 Elm St, Othertown, USA',
+      contactNumber: '234-567-8901',
+    },
+    {
+      id: '3',
+      patientId: 'P003',
+      name: 'Alice Johnson',
+      nationalId: 'NID003',
+      age: 40,
+      address: '789 Oak St, Sometown, USA',
+      contactNumber: '345-678-9012',
+    },
+    {
+      id: '4',
+      patientId: 'P004',
+      name: 'Bob Brown',
+      nationalId: 'NID004',
+      age: 35,
+      address: '101 Pine St, Anothertown, USA',
+      contactNumber: '456-789-0123',
+    },
+  ];
+  
+
+  const filteredPatients = mockPatients.filter(
+    (patient) =>
+      patient.patientId.includes(query) ||
+      patient.name.toLowerCase().includes(query.toLowerCase()) ||
+      patient.nationalId.includes(query)
+  );
+
+  const paginatedPatients = filteredPatients.slice(
+    (page - 1) * pageSize,
+    page * pageSize
+  );
+
+  return {
+    patients: paginatedPatients,
+    hasMore: filteredPatients.length > page * pageSize,
+  };
+};

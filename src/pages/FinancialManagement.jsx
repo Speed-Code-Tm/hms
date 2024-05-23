@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import ReusableTable from './ReusableTable';
 import { Button, Dropdown, Tabs, Tab, Modal, Form, Badge, Container } from 'react-bootstrap';
 import styled from 'styled-components';
 import Expenses from '../components/financials/Expenses';
 import DepartmentBudget from '../components/financials/DepartmentBudget';
+import { retrieveBudgets, retrieveExpenses } from './configs';
 
 // Mock data for procurement items, department budgets, employee wages, and projections
 const procurementItems = [
@@ -31,7 +32,9 @@ const projections = [
 ];
 
 const FinancialManagement = () => {
-  const [activeTab,setActiveTab] = useState()
+  const [activeTab,setActiveTab] = useState('expenses')
+  const [expenses,setExpenses] = useState([])
+  const [budgets,setBudgets] = useState([])
   const [initialState, setInitialState] = useState({
     pageIndex: 0,
     pageSize: 5,
@@ -91,6 +94,8 @@ const FinancialManagement = () => {
       handleApprovalModalOpen();
     };
 
+   
+
     return (
       <Dropdown>
         <Dropdown.Toggle variant="secondary" id={`procurement-action-${procurementItem.id}`}>
@@ -121,21 +126,54 @@ const FinancialManagement = () => {
     handleApprovalModalClose();
   };
 
+
+  async function fetchExpense(){
+    try{
+      const expenses = await retrieveExpenses()
+      
+      setExpenses(expenses)
+    }catch(error){
+      console.log(error)
+    }
+  
+  }
+
+  async function fetchBudgets(){
+try{
+  const budgets = await retrieveBudgets()
+    setBudgets(budgets)
+}catch(error){
+  console.log(error)
+}
+  
+
+}
+  useEffect(()=>{
+    
+      if(activeTab === 'expenses'){
+          fetchExpense()
+      } else if(activeTab === 'budgets'){
+        fetchBudgets()
+      }
+  },[activeTab])
+
   return (
     <Container Fluid style={{marginTop:"20px"}}>
-      <Tabs defaultActiveKey="expenses"
+      <Tabs 
+      activeKey={activeTab}
          onSelect={(key) => setActiveTab(key)}
+         
       
       >
         <Tab eventKey="expenses" title="Expenses"
          activeKey={activeTab}
         
         >
-          <Expenses activeTab={'expenses'}/>
+          <Expenses refetch={fetchExpense} expenses={expenses} activeTab={'expenses'}/>
         </Tab>
         <Tab eventKey="budgets" title="Department Budgets">
 
-          <DepartmentBudget activeTab='budgets'/>
+          <DepartmentBudget refetch={fetchBudgets} budgets={budgets} activeTab='budgets'/>
          
          
         </Tab>

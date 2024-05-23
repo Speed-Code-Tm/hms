@@ -21,7 +21,6 @@ import SideBar from './components/Sidebar';
 import VendorManagement from './pages/VendorManagement';
 import Loader from './components/Loader';
 import WorkSchedule from './components/Workschedule';
-import WardManagement from './pages/WardManagement';
 import { ToastContainer } from 'react-toastify';
 import UserRoleMapping from './pages/UserRolesTable';
 import 'react-toastify/dist/ReactToastify.css';
@@ -64,14 +63,12 @@ function App() {
               <Route path="/Procurement" element={<Procurement />} />
               {/* Procurement Route */}
               <Route path="/receiving-vendor-management" element={<VendorManagement />} />
-              {/* Inpatient management Route */}
-              <Route path='/InpatientManagement' element={<InpatientManagement />} />
+              {/*Ward management &  Inpatient management Route */}
+              <Route path='/wardManagement' element={<InpatientManagement />} />
               {/* FinancialManagement */}
               <Route path='/FinancialManagement' element={<FinancialManagement />} />
               {/* Patiet management Route */}
               <Route path='/patientCare' element={<PatientManagement />} />
-              {/**Route for ward management */}
-              <Route path='/wardManagement' element={<WardManagement />} />
               {/**Route for work schedule */}
               <Route path='/DutyRota' element={<WorkSchedule />} />
               {/**Route for user role mapping */}

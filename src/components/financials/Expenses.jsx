@@ -5,12 +5,15 @@ import { Form } from 'react-bootstrap'
 import Select from 'react-select'
 import * as Yup from 'yup';
 import { toast } from 'react-toastify'
-import { addExpense, retrieveExpenses } from '../../pages/configs'
+import { addExpense, deleteExpense, retrieveExpenses, updateExpense } from '../../pages/configs'
 import ReusableTable from '../../pages/ReusableTable'
+import ConfirmationModal from '../ConfirmationModal'
+import { serverTimestamp } from 'firebase/firestore'
 
-const Expenses = ({activeTab}) => {
+const Expenses = ({ expenses, refetch}) => {
     const [showModal,setShowModal] = useState(false)
-    const [data,setData] = useState([])
+    const [selectedExpense,setSelectedExpense] = useState()
+    const [showConfirmDelete,setShowConfirmDelete] = useState(false)
     const [loading,setLoading] = useState(false)
     const [formData, setFormData] = useState({
         category: '',
@@ -18,9 +21,29 @@ const Expenses = ({activeTab}) => {
         amount: '',
       });
 
-      const handleRowClick=() =>{
+      const handleRowClick=(expense, action) =>{
 
+        setSelectedExpense(expense)
+        
+        if(action === 'update'){
+          setShowModal(true)
+        }else if( action === 'delete'){
+          setShowConfirmDelete(true)
+        }
       }
+
+
+      const confirmDelete = async () =>{
+        try{
+
+          await deleteExpense(selectedExpense.id)
+          handleCloseModal()
+          refetch()
+        }catch(error){
+          console.log(error);
+        }
+      }
+
 
 
 
@@ -59,23 +82,46 @@ const Expenses = ({activeTab}) => {
       });
 
 
+
+      const handleCloseModal = () =>{
+        setShowModal(false)
+        setShowConfirmDelete(false)
+        setSelectedExpense(null)
+        setFormData({
+          category:'',
+          department:'',
+          amount:'',
+
+      })
+      }
+
+
       const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true)
        try {
           
         await expenseSchema.validate(formData, {abortEarly:false})
+        let message;
 
-        await addExpense({...formData, department: formData.department.value, category:formData.category.value})
+        if(selectedExpense){
 
-        toast.success('Expense added')
-        setShowModal(false)
-       await fetchExpense()
-        setData({
-            category:'',
-            department:'',
-            amount:''
-        })
+          await updateExpense(selectedExpense.id, {...formData, department: formData.department.value
+            ,category:formData.category.value})
+
+          message = "Expense updated"
+
+        }else{
+        await addExpense({...formData, department: formData.department.value, createdAt: serverTimestamp(),category:formData.category.value})
+
+          message = "Expense added"
+        }
+
+
+        toast.success(message)
+        handleCloseModal()
+       await refetch()
+        
        } catch (error) {
            
         if (error.inner && error.inner.length > 0) {
@@ -106,19 +152,17 @@ const Expenses = ({activeTab}) => {
     pageSize: 10,
   };
 
-    async function fetchExpense(){
-      const expenses = await retrieveExpenses()
-
-      setData(expenses)
+  useEffect(()=>{
+    if(selectedExpense){
+      setFormData({amount:selectedExpense.amount,category:{label:selectedExpense?.category, value:selectedExpense?.category
+      },department:{label:selectedExpense?.department, value:selectedExpense?.department}
+      })
     }
-    useEffect(()=>{
-        if(activeTab === 'expenses'){
-            fetchExpense()
-        }
-    },[activeTab])
+  },[selectedExpense])
+  
   return (
     <div>
-        <ReusableModal title="Add Expense" onHide={()=>setShowModal(false)} show={showModal}>  
+        <ReusableModal title={!selectedExpense ? "Add Expense": "Update Expense"} onHide={handleCloseModal} show={showModal}>  
             <Form onSubmit={handleSubmit}>
             <Row className='mb-3'>
         <Col md={6}>
@@ -158,8 +202,9 @@ const Expenses = ({activeTab}) => {
           </Form.Group>
         </Col>
       </Row>
-      <Button variant="primary" type="submit">
-        Add Expense
+      <Button variant="primary" disabled={loading} type="submit">
+        {selectedExpense ? loading? "Updating ": "Update"  : loading ? 'Submitting...': 'Add Expense'}
+       
       </Button>
             </Form>
         </ReusableModal>
@@ -168,9 +213,17 @@ const Expenses = ({activeTab}) => {
       <Button onClick={()=>setShowModal(true)}>Add Expense</Button>
       </div>
 
+{/* expense deletion confirmation modal */}
+
+<ConfirmationModal
+handleClose={handleCloseModal}
+handleConfirm={confirmDelete}
+show={showConfirmDelete}
+message={"Are you sure you want to remove this expense?"}
+/>
       <ReusableTable
       columns={expenseColumns}
-      data={data}
+      data={expenses}
       initialState={initialState}
       ActionDropdown={({ row }) => (
         <div>
@@ -182,7 +235,7 @@ const Expenses = ({activeTab}) => {
           >
             <Dropdown.Item
               href="#/action-1"
-              onClick={() => handleRowClick(row.original, 'edit')}
+              onClick={() => handleRowClick(row.original, 'update')}
             >
               Update
             </Dropdown.Item>

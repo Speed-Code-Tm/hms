@@ -6,12 +6,15 @@ import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import { Button, Col, Dropdown, DropdownButton, Form, Row } from 'react-bootstrap';
 import { toast } from 'react-toastify';
-import { addBudget, retrieveBudgets } from '../../pages/configs';
+import { addBudget, deleteBudget, retrieveBudgets, updateBudget } from '../../pages/configs';
 import * as Yup from 'yup';
+import ConfirmationModal from '../ConfirmationModal';
 
 
-const DepartmentBudget = ({activeTab}) => {
+const DepartmentBudget = ({ budgets, refetch}) => {
     const [showModal,setShowModal] = useState(false)
+    const [showConfirmDelete,setShowConfirmDelete] = useState(false)
+    const [selectedBudget,setSelectedBudget] = useState()
     const [formData, setFormData] = useState({
         department: '',
         amount: '',
@@ -36,8 +39,6 @@ const DepartmentBudget = ({activeTab}) => {
 
   ]
 
-
-
       const departments = [
         { value: 'Human Resources', label: 'Human Resources' },
   { value: 'Ict', label: 'ICT' },
@@ -45,8 +46,40 @@ const DepartmentBudget = ({activeTab}) => {
   { value: 'Procurement', label: 'Procurement' },
       ];
 
-      const handleRowClick = (item)=>{
+      const handleRowClick=(budget, action) =>{
 
+        setSelectedBudget(budget)
+        
+        if(action === 'update'){
+          setShowModal(true)
+        }else if( action === 'delete'){
+          setShowConfirmDelete(true)
+        }
+      }
+
+
+      const confirmDelete = async () =>{
+        try{
+
+          await deleteBudget(selectedBudget.id)
+          handleCloseModal()
+          refetch()
+        }catch(error){
+          console.log(error);
+        }
+      }
+
+
+      const handleCloseModal = () =>{
+        setShowModal(false)
+        setShowConfirmDelete(false)
+        setSelectedBudget(null)
+        setFormData({
+          department: '',
+          amount: '',
+          startDate: new Date(),
+          endDate: new Date(),
+        })
       }
 
       const handleChange = (fieldName, value) => {
@@ -82,20 +115,25 @@ const DepartmentBudget = ({activeTab}) => {
         try {
           
           await budgetValidationSchema.validate(formData, {abortEarly:false})
+          let message;
 
-          console.log(typeof formData.endDate);
+          if(selectedBudget){
 
-          await addBudget({...formData,department:formData.department,endDate:formData.endDate, startDate:formData.startDate})
+            await updateBudget(selectedBudget.id, {...formData,department:formData.department,endDate:formData.endDate, startDate:formData.startDate})
 
-          toast.success('Budget Created')
+            message = "Budget Updated"
+          }else{
+            await addBudget({...formData,department:formData.department,endDate:formData.endDate, startDate:formData.startDate})
 
-          setFormData({
-            department: '',
-            amount: '',
-            startDate: new Date(),
-            endDate: new Date(),
-          })
-          setShowModal(false)
+            message = "Budget Created"
+          }
+
+
+          toast.success(message)
+
+         
+         handleCloseModal()
+         refetch()
         } catch (error) {
          console.log(error);
           
@@ -113,25 +151,28 @@ const DepartmentBudget = ({activeTab}) => {
         
       };
 
-      async function fetchBudgets(){
 
-        const budgets = await retrieveBudgets()
-        console.log(budgets);
-        setData(budgets)
+      useEffect(()=>{
+        if(selectedBudget){
+          setFormData({
+            ...formData,
+            department:selectedBudget.department,
+            amount:selectedBudget.amount,
+            startDate:new Date(selectedBudget?.startDate?.seconds * 1000),
+            endDate:new Date(selectedBudget?.endDate?.seconds * 1000)
 
-    }
+          
+          })
+        }
+      })
+      
 
 
-    useEffect(()=>{
-      console.log(activeTab)
-      if(activeTab === 'budgets'){
-        fetchBudgets()
-      }
-    },[activeTab])
+    
   return (
     <div>
 
-        <ReusableModal title="Add Budget" show={showModal} onHide={()=>setShowModal(false)}>
+        <ReusableModal title={!selectedBudget?"Add Budget":"Update Budget" } show={showModal} onHide={handleCloseModal}>
         <Form onSubmit={handleSubmit}>
       <Row className='mb-3'>
         <Col md={6}>
@@ -185,7 +226,24 @@ const DepartmentBudget = ({activeTab}) => {
       <Button type="submit" onClick={()=>setShowModal(true)} disabled={loading}>{loading ?"Submitting..." :"Create Budget"}</Button>
     </Form>
 
+
+
         </ReusableModal>
+
+
+        {/* budget deletion confirmation modal */}
+
+        <ConfirmationModal
+
+        show={showConfirmDelete}
+
+        handleConfirm={confirmDelete}
+
+        handleClose={handleCloseModal}
+
+        message="Are you sure you want to remove this budget"
+
+        />
 
         <div className="d-flex justify-content-between py-3">
             <Button onClick={()=>setShowModal(true)} >Add Budget</Button>
@@ -193,7 +251,7 @@ const DepartmentBudget = ({activeTab}) => {
       <ReusableTable
         columns={departmentBudgetColumns}
         initialState={initialState}
-        data={data}
+        data={budgets}
         ActionDropdown={({ row }) => (
           <div>
             {/* add a drop down button menu wth icons and functions */}
@@ -204,7 +262,7 @@ const DepartmentBudget = ({activeTab}) => {
             >
               <Dropdown.Item
                 href="#/action-1"
-                onClick={() => handleRowClick(row.original, 'edit')}
+                onClick={() => handleRowClick(row.original, 'update')}
               >
                 Update
               </Dropdown.Item>

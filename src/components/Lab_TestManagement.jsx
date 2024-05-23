@@ -13,14 +13,18 @@ import {
   Pagination,
   InputGroup,
   FormControl,
+  DropdownButton,
+  Dropdown,
 } from "react-bootstrap";
 import { Formik, Form as FormikForm, Field } from "formik";
 import { FaSearch, FaPlus, FaEdit, FaSave, FaTimes } from "react-icons/fa";
 import styled from "styled-components";
 import * as Yup from 'yup'
 import { toast } from "react-toastify";
-import { addLabTest, retrieveLabTestCatalogue } from "../pages/configs";
-const TestManagement = () => {
+import { addLabTest, deleteTestCatalogue, retrieveLabTestCatalogue, updateLabTest } from "../pages/configs";
+import ReusableTable from "../pages/ReusableTable";
+import ConfirmationModal from "./ConfirmationModal";
+const TestManagement = ({testCatalogue, refetch}) => {
   const [tests, setTests] = useState([
     {
       id: 1,
@@ -58,6 +62,8 @@ const TestManagement = () => {
 
   const [showTestModal, setShowTestModal] = useState(false);
   const [selectedTest, setSelectedTest] = useState(null);
+const [deleteConfirmation,setShowDeleteConfirmation] = useState(false)
+
   const [loading,setLoading] = useState(false)
   const TEST_COLUMNS = [
     {
@@ -97,6 +103,11 @@ const TestManagement = () => {
     },
   ];
 
+  const initialState = {
+    pageIndex: 0,
+    pageSize: 10,
+  }
+
   const testColumns = useMemo(() => TEST_COLUMNS, []);
 
   const {
@@ -118,7 +129,7 @@ const TestManagement = () => {
   } = useTable(
     {
       columns: testColumns,
-      data: tests,
+      data: testCatalogue,
     },
     useGlobalFilter,
     useSortBy,
@@ -138,22 +149,57 @@ const TestManagement = () => {
       .required('Specimen Type is required')
   });
 
+  //row click
+
+  const handleRowClick = (test, action) =>{
+    setSelectedTest(test)
+    if(action === 'update'){
+      setShowTestModal(true)
+
+    }else{
+      setShowDeleteConfirmation(true)
+    }
+  }
+  const handleCloseModal = () =>{
+      setShowTestModal(false)
+
+    if(selectedTest){
+      setSelectedTest(null)
+      if(deleteConfirmation){
+        setShowDeleteConfirmation(false)
+      }
+    }
+  }
  
 
-  const handleSubmit  = async (values) =>{
+  const confirmDeletion = async () =>{
+    await deleteTestCatalogue(selectedTest.id)
+    handleCloseModal()
+    refetch()
+  }
 
-    console.log(values)
+  const handleSubmit  = async (values) =>{
 
     try {
 
       await testValidationSchema.validate(values,{abortEarly:false})
 
-      await addLabTest(values)
+      let message
 
-      toast.success('Test added')
+      if(selectedTest){
 
-      setShowTestModal(false)
-      fetchLabTestCatalogue()
+        await updateLabTest(selectedTest.id, values)
+        message = 'Tests Updated'
+
+      }else{
+        await addLabTest(values)
+        message = 'Test added'
+      }
+
+      toast.success(message)
+
+      handleCloseModal()
+      refetch()
       
     } catch (error) {
       if (error.inner && error.inner.length > 0) {
@@ -169,21 +215,18 @@ const TestManagement = () => {
 
   }
 
-  async function fetchLabTestCatalogue(){
-      const testsCatalogueData = await retrieveLabTestCatalogue()
-      setTests(testsCatalogueData)
-  }
 
-
-  useEffect(()=>{
-
-  fetchLabTestCatalogue()
-}, [])
 
 
   return (
     <div>
-      <TableContainer>
+      <div className="py-2 d-flex justify-content-end">
+      <Button variant="primary" onClick={() => setShowTestModal(true)}>
+            <FaPlus /> Add Test
+          </Button>
+      </div>
+       
+      {/* <TableContainer>
         <HeaderContainer>
           <InputGroup style={{ width: "50%" }}>
             <InputGroup.Text>
@@ -273,7 +316,40 @@ const TestManagement = () => {
             ))}
           </select>
         </PaginationContainer>
-      </TableContainer>
+      </TableContainer> */}
+<ReusableTable
+
+data={testCatalogue}
+initialState={initialState}
+columns={testColumns}
+
+ActionDropdown={({ row }) => (
+  <div>
+    {/* add a drop down button menu wth icons and functions */}
+    <DropdownButton dropup="true" id="dropdown-basic-button" title="Actions">
+    
+      <Dropdown.Item href="#/action-1" onClick={()=>handleRowClick(row.original,'update')} >
+    Update
+      </Dropdown.Item>
+
+      <Dropdown.Item href="#/action-2" onClick={()=>handleRowClick(row.original,'delete')}>
+      Delete
+      </Dropdown.Item>
+     
+    </DropdownButton>
+  </div>
+)}
+
+/>
+
+{/* Deletion Confirmation modal  */}
+
+<ConfirmationModal
+        show={deleteConfirmation}
+        handleClose={handleCloseModal}
+        handleConfirm={confirmDeletion}
+        message="Are you sure you want to delete this test?"
+      />
 
       <TestModal
         show={showTestModal}
@@ -340,9 +416,9 @@ const TestModal = ({ show, onHide, test, handleSubmit }) => {
       backdrop="static"
       keyboard={false}
     >
-      <Modal.Header style={{  position: "relative" }}>
-        <Modal.Title style={{ textAlign: "center", flex: 1 }}>
-          {test ? "Edit Test" : "Add New Test"}
+      <Modal.Header className="bg-primary" style={{  position: "relative" }}>
+        <Modal.Title  style={{ textAlign: "center", color:'white',flex: 1 }}>
+          {test ? "Update Test" : "Add New Test"}
         </Modal.Title>
         <CloseButton variant="danger" onClick={onHide}>
           <FaTimes />

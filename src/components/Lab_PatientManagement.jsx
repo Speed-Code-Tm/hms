@@ -21,8 +21,11 @@ import { format } from "date-fns";
 import * as Yup from 'yup';
 import styled from "styled-components";
 import ReusableTable from "../pages/ReusableTable";
+import { deleteLabTest, updateLabTestResult } from "../pages/configs";
+import { toast } from "react-toastify";
+import ConfirmationModal from "./ConfirmationModal";
 
-const PatientManagement = () => {
+const PatientManagement = ({testOrders}) => {
   const [patients, setPatients] = useState([
     {
       id: 1,
@@ -83,9 +86,16 @@ const PatientManagement = () => {
   ]);
 
   const [showOrderModal, setShowOrderModal] = useState(false);
-  const [selectedPatient, setSelectedPatient] = useState(null);
+  // const [selectedPatient, setSelectedPatient] = useState(null);
   const [selectedOrder, setSelectedOrder] = useState(null);
-
+  const [file,setFile] = useState() 
+  const [formData,setFormData] = useState({
+    resultValue:'',
+    referenceRange:'',
+    abnormal:false,
+    notes:'',
+  })
+const [deleteConfirmation,setShowDeleteConfirmation] = useState(false)
   const getStatusColor = (status) => {
     switch (status) {
       case "pending":
@@ -100,7 +110,7 @@ const PatientManagement = () => {
   const COLUMNS = [
     {
       Header: "Patient Name",
-      accessor: "name",
+      accessor: "patientName",
     },
     {
       Header: "Age",
@@ -110,10 +120,10 @@ const PatientManagement = () => {
       Header: "Gender",
       accessor: "gender",
     },
-    {
-      Header: "Email",
-      accessor: "email",
-    },
+    // {
+    //   Header: "Email",
+    //   accessor: "email",
+    // },
     {
       Header: "Phone",
       accessor: "phone",
@@ -158,38 +168,39 @@ const PatientManagement = () => {
         Actions
       </Dropdown.Toggle>
       <Dropdown.Menu>
-        <Dropdown.Item
+        {/* <Dropdown.Item
           onClick={() => {
-            setSelectedPatient(row.original);
+            // setSelectedPatient(row.original);
             setSelectedOrder(row.original);
             setShowOrderModal(true);
           }}
         >
           <FaEdit /> Edit Test
-        </Dropdown.Item>
+        </Dropdown.Item> */}
         <Dropdown.Item
           onClick={() => {
-            setSelectedPatient(row.original);
+            // setSelectedPatient(row.original);
             setSelectedOrder(row.original);
             setShowOrderModal(true);
-          }}
+          }} 
         >
           <FaClipboardCheck /> Add Result
         </Dropdown.Item>
         <Dropdown.Divider />
         <Dropdown.Item
-          onClick={() => {
-            const updatedPatients = patients.map((p) => {
-              if (p.id === row.original.id) {
-                const updatedOrders = p.orders.filter(
-                  (o) => o.id !== row.original.id
-                );
-                return { ...p, orders: updatedOrders };
-              }
-              return p;
-            });
-            setPatients(updatedPatients);
-          }}
+          onClick={() => 
+           handleDelete(row.original)
+            // const updatedPatients = patients.map((p) => {
+            //   if (p.id === row.original.id) {
+            //     const updatedOrders = p.orders.filter(
+            //       (o) => o.id !== row.original.id
+            //     );
+            //     return { ...p, orders: updatedOrders };
+            //   }
+            //   return p;
+            // });
+            // setPatients(updatedPatients);
+          }
         >
           <FaTrashAlt /> Delete Test
         </Dropdown.Item>
@@ -197,52 +208,111 @@ const PatientManagement = () => {
     </Dropdown>
   );
 
+  //delete handler
+
+  const handleDelete = async (test) =>{
+
+    setShowDeleteConfirmation(true)
+    setSelectedOrder(test)
+
+
+  }
+
+  const confirmDeletion  = async () =>{
+    await deleteLabTest(selectedOrder.id)
+    setShowDeleteConfirmation(false)
+    setSelectedOrder(null)
+  }
+  //submitting a testOrder / updating test result
+
+  const handleSubmit =  async (values, { resetForm }) =>{
+    try {
+      let message;
+      
+      if(selectedOrder){
+        await  validationSchema.validate(values,{abortEarly:false})
+
+        await updateLabTestResult(selectedOrder?.id, values)
+        message = "Labtest result updated"
+      }
+
+      toast.success(message)
+
+      setShowOrderModal(false)
+
+      resetForm()
+    } catch (error) {
+       if (error.inner && error.inner.length > 0) {
+        const firstErrorMessage = error.inner[0].message;
+        toast.error(`Please fix the following error: ${firstErrorMessage}`);
+      } else {
+        toast.error(
+          "An unknown validation error occurred. Please check the form data."
+        );
+      } 
+    }
+
+  }
+
+
+
   return (
     <div>
       <ReusableTable
         columns={COLUMNS}
-        data={data}
+        data={testOrders}
         initialState={{
           pageSize: 10,
         }}
         ActionDropdown={ActionDropdown}
       />
 
+    {/* test order delete confirmation */}
+
+    <ConfirmationModal
+        show={deleteConfirmation}
+        handleClose={()=>{setSelectedOrder(null);setShowDeleteConfirmation(false)}}
+        handleConfirm={confirmDeletion}
+        message="Are you sure you want to delete this order?"
+      />
+
       <OrderModal
         show={showOrderModal}
         onHide={() => {
           setShowOrderModal(false);
-          setSelectedPatient(null);
           setSelectedOrder(null);
         }}
-        patient={selectedPatient}
+        
         order={selectedOrder}
-        handleSubmit={(values) => {
-          const updatedPatients = patients.map((p) => {
-            if (p.id === selectedPatient.id) {
-              const updatedOrders = p.orders.map((o) => {
-                if (o.id === selectedOrder?.id) {
-                  return { ...o, ...values, status: "complete" };
-                }
-                return o;
-              });
-              if (!selectedOrder) {
-                const newOrder = {
-                  id: p.orders.length + 1,
-                  ...values,
-                  status: "pending",
-                };
-                updatedOrders.push(newOrder);
-              }
-              return { ...p, orders: updatedOrders };
-            }
-            return p;
-          });
-          setPatients(updatedPatients);
-          setShowOrderModal(false);
-          setSelectedPatient(null);
-          setSelectedOrder(null);
-        }}
+        handleSubmit={
+          handleSubmit
+        //   (values) => {
+        //   const updatedPatients = patients.map((p) => {
+        //     if (p.id === selectedPatient.id) {
+        //       const updatedOrders = p.orders.map((o) => {
+        //         if (o.id === selectedOrder?.id) {
+        //           return { ...o, ...values, status: "complete" };
+        //         }
+        //         return o;
+        //       });
+        //       if (!selectedOrder) {
+        //         const newOrder = {
+        //           id: p.orders.length + 1,
+        //           ...values,
+        //           status: "pending",
+        //         };
+        //         updatedOrders.push(newOrder);
+        //       }
+        //       return { ...p, orders: updatedOrders };
+        //     }
+        //     return p;
+        //   });
+        //   setPatients(updatedPatients);
+        //   setShowOrderModal(false);
+        //   setSelectedOrder(null);
+        // }
+      
+      }
       />
     </div>
   );
@@ -272,7 +342,7 @@ const validationSchema = Yup.object().shape({
   }),
 });
 
-const OrderModal = ({ show, onHide, patient, order, handleSubmit }) => {
+const OrderModal = ({ show, onHide, order, handleSubmit }) => {
   const initialValues = order
     ? {
         test: order.test,
@@ -299,40 +369,40 @@ const OrderModal = ({ show, onHide, patient, order, handleSubmit }) => {
 
   return (
     <Modal show={show} onHide={onHide} size="lg">
-      <Modal.Header closeButton>
-        <Modal.Title>{order ? 'Update Test Order' : 'Add New Test Order'}</Modal.Title>
+      <Modal.Header className="bg-primary"  closeButton>
+        <Modal.Title style={{color:"white"}}>{order ? 'Update Test Order' : 'Add New Test Order'}</Modal.Title>
       </Modal.Header>
       <Formik initialValues={initialValues} onSubmit={handleSubmit} validationSchema={validationSchema}>
         {({ isSubmitting }) => (
           <FormikForm>
             <Modal.Body>
               <p>
-                Patient: {patient?.name} <br />
-                Patient ID: {patient?.id}
+                Patient: {order?.patientName} <br />
+                Patient ID: {order?.patientId}
               </p>
               <Form.Group>
                 <Form.Label>Test</Form.Label>
-                <Field as={Form.Control} type="text" name="test" placeholder="Enter test name" />
+                <Field as={Form.Control} type="text" name="test" placeholder="Enter test name" disabled/>
               </Form.Group>
-              <Row>
+              <Row className='mb-3'>
                 <Col>
                   <Form.Group>
                     <Form.Label>Date Ordered</Form.Label>
-                    <Field as={Form.Control} type="date" name="dateOrdered" placeholder="Enter date ordered" />
+                    <Field as={Form.Control} type="date" name="dateOrdered" placeholder="Enter date ordered" disabled/>
                   </Form.Group>
                 </Col>
                 <Col>
                   <Form.Group>
                     <Form.Label>Ordering Doctor</Form.Label>
-                    <Field as={Form.Control} type="text" name="orderingDoctor" placeholder="Enter ordering doctor" />
+                    <Field as={Form.Control} type="text" name="orderingDoctor" placeholder="Enter ordering doctor" disabled/>
                   </Form.Group>
                 </Col>
               </Row>
-              <Row>
+              <Row className="mb-3">
                 <Col>
                   <Form.Group>
                     <Form.Label>Priority</Form.Label>
-                    <Field as={Form.Select} name="priority">
+                    <Field as={Form.Select} name="priority" disabled>
                       <option value="routine">Routine</option>
                       <option value="urgent">Urgent</option>
                     </Field>
@@ -341,7 +411,7 @@ const OrderModal = ({ show, onHide, patient, order, handleSubmit }) => {
                 <Col>
                   <Form.Group>
                     <Form.Label>Specimen Type</Form.Label>
-                    <Field as={Form.Select} name="specimenType">
+                    <Field as={Form.Select} name="specimenType" disabled>
                       <option value="">Select specimen type</option>
                       <option value="blood">Blood</option>
                       <option value="urine">Urine</option>
@@ -353,24 +423,24 @@ const OrderModal = ({ show, onHide, patient, order, handleSubmit }) => {
               </Row>
               {order && (
                 <>
-                  <Form.Group>
+                  <Form.Group className="mb-3">
                     <Form.Label>Result Value</Form.Label>
                     <Field as={Form.Control} type="number" name="resultValue" placeholder="Enter result value" />
                   </Form.Group>
-                  <Form.Group>
+                  <Form.Group className="mb-3">
                     <Form.Label>Reference Range</Form.Label>
                     <Field as={Form.Control} type="text" name="referenceRange" placeholder="Enter reference range" />
                   </Form.Group>
-                  <Form.Group>
+                  <Form.Group className="mb-3">
                     <Form.Label>Abnormal Flag</Form.Label>
                     <Field as={Form.Check} type="checkbox" name="abnormalFlag" />
                   </Form.Group>
-                  <Form.Group>
+                  <Form.Group className="mb-3">
                     <Form.Label>Notes</Form.Label>
                     <Field as={Form.Control} type="textarea" name="notes" placeholder="Enter notes" />
                   </Form.Group>
                   <Form.Group>
-                    <Form.Label>Upload Results</Form.Label>
+                    <Form.Label className="me-2">Upload Results</Form.Label>
                     <Button variant="primary" size="lg" block>
                       <FaUpload /> Upload Results
                     </Button>
@@ -379,7 +449,7 @@ const OrderModal = ({ show, onHide, patient, order, handleSubmit }) => {
               )}
             </Modal.Body>
             <Modal.Footer>
-              <Button variant="secondary" onClick={onHide}>
+              <Button variant="outlined" onClick={onHide}>
                 Cancel
               </Button>
               <Button variant="primary" type="submit" disabled={isSubmitting}>

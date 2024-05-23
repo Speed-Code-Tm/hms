@@ -4,7 +4,9 @@
   display: flex ;
   min-height: 100vh ;
 }
-
+a{
+  text-decoration: none;
+}
 .content-container {
   flex-grow: 1;
   overflow-y: auto; /* Add this if you want the content to be scrollable */

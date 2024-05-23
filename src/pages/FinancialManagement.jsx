@@ -123,10 +123,12 @@ const FinancialManagement = () => {
 
   return (
     <Container Fluid style={{marginTop:"20px"}}>
-      <Tabs defaultActiveKey="expenses">
+      <Tabs defaultActiveKey="expenses"
+         onSelect={(key) => setActiveTab(key)}
+      
+      >
         <Tab eventKey="expenses" title="Expenses"
          activeKey={activeTab}
-         onSelect={(key) => setActiveTab(key)}
         
         >
           <Expenses activeTab={'expenses'}/>

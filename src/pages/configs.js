@@ -368,7 +368,7 @@ export const addExpense = async (expense) =>{
   try {
     const accountId = await getCollectionId(hospitalRef, 'Financials')
 
-    const expensesRef = hospitalRef.collection('Financials').doc(accountsId).collection('expenses');
+    const expensesRef = hospitalRef.collection('Financials').doc(accountId).collection('expenses');
   
   
     await expensesRef.add(expense)

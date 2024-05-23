@@ -1,0 +1,9 @@
+.card {
+  max-width: 500px;
+  width: 100%;
+}
+
+.form-label {
+  display: flex;
+  align-items: center;
+}

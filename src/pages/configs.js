@@ -523,8 +523,7 @@ export const addExpense = async (expense) =>{
   try {
     const accountsId = await getCollectionId(hospitalRef, 'Financials')
 
-    const expensesRef = hospitalRef.collection('Financials').doc(accountId).collection('expenses');
-  
+    const expensesRef = hospitalRef.collection('Financials').doc(accountsId).collection('expenses');
   
     await expensesRef.add(expense)
 
@@ -803,44 +802,7 @@ export const deleteLabTest  = async (orderId) =>{
 
 export const searchPatients = (query, page = 1, pageSize = 10) => {
 
-  const mockPatients = [
-    {
-      id: '1',
-      patientId: 'P001',
-      name: 'John Doe',
-      nationalId: 'NID001',
-      age: 30,
-      address: '123 Main St, Anytown, USA',
-      contactNumber: '123-456-7890',
-    },
-    {
-      id: '2',
-      patientId: 'P002',
-      name: 'Jane Smith',
-      nationalId: 'NID002',
-      age: 25,
-      address: '456 Elm St, Othertown, USA',
-      contactNumber: '234-567-8901',
-    },
-    {
-      id: '3',
-      patientId: 'P003',
-      name: 'Alice Johnson',
-      nationalId: 'NID003',
-      age: 40,
-      address: '789 Oak St, Sometown, USA',
-      contactNumber: '345-678-9012',
-    },
-    {
-      id: '4',
-      patientId: 'P004',
-      name: 'Bob Brown',
-      nationalId: 'NID004',
-      age: 35,
-      address: '101 Pine St, Anothertown, USA',
-      contactNumber: '456-789-0123',
-    },
-  ];
+ 
   
 
   const filteredPatients = mockPatients.filter(

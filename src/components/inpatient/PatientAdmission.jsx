@@ -1,10 +1,9 @@
-import React from 'react'
-import { Button, Col, Container, Dropdown, Form, Row } from 'react-bootstrap'
-import ReusableTable from '../../pages/ReusableTable';
+import React, { useEffect } from 'react'
+import { Alert, Button, Card, Col, Container, Dropdown, Form, ListGroup, Row } from 'react-bootstrap'
 import { useState } from 'react';
 import Select from 'react-select';
-import {AsyncPaginate} from 'react-select-async-paginate';
-import { searchPatients } from '../../pages/configs';
+
+import DatePicker from 'react-datepicker';
 
 // Mock data for patients 
 const patients = [
@@ -14,29 +13,96 @@ const patients = [
   ];
 const PatientAdmission = () => {
 
-    const [patient,setPatient] = useState()
+    // const [patient,setPatient] = useState()
     const [patients,setPatients] = useState([])
+    const [searchTerm, setSearchTerm] = useState('')
     const [initialState, setInitialState] = useState({
         pageIndex: 0,
         pageSize: 5,
       });
-      const [inputValue, setInputValue] = useState('');
+      const [results, setResults] = useState([]);
+      const [wards, setWards] = useState([
+        { name: 'Ward E', category: 'General Ward', capacity: 20, occupiedBeds: 10 },
+        { name: 'Ward F', category: 'Intensive Care', capacity: 10, occupiedBeds: 7 },
+      ]);
+      const mockPatients = [
+        {
+          id: '1',
+          name: 'John Doe',
+          idNumber: 'ID123456',
+          patientId: 'P103',
+          dob: '1990-01-01',
+          address: '123 Main St, Anytown, USA',
+          phone: '555-1234',
+          email: 'john.doe@example.com'
+        },
+        {
+          id: '2',
+          name: 'Jane Smith',
+          idNumber: 'ID654321',
+          patientId: 'P104',
+          dob: '1985-05-15',
+          address: '456 Oak St, Anytown, USA',
+          phone: '555-5678',
+          email: 'jane.smith@example.com'
+        },
+        {
+          id: '3',
+          name: 'Alice Johnson',
+          idNumber: 'ID789012',
+          patientId: 'P105',
+          dob: '1978-10-20',
+          address: '789 Pine St, Anytown, USA',
+          phone: '555-8765',
+          email: 'alice.johnson@example.com'
+        },
+        {
+          id: '4',
+          name: 'Bob Brown',
+          idNumber: 'ID345678',
+          patientId: 'P106',
+          dob: '1967-12-30',
+          address: '101 Maple St, Anytown, USA',
+          phone: '555-4321',
+          email: 'bob.brown@example.com'
+        }
+      ];
 
+
+      const patient = {
+        name: 'John Doe',
+        patientId: 'P103',
+        idNumber: 'ID123456',
+        dob: '1990-01-01',
+        gender: 'Male',
+        phone: '555-1234',
+        email: 'john.doe@example.com',
+        emergencyContact: {
+          name: 'Jane Doe',
+          relationship: 'Spouse',
+          phone: '555-5678',
+          email: 'jane.doe@example.com'
+        },
+        bloodType: 'O+',
+        allergies: ['Peanuts', 'Penicillin'],
+        currentMedications: ['Aspirin', 'Metformin'],
+        medicalHistory: ['Diabetes', 'Hypertension'],
+        primaryCarePhysician: {
+          name: 'Dr. Smith',
+          contact: '555-8765'
+        },
+        insurance: {
+          provider: 'NHIF',
+          policyNumber: 'HC123456789',
+          validity: '2024-12-31'
+        }
+      };
 
   const [formData, setFormData] = useState({
-    admissionId: '',
-    patientId: '',
+   
     admissionDate: '',
-    reasonForAdmission: '',
-    admittingPhysician: '',
-    assignedRoom: '',
-    diagnosis: '',
-    procedures: [],
-    attendingPhysicians: [],
-    medicationOrders: [],
-    clinicalNotes: '',
-    dischargeDate: '',
-    dischargeSummary: '',
+    assignedWard: '',
+    admittingDoctor:''
   });
 
   // Sample options for react-select components
@@ -58,115 +124,189 @@ const PatientAdmission = () => {
     // Add more options as needed
   ];
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
+
+  //wards
+
+  const wardOptions = wards.map((ward) => ({
+    value: ward.name,
+    label: `${ward.name} (${ward.category} - ${ward.capacity - ward.occupiedBeds} beds available)`,
+  }));
+
+
+  const handleSelectChange = (name, selectedOption) => {
+    setFormData({ ...formData, [name]: selectedOption });
   };
 
-  const handleSelectChange = (name, selectedOptions) => {
-    setFormData({ ...formData, [name]: selectedOptions });
-  };
+  const handleChange =  (field, value) =>{
+    
+    setFormData({
+      ...formData,
+      [field]: value
+    });
+  }
   const [selectedPatient, setSelectedPatient] = useState(null);
 
-  const loadOptions = async (searchQuery, loadedOptions, { page }) => {
-    const response = searchPatients(searchQuery, page);
 
-    const options = response.patients.map((patient) => ({
-      value: patient,
-      label: `${patient.name} (ID: ${patient.patientId}, National ID: ${patient.nationalId})`,
-    }));
 
-    return {
-      options,
-      hasMore: response.hasMore,
-      additional: {
-        page: (page || 1) + 1,
-      },
-    };
-  };
+  useEffect(() => {
+    if (searchTerm.length >= 3) {
+      const filteredResults = mockPatients.filter((patient) => {
+        const searchLower = searchTerm.toLowerCase();
+        return (
+          patient?.name?.toLowerCase().includes(searchLower) ||
+          patient?.idNumber?.toLowerCase().includes(searchLower) ||
+          patient?.patientId?.toLowerCase().includes(searchLower)
+        );
+      });
+      setResults(filteredResults);
+    } else {
+      setResults([]);
+    }
+  }, [searchTerm, ]);
 
-  const handleSearcChange = (selectedOption) => {
-    setSelectedPatient(selectedOption);
-    // onPatientSelect(selectedOption.value);
-  };
 
+  const handleSelectPatient = (patient) => {
+    setSelectedPatient(patient);
+    setSearchTerm(patient.name);
+    setResults([]);
+  }
   
   return (
-    <Form>
-    <Row>
-    <Col>
-      <Form.Group>
-        <Form.Label>Patient Name</Form.Label>
-        <AsyncPaginate
-      value={selectedPatient}
-      loadOptions={loadOptions}
-      onChange={handleSearcChange}
-      additional={{ page: 1 }}
-      placeholder="Search by Patient ID, Name, or National ID"
-    />
-      </Form.Group>
-      {/* Add other form fields here */}
+      <Row>
+        <Col md={8}>
+
+        <Row className='mb-3'>
+    <Col xs={6}>
+    <Form.Label>Patient</Form.Label>
+    <Form.Control
+        type="text"
+        placeholder="Search by name, ID number, or patient ID"
+        value={searchTerm}
+        onChange={(e) => setSearchTerm(e.target.value)}
+        className='custom-search'
+      />
+      {results.length > 0 && (
+        <ListGroup>
+          {results.map((patient) => (
+            <ListGroup.Item key={patient.id} className='cursor-pointer' onClick={() => handleSelectPatient(patient)}>
+              {patient.name} 
+            </ListGroup.Item>
+          ))}
+        </ListGroup>
+      )}
+      
     </Col>
-    <Col>
+    
+  </Row>
+
+  <Row>
+ <Col xs={12}>
+  <Card>
+            <Card.Header>
+              <h3>Patient Information</h3>
+            </Card.Header>
+            <Card.Body>
+              <Row>
+                <Col md={6}>
+                  <h5>Identification</h5>
+                  <ListGroup>
+                    <ListGroup.Item><strong>Full Name:</strong> {patient.name}</ListGroup.Item>
+                    <ListGroup.Item><strong>Patient ID:</strong> {patient.patientId}</ListGroup.Item>
+                    <ListGroup.Item><strong>ID Number:</strong> {patient.idNumber}</ListGroup.Item>
+                    <ListGroup.Item><strong>Date of Birth:</strong> {patient.dob}</ListGroup.Item>
+                    <ListGroup.Item><strong>Gender:</strong> {patient.gender}</ListGroup.Item>
+                    <ListGroup.Item><strong>Contact:</strong> {patient.phone}, {patient.email}</ListGroup.Item>
+                  </ListGroup>
+                </Col>
+                <Col md={6}>
+                  <h5>Emergency Contact</h5>
+                  <ListGroup>
+                    <ListGroup.Item><strong>Name:</strong> {patient.emergencyContact.name}</ListGroup.Item>
+                    <ListGroup.Item><strong>Relationship:</strong> {patient.emergencyContact.relationship}</ListGroup.Item>
+                    <ListGroup.Item><strong>Contact:</strong> {patient.emergencyContact.phone}, {patient.emergencyContact.email}</ListGroup.Item>
+                  </ListGroup>
+                </Col>
+              </Row>
+              <Row className="mt-4">
+                <Col md={6}>
+                  <h5>Medical Information</h5>
+                  {patient.allergies && patient.allergies.length > 0 && (
+                    <Alert variant="danger">
+                      <strong>Allergies:</strong> {patient.allergies.join(', ')}
+                    </Alert>
+                  )}
+                  <ListGroup>
+                    <ListGroup.Item><strong>Blood Type:</strong> {patient.bloodType}</ListGroup.Item>
+                    <ListGroup.Item><strong>Current Medications:</strong> {patient.currentMedications.join(', ')}</ListGroup.Item>
+                    <ListGroup.Item><strong>Medical History:</strong> {patient.medicalHistory.join(', ')}</ListGroup.Item>
+                    {/* <ListGroup.Item><strong>Primary Care Physician:</strong> {patient.primaryCarePhysician.name} ({patient.primaryCarePhysician.contact})</ListGroup.Item> */}
+                  </ListGroup>
+                </Col>
+                <Col md={6}>
+                  <h5>Insurance Information</h5>
+                  <ListGroup>
+                    <ListGroup.Item><strong>Provider:</strong> {patient.insurance.provider}</ListGroup.Item>
+                    <ListGroup.Item><strong>Policy Number:</strong> {patient.insurance.policyNumber}</ListGroup.Item>
+                    <ListGroup.Item><strong>Validity:</strong> {patient.insurance.validity}</ListGroup.Item>
+                  </ListGroup>
+                </Col>
+              </Row>
+            </Card.Body>
+          </Card>
+          </Col>
+
+  </Row>
+
+
+
+        </Col>
+        <Col md={4}>
+<Form>
+        <Row>
+          <Col xs={12} className='mb-3'>
+          <Form.Group>
+            <Form.Label className='d-block'>Admission Date
+            </Form.Label>
+            <DatePicker
+              id="admissionDate"
+              className='form-control d-block'
+              style={{width:"100%"}}
+              selected={formData.admissionDate}
+              minDate={new Date()}
+              onChange={(date) => handleChange('admissionDate', date)}
+              showTimeSelect
+             
+              dateFormat="yyyy-MM-dd h:mm aa"
+            />
+          </Form.Group>
+          </Col>
+    
+        <Col xs={12} className='mb-3'>
+          <Form.Group>
+            <Form.Label>Assign Ward</Form.Label>
+            <Select options={wardOptions} onChange={(option)=>handleSelectChange('assignedWard', option)} />
+          </Form.Group>
+          </Col>
+    <Col xs={12} className='mb-3'>
       <Form.Group>
-        <Form.Label>Patient ID</Form.Label>
+        <Form.Label>Doctor</Form.Label>
         <Form.Control
-          type="text"
-          name="patientId"
-          value={formData.patientId}
-          onChange={handleChange}
+         
         />
       </Form.Group>
-      {/* Add other form fields here */}
+    </Col>
+<Col xs={6}>
+
+    <Button>Add Inpatient</Button>
     </Col>
   </Row>
-  <Row>
-    <Col>
-      <Form.Group>
-        <Form.Label>Procedures/Treatments</Form.Label>
-        <Select
-          isMulti
-          name="procedures"
-          options={procedureOptions}
-          value={formData.procedures}
-          onChange={(selectedOptions) =>
-            handleSelectChange('procedures', selectedOptions)
-          }
-        />
-      </Form.Group>
-    </Col>
-    <Col>
-      <Form.Group>
-        <Form.Label>Attending Physicians/Care Team</Form.Label>
-        <Select
-          isMulti
-          name="attendingPhysicians"
-          options={physicianOptions}
-          value={formData.attendingPhysicians}
-          onChange={(selectedOptions) =>
-            handleSelectChange('attendingPhysicians', selectedOptions)
-          }
-        />
-      </Form.Group>
-    </Col>
-  </Row>
-  <Row>
-    <Col>
-      <Form.Group>
-        <Form.Label>Medication Orders</Form.Label>
-        <Select
-          isMulti
-          name="medicationOrders"
-          options={medicationOptions}
-          value={formData.medicationOrders}
-          onChange={(selectedOptions) =>
-            handleSelectChange('medicationOrders', selectedOptions)
-          }
-        />
-      </Form.Group>
-    </Col>
-    </Row>
+
     </Form>
+
+        </Col>
+      </Row>
+   
+ 
    
   )
 }

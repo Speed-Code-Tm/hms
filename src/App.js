@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './App.css';
+import 'react-datepicker/dist/react-datepicker.css';
 import { BrowserRouter as Router, Route, Routes, useNavigate } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import NavBar from './components/Navbar';
@@ -26,74 +27,20 @@ import EmployeeProfile from './components/userProfile';
 import RegistrationForm from './pages/HospitalRegistration';
 import LoginPage from './auth/Login';
 import PatientSchedule from './pages/patientSchedule'
+import WardManagement from './pages/WardManagement';
 
 function App() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(true);
 
   const handleLogin = () => {
     setIsLoggedIn(true);
   };
 
   return (
-<<<<<<< HEAD
-    <>
-      <Router>
-        <div className="app-container">
-          <SideBar />
-          <div className="content-container">
-            <NavBar />
-            {/* <Loader /> Render the Loader component here */}
-            <Routes>
-              {/* Home Route */}
-              <Route path="/" element={<RegistrationForm />} />
-              {/* Dashboard Route */}
-              <Route path="/dashboard" element={<Dashboard />} />
-              {/* registration route */}
-              <Route path="/registration" element={<Registration />} />
-              {/* Triage Assessment Route */}
-              <Route path="/TriageAssessment" element={<TriageAssessment />} />
-              {/* Patient Profile Route */}
-              <Route path="/PatientProfile" element={<PatientProfile />} />
-              {/* User Profile Route */}
-              <Route path="/UserProfile/:id" element={<EmployeeProfile />} />
-              {/* imaging dashboard */}
-              <Route path='/ImagingDashboard' element={<ImagingDashboard />} />
-              {/* Laboratory route */}
-              <Route path='/Laboratory' element={<LaboratoryManagement />} />
-              {/* Telemedicine Route */}
-              <Route path="/TeleMedicine" element={<TeleMedicine />} />
-              {/* User Management Route */}
-              <Route path="/UserManagement" element={<UserManagement />} />
-              {/* Pharmacy Route */}
-              <Route path="/Pharmacy" element={<Pharmacy />} />
-              {/* Procurement Route */}
-              <Route path="/Procurement" element={<Procurement />} />
-              {/* Procurement Route */}
-              <Route path="/receiving-vendor-management" element={<VendorManagement />} />
-              {/*Ward management &  Inpatient management Route */}
-              <Route path='/wardManagement' element={<InpatientManagement />} />
-              {/* FinancialManagement */}
-              <Route path='/FinancialManagement' element={<FinancialManagement />} />
-              {/* Patiet management Route */}
-              <Route path='/patientCare' element={<PatientManagement />} />
-              {/**Route for work schedule */}
-              <Route path='/DutyRota' element={<WorkSchedule />} />
-              {/**Route for user role mapping */}
-              <Route path='/Permissions' element={<UserRoleMapping />} />
-              {/* Other routes */}
-            </Routes>
-          </div>
-        </div>
-        {/* <Footer /> */}
-      </Router>
-      <ToastContainer/>
-    </>
-=======
     <Router>
       <AppRoutes isLoggedIn={isLoggedIn} handleLogin={handleLogin} />
       <ToastContainer />
     </Router>
->>>>>>> 55fa784cc3c1084c20396db2a09d47b1c4091cb3
   );
 }
 

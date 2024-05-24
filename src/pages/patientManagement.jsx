@@ -35,12 +35,8 @@ const PatientManagement = () => {
   const [showOrderMedicine, setShowOrderMedicine] = useState(false);
   const [showOrderImaging, setShowOrderImaging] = useState(false); 
   const [showOrderLabTest, setShowOrderLabTest] = useState(false); 
-<<<<<<< HEAD
-  const [showAdmissionModal,setShowAdmissionModal] = useState(false)
-=======
   const [showVitalSigns, setShowVitalSigns] = useState(false);
 
->>>>>>> 55fa784cc3c1084c20396db2a09d47b1c4091cb3
   const toggleDoctorsNotes = () => setShowDoctorsNotes(!showDoctorsNotes);
   const toggleNursingNotes = () => setShowNursingNotes(!showNursingNotes);
   const toggleOrderMedicine = () => setShowOrderMedicine(!showOrderMedicine);
@@ -48,10 +44,7 @@ const PatientManagement = () => {
   const toggleOrderLabTest = () => setShowOrderLabTest(!showOrderLabTest); 
   const toggleVitalSigns = () => setShowVitalSigns(!showVitalSigns);
 
-  const handleCloseModal = () =>{
-    setShowAdmissionModal(false)
-  }
-
+ 
 
   useEffect(() => {
     const fetchData = async () => {
@@ -107,16 +100,7 @@ const PatientManagement = () => {
   return (
     <Container className="patient-management-container py-3">
         <h2>Inpatient Management</h2>
-        <div className="py-3 d-flex justify-content-end">
-            <Button onClick={()=>setShowAdmissionModal(true)}>Admit Patient</Button>
-          </div>
-
-{/* patient admision modal */}
-
-<ReusableModal show={showAdmissionModal} onHide={handleCloseModal}  title={"Admit Patient"}>
-
-<PatientAdmission/>
-</ReusableModal>
+       
 
       <ReusableTable
         columns={columns}

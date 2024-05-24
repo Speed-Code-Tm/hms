@@ -3,7 +3,6 @@ import ReusableTable from '../../pages/ReusableTable'
 import ReusableModal from '../ReusableModal'
 import Select from 'react-select'
 import DatePicker from 'react-datepicker';
-import 'react-datepicker/dist/react-datepicker.css';
 import { Button, Col, Dropdown, DropdownButton, Form, Row } from 'react-bootstrap';
 import { toast } from 'react-toastify';
 import { addBudget, deleteBudget, retrieveBudgets, updateBudget } from '../../pages/configs';

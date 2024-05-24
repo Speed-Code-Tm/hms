@@ -297,7 +297,7 @@ const PatientAdmission = () => {
     </Col>
 <Col xs={6}>
 
-    <Button>Add Inpatient</Button>
+    <Button>Submit</Button>
     </Col>
   </Row>
 

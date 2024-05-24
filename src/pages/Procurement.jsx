@@ -24,6 +24,7 @@ import firebaseConfig from "./configs";
 import {getDocs,collection, getFirestore} from 'firebase/firestore'
 import OrderManagement from "../components/OrderManagement";
 import DepartmentNeeds from "../components/DepartmentNeeds";
+import { Inventory } from "../components/inventory/Inventory";
 const app = initializeApp(firebaseConfig)
 const db = getFirestore(app)
 
@@ -90,14 +91,15 @@ const OrderManagementTab = ({orders}) => {
 const InventoryTab = () => {
   return (
     <Container>
-      <Card>
+      {/* <Card>
         <Card.Header>
           <h4>Gauze Pads</h4>
         </Card.Header>
         <Card.Body>
-          <ProgressBar now={65} label={"65%"} />
+          <CircularProgressBar now={65} label={"65%"} />
         </Card.Body>
-      </Card>
+      </Card> */}
+      <Inventory/>
       {/* Add more inventory items here */}
     </Container>
   );
@@ -264,7 +266,7 @@ const fetchIssuedItems = async () => {
 
  
   return (
-    <Container>
+    <Container className="py-3">
       <Row>
         <Col>
           <Tabs

@@ -3,15 +3,11 @@ import * as Yup from "yup";
 import { Form, Button } from "react-bootstrap";
 import styled from "styled-components";
 import {
-  addDoc,
-  collection,
-  getDocs,
-  deleteDoc,
-  doc,
+ 
   getFirestore,
-  Timestamp,
+  serverTimestamp,
 } from "firebase/firestore";
-import firebaseConfig from "../pages/configs";
+import firebaseConfig, { orderVendorItem } from "../pages/configs";
 import { initializeApp } from "firebase/app";
 import { toast } from "react-toastify";
 const app = initializeApp(firebaseConfig); // Initialize Firebase app
@@ -58,13 +54,13 @@ const OrderItem = ({ selectedItem, setSelectedItem, onClose }) => {
     setLoading(true);
     try {
       await orderValidationSchema.validate(formData, { abortEarly: false });
-      const timestamp = Timestamp.now()
-      const date = timestamp.toDate()
-      const formattedDate = date.toLocaleString();
+     
+      
+      const formattedDate =  serverTimestamp();
     
       let newFormData = {...formData, orderDate:formattedDate}
-      const orderCollection = collection(db, "orders");
-      await addDoc(orderCollection, newFormData);
+      
+      await orderVendorItem(newFormData)
       
       setFormData({
         vendor: "",
@@ -72,7 +68,7 @@ const OrderItem = ({ selectedItem, setSelectedItem, onClose }) => {
         unitCost: "",
         quantity: "",
         unitType:'',
-        deliveryDate: "",
+        deliveredAt: "",
         orderDate: "",
         status: "ordered",
       });
@@ -80,6 +76,7 @@ const OrderItem = ({ selectedItem, setSelectedItem, onClose }) => {
       onClose();
       setSelectedItem();
       setLoading(false);
+      toast.success("Order Submitted")
     } catch (errors) {
       if (errors.inner && errors.inner.length > 0) {
         const firstErrorMessage = errors.inner[0].message;

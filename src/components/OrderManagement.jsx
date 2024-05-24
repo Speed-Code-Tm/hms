@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { db } from "../pages/configs";
+import { db, retrieveInventoryOrders } from "../pages/configs";
 import { collection, doc, getDocs } from "firebase/firestore";
 import ReusableTable from "../pages/ReusableTable";
 import { Dropdown, DropdownButton } from "react-bootstrap";
@@ -18,7 +18,7 @@ const OrderManagement = ({ activeTab }) => {
     { Header: "Vendor", accessor: "vendor" },
     { Header: "Status", accessor: "status" },
     { Header: "Date Ordered", accessor: "orderDate" },
-    { Header: "Delivery Date", accessor: "deliveryDate" },
+    { Header: "Delivery Date", accessor: "deliveredAt" },
   ];
 
   const [initialState, setInitialState] = useState({
@@ -34,14 +34,7 @@ const OrderManagement = ({ activeTab }) => {
 
   const fetchOrders = async () => {
     try {
-      const ordersCollection = collection(db, "orders");
-
-      const ordersSnapshot = await getDocs(ordersCollection);
-
-      const ordersData = ordersSnapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      }));
+     const ordersData = await retrieveInventoryOrders()
     
       setOrders(ordersData);
     } catch (error) {
@@ -62,7 +55,7 @@ const OrderManagement = ({ activeTab }) => {
     <ReusableModal title="Update Inventory" show={showModal}
     onHide={()=>setShowModal(false)}
     >
-        <CompleteOrder orderItem={orderItem} onHide={()=>setShowModal(false)} setOrderItem={setOrderItem}/>
+        <CompleteOrder orderItem={orderItem} refetch={fetchOrders} onHide={()=>setShowModal(false)} setOrderItem={setOrderItem}/>
 
     </ReusableModal>
     <ReusableTable
@@ -74,9 +67,9 @@ const OrderManagement = ({ activeTab }) => {
           {/* add a drop down button menu wth icons and functions */}
           <DropdownButton dropup="true" id="dropdown-basic-button" title="Actions">
           
-            <Dropdown.Item href="#/action-1" onClick={()=>handleRowClick(row.original,'delivered')} >
+           {row?.original?.status !== 'delivered' && <Dropdown.Item href="#/action-1" onClick={()=>handleRowClick(row.original,'delivered')} >
            Mark Delivered
-            </Dropdown.Item>
+            </Dropdown.Item>}
 
              <Dropdown.Item href="#/action-1" >
           Cancel Order

@@ -2,7 +2,7 @@
 import  firebase from 'firebase/compat/app';
 import 'firebase/compat/firestore';
 import { getAnalytics } from "firebase/analytics";
-import { getFirestore, collection, doc, setDoc, addDoc, getDocs, updateDoc, deleteDoc } from "firebase/firestore";
+import { getFirestore, collection, doc, setDoc, addDoc, getDocs, updateDoc, deleteDoc, serverTimestamp } from "firebase/firestore";
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
@@ -398,14 +398,101 @@ export const updateVitalSigns = async (hospitalVisitId, vitalSigns) => {
    
   }
 
+  //update item order
+
+  export const completOrder = async (newItem , orderedItem, orderId) =>{
+
+    try{
+      const procurementId =  await getCollectionId(hospitalRef, 'Procurement')
+    
+      const inventoryRef = hospitalRef.collection('Procurement').doc(procurementId).collection('inventory');
+      
+      const orderRef = hospitalRef.collection('Procurement').doc(procurementId).collection('inventoryOrders').doc(orderId);
+
+      if(newItem){
+
+        inventoryRef.add(orderedItem)
+
+      }else{
+        const querySnapshot = await inventoryRef.where('itemName', '==', orderedItem.itemName).get();
+
+        if (querySnapshot.empty) {
+         throw new Error('No matching documents found.');
+        
+        } else {
+          const docRef = querySnapshot.docs[0].ref;
+          const existingItem = querySnapshot.docs[0].data();
+          const updatedQuantity = existingItem.quantity + orderedItem.quantity;
+          await docRef.update({ quantity: updatedQuantity });
+        }
+      }
+
+      await orderRef.update({status:'delivered', deliveredAt: serverTimestamp()})
+
+    }catch(error){
+      console.log(error)
+      throw error
+    }
+
+  }
+
+  // order inventory item from vendor
+
+export const orderVendorItem  = async (itemOrder) =>{
+  try{
+    const procurementId =  await getCollectionId(hospitalRef, 'Procurement')
+    
+    const orderRef = hospitalRef.collection('Procurement').doc(procurementId).collection('inventoryOrders')
+    
+    await orderRef.add(itemOrder)
+
+  }catch(error){
+    throw error
+  }
+}
+
+
+  //retrieve inventory orders
+
+  export const retrieveInventoryOrders = async() =>{
+ try {
+  const procurementId =  await getCollectionId(hospitalRef, 'Procurement')
+    
+  
+  const orderRef = hospitalRef.collection('Procurement').doc(procurementId).collection('inventoryOrders')
+
+  const ordersSnapshot = await getDocs(orderRef);
+
+  const ordersData = ordersSnapshot.docs.map((doc) => {
+    
+    const data = doc.data();
+   
+    return {
+      id:doc.id,
+      ...data,
+      orderDate:data?.orderDate ? new Date(data?.orderDate?.seconds * 1000).toLocaleString():'N/A',
+      deliveredAt: data?.deliveredAt ? new Date(data?.deliveredAt?.seconds * 1000).toLocaleString() : 'N/A'
+    }
+  });
+
+
+  return ordersData
+
+ } catch (error) {
+  throw error
+ }
+  }
+
+
+
+
+
   //requesting an item from procurement
 
  export const requestItem = async (item, department) =>{
 
     try {
-    // const departmentNeedsRef = collection(db, 'departmentNeeds')
-
-    // get parent collection document id
+   
     const procurementId =  await getCollectionId(hospitalRef, 'Procurement')
     
     const departmentNeedsRef = hospitalRef.collection('Procurement').doc(procurementId).collection('departmentNeeds');
@@ -798,27 +885,6 @@ export const deleteLabTest  = async (orderId) =>{
 }
 
 
-// search patient
 
-export const searchPatients = (query, page = 1, pageSize = 10) => {
 
- 
-  
 
-  const filteredPatients = mockPatients.filter(
-    (patient) =>
-      patient.patientId.includes(query) ||
-      patient.name.toLowerCase().includes(query.toLowerCase()) ||
-      patient.nationalId.includes(query)
-  );
-
-  const paginatedPatients = filteredPatients.slice(
-    (page - 1) * pageSize,
-    page * pageSize
-  );
-
-  return {
-    patients: paginatedPatients,
-    hasMore: filteredPatients.length > page * pageSize,
-  };
-};

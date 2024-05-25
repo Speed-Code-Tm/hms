@@ -223,15 +223,25 @@ const confirmItemDeletion  = async () =>{
 
 
     const fetchVendors = async () => {
-      const vendorsData = await retrieveVendors()
-      setData(vendorsData);
+      try{
+        const vendorsData = await retrieveVendors()
+        setData(vendorsData);
+      }catch(error){
+        console.log(error)
+      }
+    
   };
 
 
   const fetchVendorItems = async () => {
+    try{
+      const vendorItemsData = await retrieveVendorItems()
+      setVendorItems(vendorItemsData);
+    }catch(error){
+      console.log(error)
+    }
    
-    const vendorItemsData = await retrieveVendorItems()
-    setVendorItems(vendorItemsData);
+   
     
 };
 

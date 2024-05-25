@@ -26,3 +26,11 @@ h5,
 h6 {
   font-family: "Nunito", sans-serif;
 }
+
+.custom-search{
+  font-size: 15px;
+}
+
+.lg-modal .modal-dialog{
+  max-width:80%!important;
+}

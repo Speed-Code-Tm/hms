@@ -55,9 +55,9 @@ const StyledSubmitButton = styled(Button)`
 `;
 
 // Reusable Modal Component
-const ReusableModal = ({ show, onHide, title,  children }) => {
+const ReusableModal = ({ show, onHide, title,  children,customClass }) => {
   return (
-    <StyledModal show={show} onHide={onHide} centered>
+    <StyledModal  className={customClass} show={show} onHide={onHide}  centered>
       <StyledModalHeader closeButton>
         <StyledModalTitle>{title}</StyledModalTitle>
       </StyledModalHeader>

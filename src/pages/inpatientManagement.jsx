@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import ReusableTable from './ReusableTable';
-import { Button, Dropdown, Tabs, Tab, Modal, Form } from 'react-bootstrap';
+import { Button, Dropdown, Tabs, Tab, Modal, Form, Container } from 'react-bootstrap';
+import PatientAdmission from '../components/inpatient/PatientAdmission';
+import ReusableModal from '../components/ReusableModal';
 
 // Mock data for patients and wards
 const patients = [
@@ -20,10 +22,16 @@ const InpatientManagement = () => {
     pageIndex: 0,
     pageSize: 5,
   });
+  
 
   const [showAddWardModal, setShowAddWardModal] = useState(false);
   const [newWardName, setNewWardName] = useState('');
   const [newWardCapacity, setNewWardCapacity] = useState(0);
+  const [showAdmissionModal,setShowAdmissionModal] = useState(false)
+
+  const handleCloseModal = () =>{
+    setShowAdmissionModal(false)
+  }
 
   // Define the columns for the patient table
   const patientColumns = [
@@ -43,6 +51,8 @@ const InpatientManagement = () => {
     { Header: 'Empty Beds', accessor: 'emptyBeds' },
     { Header: 'Nurses', accessor: 'nurses', Cell: ({ value }) => value.join(', ') },
   ];
+
+
 
   // Define the action dropdown component for patient rows
   const PatientActionDropdown = ({ row }) => {
@@ -89,11 +99,15 @@ const InpatientManagement = () => {
   };
 
   return (
-    <div>
+    <Container className='py-3'>
       <h2>Inpatient Management</h2>
 
       <Tabs defaultActiveKey="patients">
         <Tab eventKey="patients" title="Patients">
+        <div className="py-3 d-flex justify-content-end">
+            <Button onClick={()=>setShowAdmissionModal(true)}>Admit Patient</Button>
+          </div>
+
           <ReusableTable
             columns={patientColumns}
             data={patients}
@@ -101,21 +115,15 @@ const InpatientManagement = () => {
             ActionDropdown={PatientActionDropdown}
           />
         </Tab>
-        <Tab eventKey="wards" title="Wards">
-          <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '1rem' }}>
-            <Button variant="primary" onClick={handleAddWardModalOpen}>
-              Add New Ward
-            </Button>
-          </div>
-          <ReusableTable
-            columns={wardColumns}
-            data={wards}
-            initialState={initialState}
-            ActionDropdown={WardActionDropdown}
-          />
-        </Tab>
+    
       </Tabs>
 
+{/* modal to add new inpatient */}
+
+<ReusableModal show={showAdmissionModal} customClass={'lg-modal'} onHide={handleCloseModal}  title={"Add InPatient"}>
+
+<PatientAdmission/>
+</ReusableModal>
       <Modal show={showAddWardModal} onHide={handleAddWardModalClose}>
         <Modal.Header closeButton>
           <Modal.Title>Add New Ward</Modal.Title>
@@ -128,6 +136,7 @@ const InpatientManagement = () => {
                 type="text"
                 placeholder="Enter ward name"
                 value={newWardName}
+                className='custom-search'
                 onChange={(e) => setNewWardName(e.target.value)}
               />
             </Form.Group>
@@ -146,12 +155,15 @@ const InpatientManagement = () => {
           <Button variant="secondary" onClick={handleAddWardModalClose}>
             Cancel
           </Button>
-          <Button variant="primary" onClick={handleAddWard}>
+          <div className="py-3">
+          <Button variant="primary"  onClick={handleAddWard}>
             Add Ward
           </Button>
+          </div>
+         
         </Modal.Footer>
       </Modal>
-    </div>
+    </Container>
   );
 };
 

@@ -1,10 +1,12 @@
 import LogoutRoundedIcon from "@mui/icons-material/LogoutRounded";
 import PersonAddIcon from "@mui/icons-material/PersonAdd";
+import LocalHospitalIcon from '@mui/icons-material/LocalHospital';
 import { Sidebar, Menu, MenuItem, SubMenu } from "react-pro-sidebar";
 import { Link } from "react-router-dom";
 import React, { useState } from "react";
 import logoImage from "./logo.svg";
 import { styled } from "@mui/material/styles";
+import Hotel  from "@mui/icons-material/Hotel";
 
 const CustomMenuItem = styled(MenuItem)(({ theme }) => ({
   "& .MuiSvgIcon-root, & .fas": {
@@ -231,6 +233,17 @@ const SideBar = () => {
             icon={<i className="fas fa-users"></i>}
           >
             Patient Care
+          </CustomMenuItem>
+
+          <CustomMenuItem
+            component={
+              <Link to="/wardManagement" onClick={handleActive}>
+               Ward Management
+              </Link>
+            }
+            icon={<Hotel/>}
+          >
+             Ward Management
           </CustomMenuItem>
         </SubMenu>
         <SubMenu

@@ -22,7 +22,9 @@ import OrderMedicine from "../components/OrderMedicine";
 import OrderLabTest from "../components/OrderLabTest";
 import OrderImaging from "../components/orderImaging";
 import VitalSigns from "../components/AddVitals";
-import PatientProfile from "./patientProfile";
+import PatientProfile from "./patientProfile"
+import ReusableModal from "../components/ReusableModal";
+import PatientAdmission from "../components/inpatient/PatientAdmission";
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
@@ -42,6 +44,8 @@ const PatientManagement = () => {
   const toggleOrderImaging = () => setShowOrderImaging(!showOrderImaging);
   const toggleOrderLabTest = () => setShowOrderLabTest(!showOrderLabTest);
   const toggleVitalSigns = () => setShowVitalSigns(!showVitalSigns);
+
+ 
 
   useEffect(() => {
     const fetchData = async () => {
@@ -95,7 +99,10 @@ const PatientManagement = () => {
   const columns = useMemo(() => COLUMNS, []);
 
   return (
-    <Container className="patient-management-container">
+    <Container className="patient-management-container py-3">
+        <h2>Inpatient Management</h2>
+       
+
       <ReusableTable
         columns={columns}
         data={data}

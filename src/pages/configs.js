@@ -2,7 +2,7 @@
 import  firebase from 'firebase/compat/app';
 import 'firebase/compat/firestore';
 import { getAnalytics } from "firebase/analytics";
-import { getFirestore, collection, doc, setDoc, addDoc, getDocs, updateDoc, deleteDoc } from "firebase/firestore";
+import { getFirestore, collection, doc, setDoc, addDoc, getDocs, updateDoc, deleteDoc, serverTimestamp } from "firebase/firestore";
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
@@ -398,14 +398,101 @@ export const updateVitalSigns = async (hospitalVisitId, vitalSigns) => {
    
   }
 
+  //update item order
+
+  export const completOrder = async (newItem , orderedItem, orderId) =>{
+
+    try{
+      const procurementId =  await getCollectionId(hospitalRef, 'Procurement')
+    
+      const inventoryRef = hospitalRef.collection('Procurement').doc(procurementId).collection('inventory');
+      
+      const orderRef = hospitalRef.collection('Procurement').doc(procurementId).collection('inventoryOrders').doc(orderId);
+
+      if(newItem){
+
+        inventoryRef.add(orderedItem)
+
+      }else{
+        const querySnapshot = await inventoryRef.where('itemName', '==', orderedItem.itemName).get();
+
+        if (querySnapshot.empty) {
+         throw new Error('No matching documents found.');
+        
+        } else {
+          const docRef = querySnapshot.docs[0].ref;
+          const existingItem = querySnapshot.docs[0].data();
+          const updatedQuantity = existingItem.newStock + orderedItem.newStock;
+          await docRef.update({ newStock: updatedQuantity });
+        }
+      }
+
+      await orderRef.update({status:'delivered', deliveredAt: serverTimestamp()})
+
+    }catch(error){
+      console.log(error)
+      throw error
+    }
+
+  }
+
+  // order inventory item from vendor
+
+export const orderVendorItem  = async (itemOrder) =>{
+  try{
+    const procurementId =  await getCollectionId(hospitalRef, 'Procurement')
+    
+    const orderRef = hospitalRef.collection('Procurement').doc(procurementId).collection('inventoryOrders')
+    
+    await orderRef.add(itemOrder)
+
+  }catch(error){
+    throw error
+  }
+}
+
+
+  //retrieve inventory orders
+
+  export const retrieveInventoryOrders = async() =>{
+ try {
+  const procurementId =  await getCollectionId(hospitalRef, 'Procurement')
+    
+  
+  const orderRef = hospitalRef.collection('Procurement').doc(procurementId).collection('inventoryOrders')
+
+  const ordersSnapshot = await getDocs(orderRef);
+
+  const ordersData = ordersSnapshot.docs.map((doc) => {
+    
+    const data = doc.data();
+   
+    return {
+      id:doc.id,
+      ...data,
+      orderDate:data?.orderDate ? new Date(data?.orderDate?.seconds * 1000).toLocaleString():'N/A',
+      deliveredAt: data?.deliveredAt ? new Date(data?.deliveredAt?.seconds * 1000).toLocaleString() : 'N/A'
+    }
+  });
+
+
+  return ordersData
+
+ } catch (error) {
+  throw error
+ }
+  }
+
+
+
+
+
   //requesting an item from procurement
 
  export const requestItem = async (item, department) =>{
 
     try {
-    // const departmentNeedsRef = collection(db, 'departmentNeeds')
-
-    // get parent collection document id
+   
     const procurementId =  await getCollectionId(hospitalRef, 'Procurement')
     
     const departmentNeedsRef = hospitalRef.collection('Procurement').doc(procurementId).collection('departmentNeeds');
@@ -525,7 +612,6 @@ export const addExpense = async (expense) =>{
 
     const expensesRef = hospitalRef.collection('Financials').doc(accountsId).collection('expenses');
   
-  
     await expensesRef.add(expense)
 
   } catch (error) {
@@ -544,9 +630,15 @@ export const retrieveExpenses = async () =>{
   
     const expenseData = expenseSnapshot.docs.map(doc => {
         
-        const data = doc.data();
-
-        return { id: doc.id, ...data };
+      const data = doc.data();
+  
+      let createdAt = data?.createdAt?.seconds 
+        ? new Date(data.createdAt.seconds * 1000).toLocaleString() 
+        : "";
+    
+      console.log(createdAt);
+    
+      return { id: doc.id, ...data, createdAt };
     });
 
     return expenseData
@@ -555,6 +647,42 @@ export const retrieveExpenses = async () =>{
     
   }
 }
+
+//update expense
+
+export const updateExpense = async (expenseId,expense) =>{
+  try{
+    const accountsId = await getCollectionId(hospitalRef, 'Financials')
+
+    const expensesRef = hospitalRef.collection('Financials').doc(accountsId).collection('expenses').doc(expenseId);
+  
+  
+    await expensesRef.update(expense)
+
+  }catch(error){
+    throw error
+  }
+ 
+
+}
+
+//remove expense
+
+export const deleteExpense = async (expenseId) =>{
+  try{
+    const accountsId = await getCollectionId(hospitalRef, 'Financials')
+
+    const expenseRef = hospitalRef.collection('Financials').doc(accountsId).collection('expenses').doc(expenseId);
+  
+    await expenseRef.delete()
+
+  }catch(error){
+    throw error
+  }
+ 
+
+}
+
 
 export const addBudget = async (budget) =>{
 
@@ -590,8 +718,8 @@ export const retrieveBudgets = async () =>{
 
     budgetData = budgetData.map(item=>{
         console.log(item);
-      const formattedStartDate = moment(item.startDate.seconds * 1000).format('MM/DD/YYYY');
-      const formattedEndDate = moment(item.endDate.seconds * 1000).format('MM/DD/YYYY');
+      const formattedStartDate = moment(item?.startDate?.seconds * 1000).format('MM/DD/YYYY');
+      const formattedEndDate = moment(item?.endDate?.seconds * 1000).format('MM/DD/YYYY');
 
     return { ...item, startDate:formattedStartDate,endDate:formattedEndDate };
     })
@@ -601,6 +729,43 @@ export const retrieveBudgets = async () =>{
     throw error
   }
 }
+
+//update budget
+
+export const updateBudget = async (budgetId,budget) =>{
+  try{
+    const accountsId = await getCollectionId(hospitalRef, 'Financials')
+
+    const budgetsRef = hospitalRef.collection('Financials').doc(accountsId).collection('budgets').doc(budgetId);
+  
+  
+    await budgetsRef.update(budget)
+
+  }catch(error){
+    throw error
+  }
+ 
+
+}
+
+//remove budget
+
+export const deleteBudget = async (budgetId) =>{
+  try{
+    const accountsId = await getCollectionId(hospitalRef, 'Financials')
+
+    const budgetRef = hospitalRef.collection('Financials').doc(accountsId).collection('budgets').doc(budgetId);
+  
+    await budgetRef.delete()
+
+  }catch(error){
+    throw error
+  }
+ 
+
+}
+
+
 
 
 // lab management 
@@ -718,3 +883,8 @@ export const deleteLabTest  = async (orderId) =>{
     throw error
   }
 }
+
+
+
+
+

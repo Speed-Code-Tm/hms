@@ -20,10 +20,11 @@ import {
 
 
 import {initializeApp} from 'firebase/app'
-import firebaseConfig from "./configs";
+import firebaseConfig, { retrieveDepartmentNeeds, retrieveInventoryItems, retrieveInventoryOrders } from "./configs";
 import {getDocs,collection, getFirestore} from 'firebase/firestore'
 import OrderManagement from "../components/OrderManagement";
 import DepartmentNeeds from "../components/DepartmentNeeds";
+import { Inventory } from "../components/inventory/Inventory";
 const app = initializeApp(firebaseConfig)
 const db = getFirestore(app)
 
@@ -87,17 +88,18 @@ const OrderManagementTab = ({orders}) => {
   );
 };
 
-const InventoryTab = () => {
+const InventoryTab = ({data}) => {
   return (
     <Container>
-      <Card>
+      {/* <Card>
         <Card.Header>
           <h4>Gauze Pads</h4>
         </Card.Header>
         <Card.Body>
-          <ProgressBar now={65} label={"65%"} />
+          <CircularProgressBar now={65} label={"65%"} />
         </Card.Body>
-      </Card>
+      </Card> */}
+      <Inventory data={data}/>
       {/* Add more inventory items here */}
     </Container>
   );
@@ -194,43 +196,36 @@ const Procurement = () => {
   const [departmentRequests,setDepartmentRequests] = useState([])
   const [issuedItems,setIssuedItems] = useState([])
   const [inventory,setInventory] = useState([])
-  
+  const [inventoryOrder,setInventoryOrder]= useState([])
+ 
 
-const fetchDepartmentRequests = async () => {
-  try {
-     
-      const departmentRequestsCollection = collection(db, 'departmentRequests');
-      
-     
-      const departmentRequestSnapshot = await getDocs(departmentRequestsCollection);
-      
+  const fetchInventoryOrders = async () => {
+    try {
+     const ordersData = await retrieveInventoryOrders()
     
-      const departmentRequestData = departmentRequestSnapshot.docs.map(doc => ({
-          id: doc.id,
-          ...doc.data(),
-      }));
-      
-      setDepartmentRequests(departmentRequestData);
-  } catch (error) {
-      console.error('Error fetching orders:', error);
-     
-  }
-};
+      setInventoryOrder(ordersData);
+    } catch (error) {
+      console.error("Error fetching orders:", error);
+    }
+  };
+
+  const fetchDeparmentRequests = async () =>{
+    try{
+      const departmentNeedsData = await retrieveDepartmentNeeds()
+    
+      setDepartmentRequests(departmentNeedsData);
+    }catch(error){
+      console.log(error)
+    }
+    
+}
 
 
 const fetchInventory = async () => {
   try {
      
-      const inventoryCollection = collection(db, 'inventory');
-      
-     
-      const inventorySnapshot = await getDocs(inventoryCollection);
-      
     
-      const inventoryData = inventorySnapshot.docs.map(doc => ({
-          id: doc.id,
-          ...doc.data(),
-      }));
+      const inventoryData = await retrieveInventoryItems()
       
       setInventory(inventoryData);
   } catch (error) {
@@ -261,10 +256,24 @@ const fetchIssuedItems = async () => {
   }
 };
 
+useEffect(()=>{
+  if(activeTab === "departmentNeeds"){
+     fetchDeparmentRequests()
+  }else if(activeTab === 'orderManagement'){
+    fetchInventoryOrders()
+  }else if(activeTab === 'inventory'){
+    fetchInventory()
+  }else if(activeTab === 'reporting'){
+
+  }else if (activeTab === 'issuedItems'){
+
+  }
+},[activeTab])
+
 
  
   return (
-    <Container>
+    <Container className="py-3">
       <Row>
         <Col>
           <Tabs
@@ -274,13 +283,13 @@ const fetchIssuedItems = async () => {
             className="justify-content-center"
           >
             <Tab eventKey="departmentNeeds" title="department Needs">
-              <DepartmentNeeds activeTab={activeTab} />
+              <DepartmentNeeds data={departmentRequests}  />
             </Tab>
             <Tab eventKey="orderManagement" title="order Management">
-              <OrderManagement activeTab={activeTab} />
+              <OrderManagement fetchData={fetchInventoryOrders} data={inventoryOrder} />
             </Tab>
             <Tab eventKey="inventory" title="Inventory">
-              <InventoryTab />
+              <InventoryTab data={inventory}  />
             </Tab>
             <Tab eventKey="reporting" title="Reporting">
               <ReportingTab />

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './App.css';
+import 'react-datepicker/dist/react-datepicker.css';
 import { BrowserRouter as Router, Route, Routes, useNavigate } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import NavBar from './components/Navbar';
@@ -19,7 +20,6 @@ import PatientManagement from './pages/patientManagement';
 import SideBar from './components/Sidebar';
 import VendorManagement from './pages/VendorManagement';
 import WorkSchedule from './components/Workschedule';
-import WardManagement from './pages/WardManagement';
 import { ToastContainer } from 'react-toastify';
 import UserRoleMapping from './pages/UserRolesTable';
 import 'react-toastify/dist/ReactToastify.css';
@@ -27,11 +27,12 @@ import EmployeeProfile from './components/userProfile';
 import RegistrationForm from './pages/HospitalRegistration';
 import LoginPage from './auth/Login';
 import PatientSchedule from './pages/patientSchedule'
+import WardManagement from './pages/WardManagement';
 import BloodSugarLog from './PatientProfile/BloodSugarLog'
 import CardexForm from './PatientProfile/NursingCardex';
 
 function App() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(true);
 
   const handleLogin = () => {
     setIsLoggedIn(true);

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from "react";
-import { Container, DropdownButton, Dropdown } from "react-bootstrap";
+import { Container, DropdownButton, Dropdown, Button } from "react-bootstrap";
 import styled from "styled-components";
 import { initializeApp } from "firebase/app";
 import { getFirestore, collection, getDocs } from "firebase/firestore";
@@ -13,15 +13,16 @@ import {
   FaFlask,
   FaXRay,
   FaBed,
+  FaRegEdit,
 } from "react-icons/fa";
 import { ToastContainer } from "react-toastify";
 import NursingNotes from "../components/AddNursingNotes";
 import DoctorsNotes from "../components/DoctorsNotes";
 import OrderMedicine from "../components/OrderMedicine";
-import OrderLabTest from "../components/OrderLabTest"; 
+import OrderLabTest from "../components/OrderLabTest";
 import OrderImaging from "../components/orderImaging";
 import VitalSigns from "../components/AddVitals";
-import PatientProfile from "./patientProfile"
+import PatientProfile from "./patientProfile";
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
@@ -31,15 +32,15 @@ const PatientManagement = () => {
   const [showDoctorsNotes, setShowDoctorsNotes] = useState(false);
   const [showNursingNotes, setShowNursingNotes] = useState(false);
   const [showOrderMedicine, setShowOrderMedicine] = useState(false);
-  const [showOrderImaging, setShowOrderImaging] = useState(false); 
-  const [showOrderLabTest, setShowOrderLabTest] = useState(false); 
+  const [showOrderImaging, setShowOrderImaging] = useState(false);
+  const [showOrderLabTest, setShowOrderLabTest] = useState(false);
   const [showVitalSigns, setShowVitalSigns] = useState(false);
 
   const toggleDoctorsNotes = () => setShowDoctorsNotes(!showDoctorsNotes);
   const toggleNursingNotes = () => setShowNursingNotes(!showNursingNotes);
   const toggleOrderMedicine = () => setShowOrderMedicine(!showOrderMedicine);
-  const toggleOrderImaging = () => setShowOrderImaging(!showOrderImaging); 
-  const toggleOrderLabTest = () => setShowOrderLabTest(!showOrderLabTest); 
+  const toggleOrderImaging = () => setShowOrderImaging(!showOrderImaging);
+  const toggleOrderLabTest = () => setShowOrderLabTest(!showOrderLabTest);
   const toggleVitalSigns = () => setShowVitalSigns(!showVitalSigns);
 
   useEffect(() => {
@@ -100,41 +101,46 @@ const PatientManagement = () => {
         data={data}
         initialState={{ pageIndex: 0, pageSize: 10 }}
         ActionDropdown={({ row }) => (
-          <DropdownButton
-            dropup={true}
-            id={`actions-dropdown-${row.id}`}
-            title="Actions"
-          >
-            <Dropdown.Item  onClick={toggleVitalSigns}>
-              <FaHeartbeat /> View Vitals
-            </Dropdown.Item>
-            <Dropdown.Item  onClick={toggleNursingNotes}>
-              <FaUserNurse /> Add Nursing Notes
-            </Dropdown.Item>
-            <Dropdown.Item  onClick={toggleDoctorsNotes}>
-              <FaNotesMedical /> Add Doctor's Notes
-            </Dropdown.Item>
-            <Dropdown.Item href="#/action-3" onClick={toggleOrderMedicine}>
-              <FaCapsules /> Order Medicine
-            </Dropdown.Item>
-            <Dropdown.Item href="#/action-4" onClick={toggleOrderLabTest}>
-              <FaFlask /> Order Lab Tests
-            </Dropdown.Item>
-            <Dropdown.Item href="#/action-5" onClick={toggleOrderImaging}>
-              <FaXRay /> Order Imaging
-            </Dropdown.Item>
-            <Dropdown.Item
-              href="#/action-6"
-              onClick={() => console.log("Discharge Patient")}
+          <>
+            <DropdownButton
+              dropup={true}
+              id={`actions-dropdown-${row.id}`}
+              title="Actions"
             >
-              <FaBed /> Discharge Patient
-            </Dropdown.Item>
-            <Dropdown.Item
-              href="/PatientProfile"
-            >
-              <FaBed /> Patient Profile
-            </Dropdown.Item>
-          </DropdownButton>
+              <Dropdown.Item onClick={toggleVitalSigns}>
+                <FaHeartbeat /> View Vitals
+              </Dropdown.Item>
+              <Dropdown.Item onClick={toggleNursingNotes}>
+                <FaUserNurse /> Add Nursing Notes
+              </Dropdown.Item>
+              <Dropdown.Item onClick={toggleDoctorsNotes}>
+                <FaNotesMedical /> Add Doctor's Notes
+              </Dropdown.Item>
+              <Dropdown.Item href="#/action-3" onClick={toggleOrderMedicine}>
+                <FaCapsules /> Order Medicine
+              </Dropdown.Item>
+              <Dropdown.Item href="#/action-4" onClick={toggleOrderLabTest}>
+                <FaFlask /> Order Lab Tests
+              </Dropdown.Item>
+              <Dropdown.Item href="#/action-5" onClick={toggleOrderImaging}>
+                <FaXRay /> Order Imaging
+              </Dropdown.Item>
+              <Dropdown.Item
+                href="#/action-6"
+                onClick={() => console.log("Discharge Patient")}
+              >
+                <FaBed /> Discharge Patient
+              </Dropdown.Item>
+              <Dropdown.Item href="/PatientProfile">
+                <FaBed /> Patient Profile
+              </Dropdown.Item>
+            </DropdownButton>
+
+            {/* // add an icon for medication list
+            <Button variant="outline-primary" style={{ marginLeft: "10px" }}>
+              <FaRegEdit />
+            </Button> */}
+          </>
         )}
       />
 
@@ -160,7 +166,7 @@ const PatientManagement = () => {
         onHide={() => setShowOrderLabTest(false)}
         // patientName={/* Pass the patient name here */}
       />
-      < VitalSigns
+      <VitalSigns
         show={showVitalSigns}
         onHide={() => setShowVitalSigns(false)}
         // patientName={/* Pass the patient name here */}

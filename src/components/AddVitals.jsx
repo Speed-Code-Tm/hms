@@ -1,31 +1,42 @@
 import React, { useState } from "react";
-import { Modal, Form, Button, ListGroup, ToggleButton } from "react-bootstrap";
+import {
+  Modal,
+  Form,
+  Button,
+  message,
+  List,
+  Input,
+  Typography,
+  Switch,
+  InputNumber,
+  Select,
+} from "antd";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
-  faPen,
   faHeart,
   faThermometer,
   faTint,
   faWeight,
   faSyringe,
   faTimes,
+  faPlus,
 } from "@fortawesome/free-solid-svg-icons";
 import * as Yup from "yup";
-import styled from "styled-components";
 
 // Dummy data
 const dummyAllergies = ["Peanuts", "Dust"];
 const dummyVitalSigns = {
-  temperature: "",
-  temperatureUnit: "F",
-  bloodPressure: { systolic: "", diastolic: "" },
-  heartRate: "",
-  bloodType: "",
-  weight: "",
-  bloodSugarLevel: "",
+  temperature: 98.6,
+  bloodPressure: { systolic: 120, diastolic: 80 },
+  heartRate: 75,
+  bloodType: "O+",
+  weight: 70,
+  bloodSugarLevel: 100,
 };
 
 const bloodTypes = ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"];
+
+const { Text } = Typography;
 
 const VitalSigns = ({
   show,
@@ -39,44 +50,35 @@ const VitalSigns = ({
   const [vitalSigns, setVitalSigns] = useState(dummyVitalSigns);
   const [editMode, setEditMode] = useState(false);
   const [isCelsius, setIsCelsius] = useState(false);
+  const [originalVitalSigns, setOriginalVitalSigns] = useState(dummyVitalSigns);
 
   const validationSchema = Yup.object().shape({
-    temperature: Yup.number().when("age", {
-      is: (age) => age < 18,
-      then: Yup.number().required("Temperature is required for children"),
-      otherwise: Yup.number(),
+    temperature: Yup.number().required("Temperature is required"),
+    bloodPressure: Yup.object().shape({
+      systolic: Yup.number()
+        .min(70, "Systolic blood pressure must be between 70 and 190")
+        .max(190, "Systolic blood pressure must be between 70 and 190")
+        .required("Systolic blood pressure is required"),
+      diastolic: Yup.number()
+        .min(40, "Diastolic blood pressure must be between 40 and 100")
+        .max(100, "Diastolic blood pressure must be between 40 and 100")
+        .required("Diastolic blood pressure is required"),
     }),
-    bloodPressure: Yup.object().when(["age", "bloodPressureEntered"], {
-      is: (age, bloodPressureEntered) =>
-        age >= 18 && bloodPressureEntered === true,
-      then: Yup.object().shape({
-        systolic: Yup.number().required("Systolic blood pressure is required"),
-        diastolic: Yup.number().required(
-          "Diastolic blood pressure is required"
-        ),
-      }),
-      otherwise: Yup.object().shape({
-        systolic: Yup.number(),
-        diastolic: Yup.number(),
-      }),
-    }),
-    heartRate: Yup.number().when(["age", "bloodPressureEntered"], {
-      is: (age, bloodPressureEntered) =>
-        age >= 18 && bloodPressureEntered === true,
-      then: Yup.number().required("Heart rate is required"),
-      otherwise: Yup.number(),
-    }),
-    bloodType: Yup.string(),
-    weight: Yup.number(),
-    bloodSugarLevel: Yup.number().when("age", {
-      is: (age) => age >= 18,
-      then: Yup.number().required("Blood sugar level is required for adults"),
-      otherwise: Yup.number(),
-    }),
+    heartRate: Yup.number()
+      .min(40, "Heart rate must be between 40 and 180")
+      .max(180, "Heart rate must be between 40 and 180")
+      .required("Heart rate is required"),
+    bloodType: Yup.string().required("Blood type is required"),
+    weight: Yup.number()
+      .min(20, "Weight must be between 20 and 300")
+      .max(300, "Weight must be between 20 and 300")
+      .required("Weight is required"),
+    bloodSugarLevel: Yup.number().required("Blood sugar level is required"),
   });
 
   const handleEditClick = () => {
-    setEditMode(!editMode);
+    setEditMode(true);
+    setOriginalVitalSigns(vitalSigns);
   };
 
   const handleAllergyChange = (e) => {
@@ -91,7 +93,9 @@ const VitalSigns = ({
   };
 
   const handleRemoveAllergy = (index) => {
-    setAllergies(allergies.filter((_, i) => i !== index));
+    const newAllergies = [...allergies];
+    newAllergies.splice(index, 1);
+    setAllergies(newAllergies);
   };
 
   const handleVitalSignChange = (field, value) => {
@@ -104,17 +108,22 @@ const VitalSigns = ({
 
   const handleSave = async () => {
     try {
-      await validationSchema.validate(
-        { ...vitalSigns, age: patientAge },
-        { abortEarly: false }
-      );
+      await validationSchema.validate(vitalSigns, { abortEarly: false });
       // Save vital signs to the database or perform any necessary operations
       setEditMode(false);
-      // Show success message or perform any necessary actions
+      setOriginalVitalSigns(vitalSigns);
+      message.success("Vital signs updated successfully");
     } catch (error) {
-      // Show error message or perform any necessary actions
+      message.error("Please correct the following errors:");
       console.error(error);
     }
+  };
+
+  const handleCancel = () => {
+    setEditMode(false);
+    setVitalSigns(originalVitalSigns);
+    setAllergies(dummyAllergies);
+    setNewAllergy("");
   };
 
   const getBloodSugarLevel = (value) => {
@@ -143,320 +152,235 @@ const VitalSigns = ({
       setVitalSigns({
         ...vitalSigns,
         temperature: ((vitalSigns.temperature - 32) * 5) / 9,
-        temperatureUnit: "C",
       });
     } else {
       setVitalSigns({
         ...vitalSigns,
         temperature: (vitalSigns.temperature * 9) / 5 + 32,
-        temperatureUnit: "F",
       });
     }
   };
 
   return (
     <Modal
-      show={show}
-      onHide={onHide}
-      size="lg"
-      centered
-      backdrop="static"
-      keyboard={false}
-    >
-      <Modal.Header closeButton>
-        <Modal.Title>
+      title={
+        <div>
           <FontAwesomeIcon
             icon={faSyringe}
             style={{ color: "#c63737", marginRight: "10px" }}
           />
-          Vital Signs & Allergies ({patientName}, {patientAge} years old)
-        </Modal.Title>
-      </Modal.Header>
-      <Modal.Body>
-        <Form>
-          <Form.Group>
-            <Form.Label>
-              <FontAwesomeIcon
-                icon={faSyringe}
-                style={{ color: "#c63737", marginRight: "10px" }}
-              />
-              Allergies
-            </Form.Label>
-            {editMode ? (
-              <>
-                <Form.Control
-                  type="text"
+          Vital Signs & Allergies
+        </div>
+      }
+      visible={show}
+      onCancel={onHide}
+      footer={[
+        <Button key="back" onClick={onHide}>
+          Close
+        </Button>,
+        editMode ? (
+          <>
+            <Button key="cancel" onClick={handleCancel}>
+              Cancel
+            </Button>
+            <Button key="submit" type="primary" onClick={handleSave}>
+              Save
+            </Button>
+          </>
+        ) : (
+          <Button key="edit" type="primary" onClick={handleEditClick}>
+            Edit
+          </Button>
+        ),
+      ]}
+    >
+      <Form
+        labelCol={{ span: 11 }}
+        wrapperCol={{ span: 14, fontWeight: 18 }}
+        layout="horizontal"
+        initialValues={editMode ? vitalSigns : originalVitalSigns}
+      >
+        <Form.Item label={<Label icon={faSyringe} text="Allergies" />}>
+          {editMode ? (
+            <>
+              <Input.Group compact>
+                <Input
+                  style={{ width: "calc(100% - 100px)" }}
                   value={newAllergy}
                   onChange={handleAllergyChange}
                   placeholder="Enter allergy"
-                  className="mb-2"
                 />
-                <ListGroup>
-                  {allergies.map((allergy, index) => (
-                    <ListGroup.Item
-                      key={index}
+                <Button type="primary" onClick={handleAddAllergy}>
+                  <FontAwesomeIcon icon={faPlus} /> Add Allergy
+                </Button>
+              </Input.Group>
+              <List
+                dataSource={allergies}
+                renderItem={(allergy, index) => (
+                  <List.Item>
+                    {allergy}
+                    <FontAwesomeIcon
+                      icon={faTimes}
                       style={{
-                        backgroundColor: index % 2 === 0 ? "#f8f9fa" : "white",
-                        display: "flex",
-                        justifyContent: "space-between",
-                        alignItems: "center",
+                        cursor: "pointer",
+                        color: "#c63737",
+                        marginLeft: "8px",
                       }}
-                    >
-                      <span>{allergy}</span>
-                      <FontAwesomeIcon
-                        icon={faTimes}
-                        style={{
-                          cursor: "pointer",
-                          color: "#c63737",
-                          marginLeft: "0.5rem",
-                        }}
-                        onClick={() => handleRemoveAllergy(index)}
-                      />
-                    </ListGroup.Item>
-                  ))}
-                </ListGroup>
-              </>
-            ) : (
-              allergies.join(", ")
+                      onClick={() => handleRemoveAllergy(index)}
+                    />
+                  </List.Item>
+                )}
+              />
+            </>
+          ) : (
+            allergies.join(", ")
+          )}
+        </Form.Item>
+        <Form.Item
+          label={<Label icon={faThermometer} text="Temperature" />}
+          name="temperature"
+          rules={[{ required: true, message: "Temperature is required" }]}
+        >
+          <div style={{ display: "flex", alignItems: "center" }}>
+            <InputNumber
+              value={vitalSigns.temperature}
+              onChange={(value) => handleVitalSignChange("temperature", value)}
+              disabled={!editMode}
+            />
+            <Text>{isCelsius ? "°C" : "°F"}</Text>
+            <Switch
+              checked={isCelsius}
+              onChange={toggleTemperatureUnit}
+              style={{ marginLeft: 8 }}
+            />
+          </div>
+        </Form.Item>
+        <Form.Item
+          label={<Label icon={faHeart} text="Heart Rate (bpm)" />}
+          name="heartRate"
+          rules={[{ required: true, message: "Heart rate is required" }]}
+        >
+          <InputNumber
+            value={vitalSigns.heartRate}
+            onChange={(value) => handleVitalSignChange("heartRate", value)}
+            disabled={!editMode}
+            addonAfter="bpm"
+          />
+        </Form.Item>
+        <Form.Item
+          label={<Label icon={faTint} text="Blood Type" />}
+          name="bloodType"
+          rules={[{ required: true, message: "Blood type is required" }]}
+        >
+          <Select
+            value={vitalSigns.bloodType}
+            onChange={(value) => handleVitalSignChange("bloodType", value)}
+            disabled={!editMode}
+          >
+            <Select.Option value="">Select blood type</Select.Option>
+            {bloodTypes.map((type) => (
+              <Select.Option key={type} value={type}>
+                {type}
+              </Select.Option>
+            ))}
+          </Select>
+        </Form.Item>
+        <Form.Item
+          label={<Label icon={faTint} text="Blood Pressure (mmHg)" />}
+          name="bloodPressure"
+          rules={[
+            { required: true, message: "Blood pressure is required" },
+            {
+              validator: (_, value) => {
+                if (!value || !value.systolic || !value.diastolic) {
+                  return Promise.reject(
+                    "Both systolic and diastolic values are required"
+                  );
+                }
+                return Promise.resolve();
+              },
+            },
+          ]}
+        >
+          <div style={{ display: "flex", alignItems: "center" }}>
+            <InputNumber
+              value={vitalSigns.bloodPressure.systolic}
+              onChange={(value) =>
+                handleVitalSignChange("bloodPressure", {
+                  ...vitalSigns.bloodPressure,
+                  systolic: value,
+                })
+              }
+              disabled={!editMode}
+              placeholder="Systolic"
+              style={{ marginRight: 8 }}
+            />
+            <Text>mmHg</Text>
+          </div>
+          <div style={{ display: "flex", alignItems: "center" }}>
+            <InputNumber
+              value={vitalSigns.bloodPressure.diastolic}
+              onChange={(value) =>
+                handleVitalSignChange("bloodPressure", {
+                  ...vitalSigns.bloodPressure,
+                  diastolic: value,
+                })
+              }
+              disabled={!editMode}
+              placeholder="Diastolic"
+              style={{ marginRight: 8 }}
+            />
+            <Text>mmHg</Text>
+          </div>
+        </Form.Item>
+        <Form.Item
+          label={<Label icon={faWeight} text="Weight (kg)" />}
+          name="weight"
+          rules={[{ required: true, message: "Weight is required" }]}
+        >
+          <InputNumber
+            value={vitalSigns.weight}
+            onChange={(value) => handleVitalSignChange("weight", value)}
+            disabled={!editMode}
+            addonAfter="kg"
+          />
+        </Form.Item>
+        <Form.Item
+          label={<Label icon={faTint} text="Blood Sugar Level (mg/dL)" />}
+          name="bloodSugarLevel"
+          rules={[{ required: true, message: "Blood sugar level is required" }]}
+        >
+          <div style={{ display: "flex", alignItems: "center" }}>
+            <InputNumber
+              value={vitalSigns.bloodSugarLevel}
+              onChange={(value) =>
+                handleVitalSignChange("bloodSugarLevel", value)
+              }
+              disabled={!editMode}
+              style={{ marginRight: 8 }}
+            />
+            <Text>mg/dL</Text>
+            {vitalSigns.bloodSugarLevel && (
+              <Text
+                style={{
+                  marginLeft: 8,
+                  color: getBloodSugarLevelColor(vitalSigns.bloodSugarLevel),
+                  fontWeight: "bold",
+                }}
+              >
+                {getBloodSugarLevel(vitalSigns.bloodSugarLevel)}
+              </Text>
             )}
-          </Form.Group>
-          <div className="row">
-            <div className="col-md-6">
-              <Form.Group>
-                <StyledLabel>
-                  <FontAwesomeIcon
-                    icon={faThermometer}
-                    style={{ color: "#c63737", marginRight: "10px" }}
-                  />
-                  Temperature
-                </StyledLabel>
-                <div className="d-flex align-items-center">
-                  <Form.Control
-                    type="number"
-                    value={vitalSigns.temperature}
-                    onChange={(e) =>
-                      handleVitalSignChange("temperature", e.target.value)
-                    }
-                    isInvalid={!!validationSchema.fields.temperature?.error}
-                    disabled={!editMode}
-                    className="mr-2"
-                  />
-                  <span>
-                    {vitalSigns.temperatureUnit === "F" ? "°F" : "°C"}
-                  </span>
-                  <ToggleButton
-                    id="temperature-switch"
-                    checked={isCelsius}
-                    onChange={toggleTemperatureUnit}
-                    className="ml-2"
-                  />
-                </div>
-                <Form.Control.Feedback type="invalid">
-                  {validationSchema.fields.temperature?.error}
-                </Form.Control.Feedback>
-              </Form.Group>
-              <Form.Group>
-                <StyledLabel>
-                  <FontAwesomeIcon
-                    icon={faHeart}
-                    style={{ color: "#c63737", marginRight: "10px" }}
-                  />
-                  Heart Rate (bpm)
-                </StyledLabel>
-                <div className="d-flex align-items-center">
-                  <Form.Control
-                    type="number"
-                    value={vitalSigns.heartRate}
-                    onChange={(e) =>
-                      handleVitalSignChange("heartRate", e.target.value)
-                    }
-                    isInvalid={!!validationSchema.fields.heartRate?.error}
-                    disabled={!editMode}
-                    className="mr-2"
-                  />
-                  <span>bpm</span>
-                </div>
-                <Form.Control.Feedback type="invalid">
-                  {validationSchema.fields.heartRate?.error}
-                </Form.Control.Feedback>
-              </Form.Group>
-            </div>
-            <div className="col-md-6">
-              <Form.Group>
-                <StyledLabel>
-                  <FontAwesomeIcon
-                    icon={faTint}
-                    style={{ color: "#c63737", marginRight: "10px" }}
-                  />
-                  Blood Type
-                </StyledLabel>
-                <Form.Control
-                  as="select"
-                  value={vitalSigns.bloodType}
-                  onChange={(e) =>
-                    handleVitalSignChange("bloodType", e.target.value)
-                  }
-                  disabled={!editMode}
-                >
-                  <option value="">Select blood type</option>
-                  {bloodTypes.map((type) => (
-                    <option key={type} value={type}>
-                      {type}
-                    </option>
-                  ))}
-                </Form.Control>
-              </Form.Group>
-              <Form.Group>
-                <StyledLabel>
-                  <FontAwesomeIcon
-                    icon={faTint}
-                    style={{ color: "#c63737", marginRight: "10px" }}
-                  />
-                  Blood Pressure (mmHg)
-                </StyledLabel>
-                <div className="d-flex align-items-center">
-                  <Form.Control
-                    type="number"
-                    value={vitalSigns.bloodPressure.systolic}
-                    onChange={(e) =>
-                      handleVitalSignChange("bloodPressure", {
-                        ...vitalSigns.bloodPressure,
-                        systolic: e.target.value,
-                      })
-                    }
-                    isInvalid={
-                      !!validationSchema.fields.bloodPressure?.error &&
-                      !!validationSchema.fields.bloodPressure?.error?.message
-                    }
-                    disabled={!editMode}
-                    placeholder="Systolic"
-                    className="mr-2"
-                    onBlur={() =>
-                      handleVitalSignChange("bloodPressureEntered", true)
-                    }
-                  />
-                  <span>mmHg</span>
-                </div>
-                <div className="d-flex align-items-center">
-                  <Form.Control
-                    type="number"
-                    value={vitalSigns.bloodPressure.diastolic}
-                    onChange={(e) =>
-                      handleVitalSignChange("bloodPressure", {
-                        ...vitalSigns.bloodPressure,
-                        diastolic: e.target.value,
-                      })
-                    }
-                    isInvalid={
-                      !!validationSchema.fields.bloodPressure?.error &&
-                      !!validationSchema.fields.bloodPressure?.error?.message
-                    }
-                    disabled={!editMode}
-                    placeholder="Diastolic"
-                    className="mr-2"
-                    onBlur={() =>
-                      handleVitalSignChange("bloodPressureEntered", true)
-                    }
-                  />
-                  <span>mmHg</span>
-                </div>
-                <Form.Control.Feedback type="invalid">
-                  {validationSchema.fields.bloodPressure?.error?.message}
-                </Form.Control.Feedback>
-              </Form.Group>
-            </div>
           </div>
-          <div className="row">
-            <div className="col-md-6">
-              <Form.Group>
-                <StyledLabel>
-                  <FontAwesomeIcon
-                    icon={faWeight}
-                    style={{ color: "#c63737", marginRight: "10px" }}
-                  />
-                  Weight (kg)
-                </StyledLabel>
-                <div className="d-flex align-items-center">
-                  <Form.Control
-                    type="number"
-                    value={vitalSigns.weight}
-                    onChange={(e) =>
-                      handleVitalSignChange("weight", e.target.value)
-                    }
-                    isInvalid={!!validationSchema.fields.weight?.error}
-                    disabled={!editMode}
-                    className="mr-2"
-                  />
-                  <span>kg</span>
-                </div>
-                <Form.Control.Feedback type="invalid">
-                  {validationSchema.fields.weight?.error}
-                </Form.Control.Feedback>
-              </Form.Group>
-            </div>
-            <div className="col-md-6">
-              <Form.Group>
-                <StyledLabel>
-                  <FontAwesomeIcon
-                    icon={faTint}
-                    style={{ color: "#c63737", marginRight: "10px" }}
-                  />
-                  Blood Sugar Level (mg/dL)
-                </StyledLabel>
-                <div className="d-flex align-items-center">
-                  <Form.Control
-                    type="number"
-                    value={vitalSigns.bloodSugarLevel}
-                    onChange={(e) =>
-                      handleVitalSignChange("bloodSugarLevel", e.target.value)
-                    }
-                    isInvalid={!!validationSchema.fields.bloodSugarLevel?.error}
-                    disabled={!editMode}
-                    className="mr-2"
-                  />
-                  <span>mg/dL</span>
-                  {vitalSigns.bloodSugarLevel && (
-                    <span
-                      style={{
-                        marginLeft: "10px",
-                        color: getBloodSugarLevelColor(
-                          vitalSigns.bloodSugarLevel
-                        ),
-                        fontWeight: "bold",
-                      }}
-                    >
-                      {getBloodSugarLevel(vitalSigns.bloodSugarLevel)}
-                    </span>
-                  )}
-                </div>
-                <Form.Control.Feedback type="invalid">
-                  {validationSchema.fields.bloodSugarLevel?.error}
-                </Form.Control.Feedback>
-              </Form.Group>
-            </div>
-          </div>
-        </Form>
-      </Modal.Body>
-      <Modal.Footer>
-        <Button variant="secondary" onClick={onHide}>
-          Close
-        </Button>
-        {editMode ? (
-          <Button variant="primary" onClick={handleSave}>
-            Save
-          </Button>
-        ) : (
-          <Button variant="primary" onClick={handleEditClick}>
-            Edit
-          </Button>
-        )}
-      </Modal.Footer>
+        </Form.Item>
+      </Form>
     </Modal>
   );
 };
-const StyledLabel = styled.div`
-  display: flex;
-  align-items: center;
-  margin-bottom: 0.5rem;
-`;
+const Label = ({ icon, text }) => (
+  <div style={{ display: "flex", alignItems: "center" }}>
+    <FontAwesomeIcon icon={icon} style={{ color: "#c63737", marginRight: 8 }} />
+    <Text strong>{text}</Text>
+  </div>
+);
 export default VitalSigns;

@@ -528,7 +528,7 @@ const SideBar = () => {
         >
           <CustomMenuItem
             component={
-              <Link to="/facility-settings" onClick={handleActive}>
+              <Link to="/CardexForm" onClick={handleActive}>
                 Facility Settings
               </Link>
             }
@@ -538,7 +538,7 @@ const SideBar = () => {
           </CustomMenuItem>
           <CustomMenuItem
             component={
-              <Link to="/user-preferences" onClick={handleActive}>
+              <Link to="/BloodSugarLog" onClick={handleActive}>
                 User Preferences
               </Link>
             }

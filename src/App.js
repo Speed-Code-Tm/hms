@@ -27,6 +27,8 @@ import EmployeeProfile from './components/userProfile';
 import RegistrationForm from './pages/HospitalRegistration';
 import LoginPage from './auth/Login';
 import PatientSchedule from './pages/patientSchedule'
+import BloodSugarLog from './PatientProfile/BloodSugarLog'
+import CardexForm from './PatientProfile/NursingCardex';
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -93,6 +95,8 @@ function AppLayout() {
           <Route path='/DutyRota' element={<WorkSchedule />} />
           <Route path='/Permissions' element={<UserRoleMapping />} />
           <Route path='/PatientSchedule' element={<PatientSchedule/>}/>
+          <Route path='/BloodSugarLog'element={<BloodSugarLog/>}/>
+          <Route path='/CardexForm'element={<CardexForm/>}/>
         </Routes>
       </div>
     </div>

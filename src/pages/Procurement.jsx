@@ -16,11 +16,12 @@ import {
   Col,
   Tabs,
   Tab,
+  DropdownButton,
 } from "react-bootstrap";
 
 
 import {initializeApp} from 'firebase/app'
-import firebaseConfig, { retrieveDepartmentNeeds, retrieveInventoryItems, retrieveInventoryOrders } from "./configs";
+import firebaseConfig, { retrieveDepartmentNeeds, retrieveInventoryItems, retrieveInventoryOrders, retrieveIssuedItems } from "./configs";
 import {getDocs,collection, getFirestore} from 'firebase/firestore'
 import OrderManagement from "../components/OrderManagement";
 import DepartmentNeeds from "../components/DepartmentNeeds";
@@ -118,11 +119,11 @@ const ReportingTab = () => {
   );
 };
 
-const IssuedItemsTab = () => {
+const IssuedItemsTab = ({data}) => {
   const issuedItemsColumns = [
-    { Header: "Item", accessor: "item" },
+    { Header: "Item", accessor: "itemName" },
     { Header: "Issued To", accessor: "issuedTo" },
-    { Header: "Quantity", accessor: "quantity" },
+    { Header: "Quantity", accessor: "issuedQuantity" },
     { Header: "Department", accessor: "department" },
     { Header: "Requested By", accessor: "requestedBy" },
     { Header: "Issued On", accessor: "issuedOn" },
@@ -133,11 +134,28 @@ const IssuedItemsTab = () => {
     pageSize: 10,
   });
 
+
   return (
     <ReusableTable
       columns={issuedItemsColumns}
-      data={procurementData}
+      data={data}
       initialState={initialState}
+      ActionDropdown={({ row }) => (
+        <div>
+          {/* add a drop down button menu wth icons and functions */}
+          <DropdownButton dropup="true" id="dropdown-basic-button" title="Actions">
+
+            {/* <Dropdown.Item href="#/action-2" onClick={() => handleRowClick(row.original, 'action')}>
+              Issue Item
+            </Dropdown.Item>
+
+            <Dropdown.Item href="#/action-2">
+              Cancel Request
+            </Dropdown.Item> */}
+
+          </DropdownButton>
+        </div>
+      )}
     />
   );
 };
@@ -238,17 +256,9 @@ const fetchInventory = async () => {
 const fetchIssuedItems = async () => {
   try {
      
-      const issuedItemsCollection = collection(db, 'issuedItems');
-      
-     
-      const issuedItemsSnapshot = await getDocs(issuedItemsCollection);
       
     
-      const issuedItemsData = issuedItemsSnapshot.docs.map(doc => ({
-          id: doc.id,
-          ...doc.data(),
-      }));
-      
+      const issuedItemsData =  await retrieveIssuedItems()
       setIssuedItems(issuedItemsData);
   } catch (error) {
       console.error('Error fetching orders:', error);
@@ -266,7 +276,7 @@ useEffect(()=>{
   }else if(activeTab === 'reporting'){
 
   }else if (activeTab === 'issuedItems'){
-
+    fetchIssuedItems()
   }
 },[activeTab])
 
@@ -283,7 +293,7 @@ useEffect(()=>{
             className="justify-content-center"
           >
             <Tab eventKey="departmentNeeds" title="department Needs">
-              <DepartmentNeeds data={departmentRequests}  />
+              <DepartmentNeeds data={departmentRequests} refetch={fetchDeparmentRequests}  />
             </Tab>
             <Tab eventKey="orderManagement" title="order Management">
               <OrderManagement fetchData={fetchInventoryOrders} data={inventoryOrder} />
@@ -295,7 +305,7 @@ useEffect(()=>{
               <ReportingTab />
             </Tab>
             <Tab eventKey="issuedItems" title="Issued Items">
-              <IssuedItemsTab />
+              <IssuedItemsTab  data={issuedItems}/>
             </Tab>
           </Tabs>
         </Col>

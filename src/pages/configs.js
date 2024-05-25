@@ -398,6 +398,34 @@ export const updateVitalSigns = async (hospitalVisitId, vitalSigns) => {
    
   }
 
+  //retrieve issued items
+
+  export const retrieveIssuedItems = async () =>{
+    try{
+
+      const procurementId = await getCollectionId(hospitalRef, 'Procurement');
+      const departmentRequestsRef = hospitalRef.collection('Procurement').doc(procurementId).collection('departmentNeeds');
+      const querySnapshot = await departmentRequestsRef.where('status', '==', 'issued').get();
+  
+    const issuedItemsData =  querySnapshot.docs.map(doc => {
+      const data = doc.data()
+
+      const issuedItem = {
+        id:doc.id,
+        ...data,
+        issuedOn:data?.issuedOn? new Date(data?.issuedOn?.seconds * 1000).toLocaleString() : '-'
+      }
+       return issuedItem
+      });
+      console.log(issuedItemsData);
+
+return issuedItemsData
+    }catch(error){
+      throw error
+    }
+  }
+
+
   //update item order
 
   export const completOrder = async (newItem , orderedItem, orderId) =>{
@@ -422,8 +450,9 @@ export const updateVitalSigns = async (hospitalVisitId, vitalSigns) => {
         } else {
           const docRef = querySnapshot.docs[0].ref;
           const existingItem = querySnapshot.docs[0].data();
-          const updatedQuantity = existingItem.newStock + orderedItem.newStock;
-          await docRef.update({ newStock: updatedQuantity });
+          const newStockCount = existingItem.newStock + orderedItem.newStock;
+          const currentStockCount = existingItem.currentStock + orderedItem.newStock
+          await docRef.update({ newStock: newStockCount, currentStock:currentStockCount });
         }
       }
 
@@ -435,6 +464,44 @@ export const updateVitalSigns = async (hospitalVisitId, vitalSigns) => {
     }
 
   }
+
+  // issue item
+
+  export const completeItemRequest = async ({itemId,requestId,quantity, issuedOn,issuedTo},action) =>{
+
+    try {
+      const procurementId =  await getCollectionId(hospitalRef, 'Procurement')
+    
+      const inventoryItemRef = hospitalRef.collection('Procurement').doc(procurementId).collection('inventory').doc(itemId);
+      
+      const requestRef = hospitalRef.collection('Procurement').doc(procurementId).collection('departmentNeeds').doc(requestId);
+
+
+      if(action === 'issue'){
+        const inventoryItemDoc = await inventoryItemRef.get()
+
+        if(!inventoryItemDoc.exists){
+          throw new Error('Inventory item not found')
+        } 
+        
+        const inventoryItem = inventoryItemDoc.data();
+        if (inventoryItem.currentStock >= quantity) {
+          await inventoryItemRef.update({
+            currentStock: inventoryItem.currentStock - quantity
+          });
+
+          await requestRef.update({status:"issued",issuedOn, issuedTo, issuedQuantity:quantity})
+        } else {
+          throw new Error('Insufficient stock to issue the requested quantity');
+        }
+      }else{
+        await requestRef.update({status:'cancelled'})
+      }
+    } catch (error) {
+      throw error
+    }
+  }
+
 
   // order inventory item from vendor
 

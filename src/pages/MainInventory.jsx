@@ -53,7 +53,7 @@ const MainInventory = ({ activeTab, department }) => {
     setLoading(true)
     try {
 
-      await requestItem({ quantity, requestedBy: 'Oliver Wanyonyi', requestDate: formattedDate, itemName: inventory.itemName, status: 'pending' }, 'pharmacy')
+      await requestItem({ quantity, requestedBy: 'Oliver Wanyonyi', requestDate: formattedDate, itemName: inventory.itemName, status: 'pending',itemId:inventory.id }, 'pharmacy')
 
       toast.success("Item request successful")
       setShowModal(false)

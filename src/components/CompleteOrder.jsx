@@ -80,18 +80,12 @@ const CompleteOrder = ({ orderItem, onHide, refetch }) => {
 
     try {
         await inventoryValidationSchema.validate(formData, { abortEarly: false });
+
+        let {quantity, ...inventoryItem} = formData
+        inventoryItem = newItem ? {...inventoryItem, startStock:quantity, newStock:0, currentStock:quantity}: {...inventoryItem, newStock:quantity}
   
       await completOrder(newItem,
-        {
-          itemName: formData.itemName,
-          category: formData.category 
-        ,
-          unitCost:formData.unitCost,
-          unitType: formData.unitType,
-          quantity: formData.quantity, 
-          reorderLevel:10,
-          description:formData.description
-      },orderItem.id
+       inventoryItem,orderItem.id
       )
 
       onHide();
@@ -196,7 +190,7 @@ const CompleteOrder = ({ orderItem, onHide, refetch }) => {
                     <Form.Control
                       type="number"
                       value={formData.quantity}
-                      onChange={(e) => changeHandler(e, "quantity")}
+                      onChange={(e) => changeHandler(e, newItem?"startStock":"newStock")}
                       required
                       disabled
                     />

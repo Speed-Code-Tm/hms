@@ -4,9 +4,9 @@ import { db } from '../pages/configs'
 import { Dropdown, DropdownButton } from 'react-bootstrap'
 import ReusableTable from '../pages/ReusableTable'
 
-const DepartmentNeeds = ({activeTab}) => {
-    const [data,setData] = useState([])
-    const [initialState, setInitialState] = useState({
+const DepartmentNeeds = ({ data}) => {
+   
+  const [initialState, setInitialState] = useState({
         pageIndex: 0,
         pageSize: 10,
       });
@@ -25,26 +25,9 @@ const [showModal,setShowModal] = useState(false)
       }
       
     
-    const fetchData = async () =>{
-        const departmentNeedsCollection = collection(db, 'departmentNeeds')
+   
 
-        const departmentNeedsSnapshot = await getDocs(departmentNeedsCollection);
-
-        const departmentNeedsData = departmentNeedsSnapshot.docs.map(doc => {
-            
-            const data = doc.data();
-
-            return { id: doc.id, ...data };
-        });
-
-        setData(departmentNeedsData);
-
-    }
-
-    useEffect(()=>{
-        if(activeTab === 'departmentNeeds'){
-        fetchData()}
-    }, [activeTab])
+  
   return (
     <ReusableTable
       columns={departmentNeedsColumns}

@@ -422,8 +422,8 @@ export const updateVitalSigns = async (hospitalVisitId, vitalSigns) => {
         } else {
           const docRef = querySnapshot.docs[0].ref;
           const existingItem = querySnapshot.docs[0].data();
-          const updatedQuantity = existingItem.quantity + orderedItem.quantity;
-          await docRef.update({ quantity: updatedQuantity });
+          const updatedQuantity = existingItem.newStock + orderedItem.newStock;
+          await docRef.update({ newStock: updatedQuantity });
         }
       }
 

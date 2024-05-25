@@ -7,8 +7,8 @@ import ReusableModal from "./ReusableModal";
 import CompleteOrder from "./CompleteOrder";
 import { toast } from "react-toastify";
 
-const OrderManagement = ({ activeTab }) => {
-  const [orders, setOrders] = useState([]);
+const OrderManagement = ({ data, fetchData }) => {
+  
   const [orderItem,setOrderItem] = useState()
   const [showModal,setShowModal] = useState(false)
   const orderManagementColumns = [
@@ -32,21 +32,9 @@ const OrderManagement = ({ activeTab }) => {
    
   };
 
-  const fetchOrders = async () => {
-    try {
-     const ordersData = await retrieveInventoryOrders()
-    
-      setOrders(ordersData);
-    } catch (error) {
-      console.error("Error fetching orders:", error);
-    }
-  };
+ 
 
-  useEffect(() => {
-    if (activeTab === "orderManagement") {
-      fetchOrders();
-    }
-  }, [activeTab]);
+ 
 
   return (
     <>
@@ -55,12 +43,12 @@ const OrderManagement = ({ activeTab }) => {
     <ReusableModal title="Update Inventory" show={showModal}
     onHide={()=>setShowModal(false)}
     >
-        <CompleteOrder orderItem={orderItem} refetch={fetchOrders} onHide={()=>setShowModal(false)} setOrderItem={setOrderItem}/>
+        <CompleteOrder orderItem={orderItem} refetch={fetchData} onHide={()=>setShowModal(false)} setOrderItem={setOrderItem}/>
 
     </ReusableModal>
     <ReusableTable
       columns={orderManagementColumns}
-      data={orders}
+      data={data}
       initialState={initialState}
       ActionDropdown={({ row }) => (
         <div>

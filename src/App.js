@@ -30,6 +30,7 @@ import PatientSchedule from './pages/patientSchedule'
 import WardManagement from './pages/WardManagement';
 import BloodSugarLog from './PatientProfile/BloodSugarLog'
 import CardexForm from './PatientProfile/NursingCardex';
+import Collection_Denials from './components/Collection_Denials';
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(true);
@@ -98,6 +99,7 @@ function AppLayout() {
           <Route path='/PatientSchedule' element={<PatientSchedule/>}/>
           <Route path='/BloodSugarLog'element={<BloodSugarLog/>}/>
           <Route path='/CardexForm'element={<CardexForm/>}/>
+          <Route path='/collections-denials' element={<Collection_Denials/>} />
         </Routes>
       </div>
     </div>

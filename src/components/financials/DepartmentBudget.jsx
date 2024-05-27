@@ -163,7 +163,7 @@ const DepartmentBudget = ({ budgets, refetch}) => {
           
           })
         }
-      })
+      },[selectedBudget])
       
 
 
@@ -273,7 +273,7 @@ const DepartmentBudget = ({ budgets, refetch}) => {
               </Dropdown.Item>
             </DropdownButton>
           </div>
-        )}v
+        )}
 />
     </div>
   )

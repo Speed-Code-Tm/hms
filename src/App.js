@@ -30,7 +30,7 @@ import PatientSchedule from './pages/patientSchedule'
 import WardManagement from './pages/WardManagement';
 import BloodSugarLog from './PatientProfile/BloodSugarLog'
 import CardexForm from './PatientProfile/NursingCardex';
-import Collection_Denials from './components/Collection_Denials';
+import Collection_Denials from './pages/Collection_Denials'
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(true);

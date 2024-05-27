@@ -1,8 +1,8 @@
 import React, { useState } from 'react'
 import { Container,Tabs,Tab } from 'react-bootstrap'
-import DenialManagement from './financials/DenialManagement'
-import ClaimManagement from './financials/ClaimManagement'
-import InvoiceManagement from './financials/InvoiceManagement'
+import DenialManagement from '../components/financials/DenialManagement'
+import ClaimManagement from '../components/financials/ClaimManagement'
+import InvoiceManagement from '../components/financials/InvoiceManagement'
 
 const Collection_Denials = () => {
     const [activeTab,setActiveTab] = useState('invoices')

@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import {DropdownButton, Dropdown,Button} from 'react-bootstrap'
 import ReusableTable from '../../pages/ReusableTable'
-import ReusableModal from '../components/ReusableModal'
+import ReusableModal from '../ReusableModal'
 import GenerateInvoice from './GenerateInvoice'
 
 const InvoiceManagement = () => {

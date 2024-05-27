@@ -20,6 +20,7 @@ const PatientAdmission = () => {
         pageIndex: 0,
         pageSize: 5,
       });
+      
       const [results, setResults] = useState([]);
       const [wards, setWards] = useState([
         { name: 'Ward E', category: 'General Ward', capacity: 20, occupiedBeds: 10 },

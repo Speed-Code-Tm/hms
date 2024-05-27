@@ -34,3 +34,7 @@ h6 {
 .lg-modal .modal-dialog{
   max-width:80%!important;
 }
+
+.cursor-pointer{
+  cursor:pointer;
+}

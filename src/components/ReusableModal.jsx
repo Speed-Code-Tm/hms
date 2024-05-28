@@ -7,6 +7,9 @@ const StyledModal = styled(Modal)`
   .modal-dialog {
     max-width: 800px;
   }
+  .modal-content{
+    min-height:400px;
+  }
 
   .modal-header {
     background-color: #007bff;

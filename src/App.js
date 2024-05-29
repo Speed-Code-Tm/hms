@@ -80,7 +80,7 @@ function AppLayout() {
         <NavBar />
         <Routes>
           <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/registration" element={<Registration />} />
+          <Route path="/booking" element={<Registration />} />
           <Route path="/TriageAssessment" element={<TriageAssessment />} />
           <Route path="/PatientProfile" element={<PatientProfile />} />
           <Route path="/UserProfile/:id" element={<EmployeeProfile />} />

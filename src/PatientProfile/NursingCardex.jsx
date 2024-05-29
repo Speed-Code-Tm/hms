@@ -1,332 +1,135 @@
-import React, { useState } from "react";
-import {
-  Layout,
-  Row,
-  Col,
-  Typography,
-  List,
-  Input,
-  Button,
-  Divider,
-  Form,
-  Modal,
-} from "antd";
-import {
-  PlusCircleOutlined,
-  EditOutlined,
-  DeleteOutlined,
-} from "@ant-design/icons";
+import React, { useState } from 'react';
+import { Tabs, Tab, Card, Button, Form, Row, Col } from 'react-bootstrap';
+import { FaEdit, FaSave, FaNotesMedical, FaPills, FaProcedures, FaUtensils, FaExclamationTriangle, FaComments, FaUserMd, FaFileAlt } from 'react-icons/fa';
 
-const { Content } = Layout;
-const { Title } = Typography;
+// Patient Header Component
+const PatientHeader = ({ patient }) => (
+  <Row className="mb-3">
+    <Col md={6}>
+      <h4>Patient's Name: {patient.name}</h4>
+    </Col>
+    <Col md={2}>
+      <p>Age: {patient.age}</p>
+    </Col>
+    <Col md={2}>
+      <p>Gender: {patient.gender}</p>
+    </Col>
+    <Col md={2}>
+      <p>MR#: {patient.mrNumber}</p>
+    </Col>
+    <Col md={12}>
+      <p>Room/Bed: {patient.roomBed}</p>
+    </Col>
+  </Row>
+);
+
+// Reusable Editable Text Component
+const EditableText = ({ label, value, onChange, editMode }) => (
+  <Form.Group controlId={label.replace(/\s+/g, '')}>
+    <Form.Label>{label}</Form.Label>
+    {editMode ? (
+      <Form.Control type="text" value={value} onChange={(e) => onChange(e.target.value)} />
+    ) : (
+      <p>{value}</p>
+    )}
+  </Form.Group>
+);
+
+// Reusable Editable TextArea Component
+const EditableTextArea = ({ label, value, onChange, editMode }) => (
+  <Form.Group controlId={label.replace(/\s+/g, '')}>
+    <Form.Label>{label}</Form.Label>
+    {editMode ? (
+      <Form.Control as="textarea" rows={4} value={value} onChange={(e) => onChange(e.target.value.split('\n'))} />
+    ) : (
+      <ul>
+        {value.map((item, index) => (
+          <li key={index}>{item}</li>
+        ))}
+      </ul>
+    )}
+  </Form.Group>
+);
+
+// Overview Tab Component
+const OverviewTab = () => {
+  const [editMode, setEditMode] = useState(false);
+  const [primaryDiagnosis, setPrimaryDiagnosis] = useState('Chronic Obstructive Pulmonary Disease (COPD)');
+  const [allergies, setAllergies] = useState('Penicillin');
+  const [currentTreatments, setCurrentTreatments] = useState(['Oxygen Therapy', 'Physical Therapy']);
+  const [codeStatus, setCodeStatus] = useState('DNR');
+
+  const toggleEditMode = () => setEditMode(!editMode);
+
+  return (
+    <Form>
+      <EditableText label="Primary Diagnosis" value={primaryDiagnosis} onChange={setPrimaryDiagnosis} editMode={editMode} />
+      <EditableText label="Allergies" value={allergies} onChange={setAllergies} editMode={editMode} />
+      <EditableTextArea label="Current Treatments" value={currentTreatments} onChange={setCurrentTreatments} editMode={editMode} />
+      <EditableText label="Code Status" value={codeStatus} onChange={setCodeStatus} editMode={editMode} />
+      <div className="d-flex justify-content-end">
+        <Button variant="primary" onClick={toggleEditMode}>
+          {editMode ? <><FaSave /> Save</> : <><FaEdit /> Edit</>}
+        </Button>
+      </div>
+    </Form>
+  );
+};
+
+// Placeholder Tab Components (Replace with actual content)
+const PlaceholderTab = ({ title, icon }) => (
+  <div>
+    <h4><>{icon}</> {title}</h4>
+    <p>Content for {title} tab goes here.</p>
+  </div>
+);
 
 const CardexForm = () => {
-  const [treatments, setTreatments] = useState([]);
-  const [medications, setMedications] = useState([]);
-  const [ivfs, setIvfs] = useState([]);
-  const [newTreatment, setNewTreatment] = useState("");
-  const [newMedication, setNewMedication] = useState("");
-  const [newIvf, setNewIvf] = useState("");
-  const [editingIndex, setEditingIndex] = useState(-1);
-  const [editingText, setEditingText] = useState("");
-  const [showEditModal, setShowEditModal] = useState(false);
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [itemToDelete, setItemToDelete] = useState(null);
-
-  const handleAddTreatment = () => {
-    if (newTreatment.trim()) {
-      setTreatments([...treatments, { text: newTreatment, date: new Date() }]);
-      setNewTreatment("");
-    }
-  };
-
-  const handleAddMedication = () => {
-    if (newMedication.trim()) {
-      setMedications([
-        ...medications,
-        { text: newMedication, date: new Date() },
-      ]);
-      setNewMedication("");
-    }
-  };
-
-  const handleAddIvf = () => {
-    if (newIvf.trim()) {
-      setIvfs([...ivfs, { text: newIvf, date: new Date() }]);
-      setNewIvf("");
-    }
-  };
-
-  const handleRemoveItem = (item) => {
-    setItemToDelete(item);
-    setShowDeleteModal(true);
-  };
-
-  const handleEditItem = (index, text) => {
-    setEditingIndex(index);
-    setEditingText(text);
-    setShowEditModal(true);
-  };
-
-  const handleSaveEdit = () => {
-    setIvfs((prevItems) =>
-      prevItems.map((item, i) =>
-        i === editingIndex ? { ...item, text: editingText } : item
-      )
-    );
-    setEditingIndex(-1);
-    setEditingText("");
-    setShowEditModal(false);
-  };
-
-  const handleCancelEdit = () => {
-    setEditingIndex(-1);
-    setEditingText("");
-    setShowEditModal(false);
-  };
-
-  const handleConfirmDelete = (item) => {
-    setIvfs((prevItems) => prevItems.filter((i) => i !== item));
-    setShowDeleteModal(false);
-  };
-
-  const handleCancelDelete = () => {
-    setShowDeleteModal(false);
+  const patient = {
+    name: 'John Doe',
+    age: 65,
+    gender: 'Male',
+    mrNumber: '123456',
+    roomBed: '402/B',
   };
 
   return (
-    <Layout style={{ padding: "24px" }}>
-      <Content>
-        <Row gutter={[24, 24]}>
-          <Col span={24}>
-            <div
-              style={{
-                backgroundColor: "#fff",
-                padding: "24px",
-                borderRadius: "4px",
-              }}
-            >
-              <Title level={4}>Patient Information</Title>
-              <Form layout="inline" style={{ marginBottom: "24px" }}>
-                <Form.Item label="Patient Name" style={{ marginRight: "16px" }}>
-                  <Input />
-                </Form.Item>
-                <Form.Item
-                  label="Primary Diagnosis"
-                  style={{ marginRight: "16px" }}
-                >
-                  <Input />
-                </Form.Item>
-                <Form.Item
-                  label="Secondary Diagnosis"
-                  style={{ marginRight: "16px" }}
-                >
-                  <Input />
-                </Form.Item>
-                <Form.Item
-                  label="Admission Date"
-                  style={{ marginRight: "16px" }}
-                >
-                  <Input />
-                </Form.Item>
-                <Form.Item label="Phone Number" style={{ marginRight: "16px" }}>
-                  <Input />
-                </Form.Item>
-                <Form.Item label="IP Number" style={{ marginRight: "16px" }}>
-                  <Input />
-                </Form.Item>
-              </Form>
-            </div>
-          </Col>
-        </Row>
-        <Divider />
-        <Row gutter={[24, 24]}>
-          <Col span={8}>
-            <div
-              style={{
-                backgroundColor: "#fff",
-                padding: "24px",
-                borderRadius: "4px",
-              }}
-            >
-              <Title level={4} style={{ textAlign: "center" }}>
-                Treatment
-              </Title>
-              <List
-                dataSource={treatments}
-                renderItem={(treatment, index) => (
-                  <List.Item
-                    actions={[
-                      <Button
-                        type="text"
-                        icon={<EditOutlined />}
-                        onClick={() => handleEditItem(index, treatment.text)}
-                      />,
-                      <Button
-                        type="text"
-                        icon={<DeleteOutlined />}
-                        onClick={() => handleRemoveItem(treatment)}
-                      />,
-                    ]}
-                    style={{
-                      padding: "12px 24px",
-                      borderRadius: "4px",
-                      marginBottom: "8px",
-                    }}
-                  >
-                    <List.Item.Meta
-                      title={treatment.text}
-                      description={treatment.date.toLocaleString()}
-                    />
-                  </List.Item>
-                )}
-              />
-              <Input.Group compact style={{ marginTop: "12px" }}>
-                <Input
-                  value={newTreatment}
-                  onChange={(e) => setNewTreatment(e.target.value)}
-                  placeholder="Add new treatment"
-                  style={{ width: "200px" }}
-                />
-                <Button
-                  type="primary"
-                  icon={<PlusCircleOutlined />}
-                  onClick={handleAddTreatment}
-                />
-              </Input.Group>
-            </div>
-          </Col>
-          <Col span={8}>
-            <div
-              style={{
-                backgroundColor: "#fff",
-                padding: "24px",
-                borderRadius: "4px",
-              }}
-            >
-              <Title level={4} style={{ textAlign: "center" }}>
-                Medications
-              </Title>
-              <List
-                dataSource={medications}
-                renderItem={(medication, index) => (
-                  <List.Item
-                    actions={[
-                      <Button
-                        type="text"
-                        icon={<EditOutlined />}
-                        onClick={() => handleEditItem(index, medication.text)}
-                      />,
-                      <Button
-                        type="text"
-                        icon={<DeleteOutlined />}
-                        onClick={() => handleRemoveItem(medication)}
-                      />,
-                    ]}
-                    style={{
-                      padding: "12px 24px",
-                      borderRadius: "4px",
-                      marginBottom: "8px",
-                    }}
-                  >
-                    <List.Item.Meta
-                      title={medication.text}
-                      description={medication.date.toLocaleString()}
-                    />
-                  </List.Item>
-                )}
-              />
-              <Input.Group compact style={{ marginTop: "12px" }}>
-                <Input
-                  value={newMedication}
-                  onChange={(e) => setNewMedication(e.target.value)}
-                  placeholder="Add new medication"
-                  style={{ width: "200px" }}
-                />
-                <Button
-                  type="primary"
-                  icon={<PlusCircleOutlined />}
-                  onClick={handleAddMedication}
-                />
-              </Input.Group>
-            </div>
-          </Col>
-          <Col span={8}>
-            <div
-              style={{
-                backgroundColor: "#fff",
-                padding: "24px",
-                borderRadius: "4px",
-              }}
-            >
-              <Title level={4} style={{ textAlign: "center" }}>
-                IVF
-              </Title>
-              <List
-                dataSource={ivfs}
-                renderItem={(ivf, index) => (
-                  <List.Item
-                    actions={[
-                      <Button
-                        type="text"
-                        icon={<EditOutlined />}
-                        onClick={() => handleEditItem(index, ivf.text)}
-                      />,
-                      <Button
-                        type="text"
-                        icon={<DeleteOutlined />}
-                        onClick={() => handleRemoveItem(ivf)}
-                      />,
-                    ]}
-                    style={{
-                      padding: "12px 24px",
-                      borderRadius: "4px",
-                      marginBottom: "8px",
-                    }}
-                  >
-                    <List.Item.Meta
-                      title={ivf.text}
-                      description={ivf.date.toLocaleString()}
-                    />
-                  </List.Item>
-                )}
-              />
-              <Input.Group compact style={{ marginTop: "12px" }}>
-                <Input
-                  value={newIvf}
-                  onChange={(e) => setNewIvf(e.target.value)}
-                  placeholder="Add new IVF"
-                  style={{ width: "200px" }}
-                />
-                <Button
-                  type="primary"
-                  icon={<PlusCircleOutlined />}
-                  onClick={handleAddIvf}
-                />
-              </Input.Group>
-            </div>
-          </Col>
-        </Row>
-      </Content>
-
-      <Modal
-        title="Edit Item"
-        open={showEditModal}
-        onOk={handleSaveEdit}
-        onCancel={handleCancelEdit}
-      >
-        {/* Edit Item Modal Content */}
-      </Modal>
-
-      <Modal
-        title="Delete Item"
-        open={showDeleteModal}
-        onOk={handleConfirmDelete}
-        onCancel={handleCancelDelete}
-      >
-        {/* Delete Item Modal Content */}
-      </Modal>
-    </Layout>
+    <Card className="mt-3">
+      <Card.Header>
+        <PatientHeader patient={patient} />
+      </Card.Header>
+      <Card.Body>
+        <Tabs defaultActiveKey="overview" id="cardex-tabs">
+          <Tab eventKey="overview" title={<><FaNotesMedical /> Overview</>}>
+            <OverviewTab />
+          </Tab>
+          <Tab eventKey="medications" title={<><FaPills /> Medications</>}>
+            <PlaceholderTab title="Medications" icon={<FaPills />} />
+          </Tab>
+          <Tab eventKey="carePlan" title={<><FaProcedures /> Care Plan</>}>
+            <PlaceholderTab title="Care Plan" icon={<FaProcedures />} />
+          </Tab>
+          <Tab eventKey="adls" title={<><FaUtensils /> ADLs</>}>
+            <PlaceholderTab title="ADLs" icon={<FaUtensils />} />
+          </Tab>
+          <Tab eventKey="dietNutrition" title={<><FaUtensils /> Diet & Nutrition</>}>
+            <PlaceholderTab title="Diet & Nutrition" icon={<FaUtensils />} />
+          </Tab>
+          <Tab eventKey="safetyPrecautions" title={<><FaExclamationTriangle /> Safety & Precautions</>}>
+            <PlaceholderTab title="Safety & Precautions" icon={<FaExclamationTriangle />} />
+          </Tab>
+          <Tab eventKey="communication" title={<><FaComments /> Communication</>}>
+            <PlaceholderTab title="Communication" icon={<FaComments />} />
+          </Tab>
+          <Tab eventKey="consultations" title={<><FaUserMd /> Consultations</>}>
+            <PlaceholderTab title="Consultations" icon={<FaUserMd />} />
+          </Tab>
+          <Tab eventKey="notes" title={<><FaFileAlt /> Notes</>}>
+            <PlaceholderTab title="Notes" icon={<FaFileAlt />} />
+          </Tab>
+        </Tabs>
+      </Card.Body>
+    </Card>
   );
 };
 

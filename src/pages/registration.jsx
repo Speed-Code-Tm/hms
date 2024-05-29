@@ -1,45 +1,19 @@
 import React, { useState, useEffect, useMemo } from "react";
-import { Container, Modal } from "react-bootstrap";
+import { Container } from "react-bootstrap";
 import styled from "styled-components";
 import { initializeApp } from "firebase/app";
-import { getFirestore, collection, getDocs, addDoc } from "firebase/firestore";
+import { getFirestore, collection, getDocs } from "firebase/firestore";
 import firebaseConfig from "../pages/configs";
 import ReusableTable from "./ReusableTable";
 import AddPatientModal from "../components/addPatient";
-import { Add, CalendarToday, Check } from "@mui/icons-material";
-import * as Yup from "yup";
-import { ToastContainer, toast } from "react-toastify";
+import { Add } from "@mui/icons-material";
+import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { DropdownButton, Dropdown, Button } from "react-bootstrap";
+import { Button } from "react-bootstrap";
+import BookingModal from "../components/PatientBooking";
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
-
-const handleBooking = (patient) => {
-  console.log("Booking patient:", patient);
-};
-
-const handleDirectCheckIn = (patient) => {
-  console.log("Checking in patient:", patient);
-};
-
-const openSesion = () => {
-  // open a modal  with name of patient and other details
-  <Modal.Dialog>
-    <Modal.Header closeButton>
-      <Modal.Title>Modal title</Modal.Title>
-    </Modal.Header>
-
-    <Modal.Body>
-      <p>Modal body text goes here.</p>
-    </Modal.Body>
-
-    <Modal.Footer>
-      <Button variant="secondary">Close</Button>
-      <Button variant="primary">Save changes</Button>
-    </Modal.Footer>
-  </Modal.Dialog>;
-};
 
 const AddPatientButton = styled.button`
   background-color: #007bff;
@@ -69,6 +43,7 @@ const HeaderContainer = styled.div`
 const PatientRegistration = () => {
   const [data, setData] = useState([]);
   const [showAddPatientModal, setShowAddPatientModal] = useState(false);
+  const [showBookingModal, setShowBookingModal] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -93,62 +68,70 @@ const PatientRegistration = () => {
     fetchData();
   }, []);
 
-  const COLUMNS = [
-    {
-      Header: "Name",
-      accessor: (row) =>
-        `${row.personalInfo.firstName || ""} ${
-          row.personalInfo.middleName || ""
-        } ${row.personalInfo.lastName || ""}`,
-    },
-    {
-      Header: "Phone Number",
-      accessor: (row) => row.personalInfo.phoneNumber || "",
-    },
-    {
-      Header: "Insurance Type",
-      accessor: (row) => row.personalInfo.insuranceType || "",
-    },
-    {
-      Header: "Gender",
-      accessor: (row) => row.personalInfo.gender || "",
-    },
-    {
-      Header: "Age",
-      accessor: (row) => {
-        const today = new Date();
-        const birthDate = new Date(row.personalInfo.dateOfBirth);
-        if (!isNaN(birthDate.getTime())) {
-          // Check if dateOfBirth is a valid date
-          let age = today.getFullYear() - birthDate.getFullYear();
-          const monthDiff = today.getMonth() - birthDate.getMonth();
-          if (
-            monthDiff < 0 ||
-            (monthDiff === 0 && today.getDate() < birthDate.getDate())
-          ) {
-            age--;
-          }
-          return age;
-        } else {
-          return ""; // Return empty string if dateOfBirth is not available
-        }
+  const columns = useMemo(() => {
+    const COLUMNS = [
+      {
+        Header: "Name",
+        accessor: (row) =>
+          `${row.personalInfo.firstName || ""} ${
+            row.personalInfo.middleName || ""
+          } ${row.personalInfo.lastName || ""}`,
       },
-    },
-    {
-      Header: "National ID",
-      accessor: (row) => row.personalInfo.nationalId || "",
-    },
-  ];
+      {
+        Header: "Phone Number",
+        accessor: (row) => row.personalInfo.phoneNumber || "",
+      },
+      {
+        Header: "Insurance Type",
+        accessor: (row) => row.personalInfo.insuranceType || "",
+      },
+      {
+        Header: "Gender",
+        accessor: (row) => row.personalInfo.gender || "",
+      },
+      {
+        Header: "Age",
+        accessor: (row) => {
+          const today = new Date();
+          const birthDate = new Date(row.personalInfo.dateOfBirth);
+          if (!isNaN(birthDate.getTime())) {
+            // Check if dateOfBirth is a valid date
+            let age = today.getFullYear() - birthDate.getFullYear();
+            const monthDiff = today.getMonth() - birthDate.getMonth();
+            if (
+              monthDiff < 0 ||
+              (monthDiff === 0 && today.getDate() < birthDate.getDate())
+            ) {
+              age--;
+            }
+            return age;
+          } else {
+            return ""; // Return empty string if dateOfBirth is not available
+          }
+        },
+      },
+      {
+        Header: "National ID",
+        accessor: (row) => row.personalInfo.nationalId || "",
+      },
+    ];
 
-  const columns = useMemo(() => COLUMNS, []);
+    return COLUMNS;
+  }, []);
 
   const ToggleAddPatientModal = () => {
     setShowAddPatientModal(!showAddPatientModal);
   };
 
+  const ToggleBookingModal = () => {
+    setShowBookingModal(!showBookingModal);
+  };
+
   return (
-    <Container className="patient-registration-container">
-      <h2>Patient Registration</h2>
+    <Container
+      className="patient-registration-container"
+      style={{ marginTop: "10px" }}
+    >
       <HeaderContainer>
         <AddPatientButton onClick={ToggleAddPatientModal}>
           <Add />
@@ -161,27 +144,20 @@ const PatientRegistration = () => {
         initialState={{ pageIndex: 0, pageSize: 10 }}
         ActionDropdown={({ row }) => (
           <div>
-            {/* add a drop down button menu wth icons and functions */}
-            <DropdownButton
-              dropup="true"
-              id="dropdown-basic-button"
-              title="Actions"
-            >
-              <Dropdown.Item href="#/action-1" onClick={openSesion()}>
-                Start Session
-              </Dropdown.Item>
-              <Dropdown.Item href="#/action-2">
-                Reschedule Session
-              </Dropdown.Item>
-              <Dropdown.Item href="#/action-3">Rebook Session</Dropdown.Item>
-              <Dropdown.Item href="#/action-4">Cancel Session</Dropdown.Item>
-            </DropdownButton>
+            <Button variant="primary" onClick={ToggleBookingModal}>
+              Book
+            </Button>
           </div>
         )}
       />
       <AddPatientModal
         show={showAddPatientModal}
         onHide={() => setShowAddPatientModal(false)}
+      />
+
+      <BookingModal
+        show={showBookingModal}
+        onHide={() => setShowBookingModal(false)}
       />
       <ToastContainer />
     </Container>

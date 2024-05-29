@@ -132,13 +132,14 @@ const SideBar = () => {
         >
           <CustomMenuItem
             component={
-              <Link to="/registration" onClick={handleActive}>
-                Patient Registration
+              <Link to="/booking" onClick={handleActive}>
+                  Patient Booking
               </Link>
             }
-            icon={<PersonAddIcon />}
+           //add a booking icon
+            icon={<i className="fas fa-calendar-alt"></i>}
           >
-            Patient Registration
+            Patient Booking
           </CustomMenuItem>
           <CustomMenuItem
             component={

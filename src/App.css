@@ -30,3 +30,7 @@ table  th{
 table td{
   font-size: 15px;
 } */
+
+.react-datepicker-wrapper{
+  width:100%;
+}

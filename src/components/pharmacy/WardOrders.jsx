@@ -89,8 +89,10 @@ const WardOrders = () =>{
               href="#/action-1"
               onClick={() => handleRowClick(row.original, 'edit')}
             >
-              Update
+             Issue Medicine
             </Dropdown.Item>
+
+
             <Dropdown.Item
               href="#/action-1"
               onClick={() => handleRowClick(row.original, 'delete')}

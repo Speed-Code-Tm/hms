@@ -5,7 +5,8 @@ import styled from 'styled-components';
 import Expenses from '../components/financials/Expenses';
 import DepartmentBudget from '../components/financials/DepartmentBudget';
 import { retrieveBudgets, retrieveExpenses } from './configs';
-
+import EmployeeWage from '../components/financials/EmployeeWage'
+import DepartmentsProjection from '../components/financials/DepartmentsProjection'
 // Mock data for procurement items, department budgets, employee wages, and projections
 const procurementItems = [
   { id: 1, item: 'Surgical Gloves', quantity: 1000, requestedBy: 'Surgery Dept', addedBy: 'John Doe', status: 'Pending' },
@@ -19,17 +20,6 @@ const departmentBudgets = [
   // Add more department budgets as needed
 ];
 
-const employeeWages = [
-  { id: 1, name: 'John Doe', position: 'Doctor', department: 'Surgery', wage: 8000 },
-  { id: 2, name: 'Jane Smith', position: 'Nurse', department: 'Emergency', wage: 5000 },
-  // Add more employee wages as needed
-];
-
-const projections = [
-  { id: 1, department: 'Surgery', revenue: 1000000, expenses: 800000, profit: 200000 },
-  { id: 2, department: 'Radiology', revenue: 600000, expenses: 400000, profit: 200000 },
-  // Add more projections as needed
-];
 
 const FinancialManagement = () => {
   const [activeTab,setActiveTab] = useState('expenses')
@@ -67,23 +57,9 @@ const FinancialManagement = () => {
     { Header: 'Budget Allocated', accessor: 'budgetAllocated' },
   ];
 
-  // Define the columns for the employee wages table
-  const employeeWagesColumns = [
-    { Header: 'ID', accessor: 'id' },
-    { Header: 'Name', accessor: 'name' },
-    { Header: 'Position', accessor: 'position' },
-    { Header: 'Department', accessor: 'department' },
-    { Header: 'Wage', accessor: 'wage' },
-  ];
+ 
 
-  // Define the columns for the projections table
-  const projectionsColumns = [
-    { Header: 'ID', accessor: 'id' },
-    { Header: 'Department', accessor: 'department' },
-    { Header: 'Revenue', accessor: 'revenue' },
-    { Header: 'Expenses', accessor: 'expenses' },
-    { Header: 'Profit', accessor: 'profit' },
-  ];
+  
 
   // Define the action dropdown component for procurement item rows
   const ProcurementItemActionDropdown = ({ row, handleApprovalModalOpen }) => {
@@ -178,18 +154,13 @@ try{
          
         </Tab>
         <Tab eventKey="wages" title="Employee Wages">
-          {/* <ReusableTable
-            columns={employeeWagesColumns}
-            data={employeeWages}
-            initialState={initialState}
-          /> */}
+    
+    <EmployeeWage/>
         </Tab>
         <Tab eventKey="projections" title="Projections">
-          {/* <ReusableTable
-            columns={projectionsColumns}
-            data={projections}
-            initialState={initialState}
-          /> */}
+         
+         <DepartmentsProjection/>
+         
         </Tab>
       </Tabs>
 

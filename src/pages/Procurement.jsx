@@ -4,7 +4,7 @@ import {
   FaEdit,
   FaTrash,
 } from "react-icons/fa";
-
+import ProcurementReporting from "../components/procurement/Reporting";
 import {
   Modal,
   Button,
@@ -25,7 +25,7 @@ import firebaseConfig, { retrieveDepartmentNeeds, retrieveInventoryItems, retrie
 import {getDocs,collection, getFirestore} from 'firebase/firestore'
 import OrderManagement from "../components/OrderManagement";
 import DepartmentNeeds from "../components/DepartmentNeeds";
-import { Inventory } from "../components/inventory/Inventory";
+import  Inventory  from "../components/procurement/Inventory";
 const app = initializeApp(firebaseConfig)
 const db = getFirestore(app)
 
@@ -302,7 +302,8 @@ useEffect(()=>{
               <InventoryTab data={inventory}  />
             </Tab>
             <Tab eventKey="reporting" title="Reporting">
-              <ReportingTab />
+              {/* <ReportingTab /> */}
+              <ProcurementReporting/>
             </Tab>
             <Tab eventKey="issuedItems" title="Issued Items">
               <IssuedItemsTab  data={issuedItems}/>

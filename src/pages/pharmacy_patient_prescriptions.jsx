@@ -88,7 +88,7 @@ const Prescriptions = ({activeTab}) => {
 
 
   const handleChange = (selectedOption, field) => {
-    console.log( selectedOption.label)
+    
     setFormData({
       ...formData,
       [field]: { id: selectedOption.value, name: selectedOption.label }
@@ -222,7 +222,7 @@ const Prescriptions = ({activeTab}) => {
 
       await prescriptionValidationSchema.validate(formData, {abortEarly:false})
      const prescriptionDate = serverTimestamp()
-     console.log(prescriptionDate)
+     
       let newFormData = {medications:formData.medications, prescriptionDate,diagnosis:formData.diagnosis,notes:formData.notes, patientName:formData.patient.name, patientId:formData.patient.id, 
         doctorName:formData.doctor.name,doctorId:formData.doctor.id}
 
@@ -251,7 +251,7 @@ const Prescriptions = ({activeTab}) => {
   async function fetchPrescriptions(){
        try {
        const prescriptions =  await retrievePrescriptions()
-       console.log(prescriptions);
+       
        setData(prescriptions)
        } catch (error) {
         console.log(error);

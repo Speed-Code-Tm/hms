@@ -49,7 +49,7 @@ const DischargeSummary = () => {
   // Handle form submission
   const onSubmit = (values, { resetForm }) => {
     // Submit logic here (e.g., sending data to server)
-    console.log(values);
+    
     // Reset form after submission
     resetForm();
   };

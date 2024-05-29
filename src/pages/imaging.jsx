@@ -107,14 +107,14 @@ const ImagingDashboard = () => {
 
   const handleEdit = (row) => {
     // Handle edit action, open modal for editing results
-    console.log("Editing results for:", row.original.patientName);
+    
     setShowModal(true);
     // Implement your logic here
   };
 
   const handleDelete = (row) => {
     // Handle delete action
-    console.log("Deleting:", row.original.patientName);
+    
     // Implement your logic here
   };
 

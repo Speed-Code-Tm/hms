@@ -64,7 +64,7 @@ const DoctorsNotes = ({ show, onHide }) => {
       setIsSubmitting(true);
       // Simulate an API call with a timeout
       setTimeout(() => {
-        console.log("Form submitted:", formData);
+        
         toast.success("Form submitted successfully!");
         setIsSubmitting(false);
         setFormData(initialValues);

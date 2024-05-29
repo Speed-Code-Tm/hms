@@ -165,13 +165,13 @@ const ActionDropdown = ({ row }) => {
 
   const handleEdit = () => {
     // Handle edit logic here
-    console.log(`Editing item: ${row.original.item}`);
+    
     setShowModal(true);
   };
 
   const handleDelete = () => {
     // Handle delete logic here
-    console.log(`Deleting item: ${row.original.item}`);
+    
   };
 
   const handleModalClose = () => setShowModal(false);

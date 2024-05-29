@@ -148,7 +148,7 @@ const Claim = () => {
   const handleSubmit = (event) => {
     event.preventDefault();
     // Handle form submission logic here
-    console.log('Claim submitted:', state.claimDetails);
+    
   };
 
 

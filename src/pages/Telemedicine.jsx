@@ -73,7 +73,7 @@ const ActionCell = styled.div`
 
 const openSession = (row) => {
   // Function to open a session based on the row data
-  console.log('Opening session for:', row.original.patientName);
+  
   // Implement your logic here
 };
 

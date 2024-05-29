@@ -92,8 +92,8 @@ const UserRoleMapping = () => {
 
   const handleSaveRoleMapping = () => {
     // Implement your logic to save the role mapping here
-    console.log('Selected Role:', selectedRole);
-    console.log('Selected Actions:', selectedActions);
+    
+    
     setShowConfirmationModal(false);
   };
 

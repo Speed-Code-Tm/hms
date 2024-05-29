@@ -87,7 +87,7 @@ const WardManagement = () => {
 
   const handleAddWard = () => {
     // Add logic to create a new ward with the provided name and capacity
-    console.log(`Adding new ward: ${newWardName} with capacity ${newWardCapacity}`);
+    
     handleAddWardModalClose();
   };
 

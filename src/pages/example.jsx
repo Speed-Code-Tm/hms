@@ -66,17 +66,17 @@ const SimplePage = () => {
   // Define the action functions
   const handleAction1 = (row) => {
     // Code for handling Action 1
-    console.log('Action 1 clicked for row:', row);
+    
   };
 
   const handleAction2 = (row) => {
     // Code for handling Action 2
-    console.log('Action 2 clicked for row:', row);
+    
   };
 
   const handleAction3 = (row) => {
     // Code for handling Action 3
-    console.log('Action 3 clicked for row:', row);
+    
   };
 
   // Initial state

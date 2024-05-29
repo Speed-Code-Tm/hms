@@ -59,7 +59,7 @@ export const createHospitalVisit = async (personalInfo, hospitalVisitData) => {
         visits: [hospitalVisitData],
       };
       const docRef = await addDoc(hospitalVisitsRef, newHospitalVisit);
-      console.log("Hospital visit document created with ID: ", docRef.id);
+      
     } catch (e) {
       console.error("Error adding hospital visit: ", e);
     }
@@ -88,7 +88,7 @@ export const createHospitalVisit = async (personalInfo, hospitalVisitData) => {
     try {
       const hospitalVisitRef = doc(db, "hospitalVisits", hospitalVisitId);
       await updateDoc(hospitalVisitRef, updatedData);
-      console.log("Hospital visit document updated successfully");
+      
     } catch (e) {
       console.error("Error updating hospital visit: ", e);
     }
@@ -99,7 +99,7 @@ export const createHospitalVisit = async (personalInfo, hospitalVisitData) => {
     try {
       const hospitalVisitRef = doc(db, "hospitalVisits", hospitalVisitId);
       await deleteDoc(hospitalVisitRef);
-      console.log("Hospital visit document deleted successfully");
+      
     } catch (e) {
       console.error("Error deleting hospital visit: ", e);
     }
@@ -110,7 +110,7 @@ export const updateVitalSigns = async (hospitalVisitId, vitalSigns) => {
     try {
       const hospitalVisitRef = doc(db, "hospitalVisits", hospitalVisitId);
       await updateDoc(hospitalVisitRef, { "visits.$.vitalSigns": vitalSigns });
-      console.log("Vital signs updated successfully");
+      
     } catch (e) {
       console.error("Error updating vital signs: ", e);
     }
@@ -172,7 +172,7 @@ export const updateVitalSigns = async (hospitalVisitId, vitalSigns) => {
 
       const prescriptionsRef = hospitalRef.collection('Pharmacy').doc(pharmacyId).collection('prescriptions')
       await prescriptionsRef.add(prescription);
-      console.log('Prescription added successfully');
+      
     } catch (error) {
       console.error('Error adding prescription:', error);
       throw error; 
@@ -193,7 +193,7 @@ export const updateVitalSigns = async (hospitalVisitId, vitalSigns) => {
 
         prescriptions.push({ id: doc.id, ...doc.data() });
       });
-      console.log(prescriptions);
+      
 
       prescriptions = prescriptions.map(prescription=>{
         
@@ -266,7 +266,7 @@ export const updateVitalSigns = async (hospitalVisitId, vitalSigns) => {
       const procurementId = await getCollectionId(hospitalRef, 'Procurement');
       const vendorRef = hospitalRef.collection('Procurement').doc(procurementId).collection('vendors').doc(vendorId);
       await vendorRef.update(formData);
-      console.log('Vendor updated successfully');
+      
     }catch(error){
       throw error
     }
@@ -417,7 +417,7 @@ export const updateVitalSigns = async (hospitalVisitId, vitalSigns) => {
       }
        return issuedItem
       });
-      console.log(issuedItemsData);
+      
 
 return issuedItemsData
     }catch(error){
@@ -703,7 +703,7 @@ export const retrieveExpenses = async () =>{
         ? new Date(data.createdAt.seconds * 1000).toLocaleString() 
         : "";
     
-      console.log(createdAt);
+      
     
       return { id: doc.id, ...data, createdAt };
     });
@@ -784,7 +784,7 @@ export const retrieveBudgets = async () =>{
     });
 
     budgetData = budgetData.map(item=>{
-        console.log(item);
+        
       const formattedStartDate = moment(item?.startDate?.seconds * 1000).format('MM/DD/YYYY');
       const formattedEndDate = moment(item?.endDate?.seconds * 1000).format('MM/DD/YYYY');
 

@@ -134,7 +134,7 @@ const PatientManagement = () => {
               </Dropdown.Item>
               <Dropdown.Item
                 href="#/action-6"
-                onClick={() => console.log("Discharge Patient")}
+                onClick={() => {}}
               >
                 <FaBed /> Discharge Patient
               </Dropdown.Item>

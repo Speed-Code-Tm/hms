@@ -64,7 +64,7 @@ const OrderLabTest = ({ show, onHide, patientName }) => {
        orderingPhysician,
        notes,
      };
-     console.log('Lab Test Order:', orderData);
+     
 
      // Show success toast
      toast.success('Lab test order submitted successfully!', {});

@@ -95,7 +95,7 @@ const MedicineInventory = ({ activeTab }) => {
   const fetchInventoryItems = async () => {
     try {
       const inventoryData = await retrievePharmacyInventory()
-      console.log(inventoryData);
+      
       setInventoryItems(inventoryData);
     } catch (error) {
       console.error("Error fetching inventory items:", error);

@@ -41,7 +41,7 @@ const CompleteOrder = ({ orderItem, onHide, refetch }) => {
 
   useEffect(() => {
     if (orderItem) {
-      console.log(orderItem);
+      
       setFormData({
         itemName: orderItem.item || "",
         category: orderItem.category || "",

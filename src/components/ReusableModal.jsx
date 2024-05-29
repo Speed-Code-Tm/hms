@@ -8,7 +8,7 @@ const StyledModal = styled(Modal)`
     max-width: 800px;
   }
   .modal-content{
-    min-height:400px;
+    min-height:250px;
   }
 
   .modal-header {

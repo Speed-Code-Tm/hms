@@ -4,7 +4,7 @@ import {CircularProgressbar, } from 'react-circular-progressbar';
 import 'react-circular-progressbar/dist/styles.css';
 
 
-export const Inventory = ({data}) =>{
+const Inventory = ({data}) =>{
 
     const inventoryColumns = [
         { accessor: 'itemName', Header: 'Item Name' },
@@ -59,3 +59,6 @@ export const Inventory = ({data}) =>{
         </div>
     )
 }
+
+
+export default Inventory

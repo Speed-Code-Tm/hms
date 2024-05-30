@@ -144,23 +144,23 @@ const SideBar = () => {
           <CustomMenuItem
             component={
               <Link to="/TriageAssessment" onClick={handleActive}>
-                Triage & Assessment
+                Triage 
               </Link>
             }
             icon={<i className="fas fa-clipboard-list"></i>}
           >
-            Triage & Assessment
+            Triage
           </CustomMenuItem>
         </SubMenu>
         <CustomMenuItem
           component={
             <Link to="/electronic-health-records" onClick={handleActive}>
-              Electronic Health Records
+              Health Records
             </Link>
           }
-          icon={<i className="fas fa-stethoscope"></i>}
+          icon={<i className="fas fa-folder-plus"></i>}
         >
-          Electronic Health Records
+          Health Records
         </CustomMenuItem>
         <CustomMenuItem
           component={

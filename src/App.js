@@ -31,6 +31,7 @@ import WardManagement from './pages/WardManagement';
 import BloodSugarLog from './PatientProfile/BloodSugarLog'
 import CardexForm from './PatientProfile/NursingCardex';
 import Collection_Denials from './pages/Collection_Denials'
+import EHR from './pages/EHR';
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(true);
@@ -101,6 +102,7 @@ function AppLayout() {
           <Route path='/BloodSugarLog'element={<BloodSugarLog/>}/>
           <Route path='/CardexForm'element={<CardexForm/>}/>
           <Route path='/collections-denials' element={<Collection_Denials/>} />
+          <Route path='/electronic-health-records' element={<EHR/>} />
         </Routes>
       </div>
     </div>

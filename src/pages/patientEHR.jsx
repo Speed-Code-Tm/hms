@@ -1,72 +1,77 @@
 import React from 'react';
-import { Container, Row, Col, Nav, Tab, Table } from 'react-bootstrap';
+import { Container, Row, Col, Nav, Tab } from 'react-bootstrap';
+import avatar from '../components/logo.svg';
+import { Avatar } from '@mui/material';
 
 const PatientEHR = () => {
   return (
-    <Container>
+    <Container fluid>
       <Row>
-        <Col md={4}>
-          {/* Patient Profile Section */}
-          <div>
-            <img src="profile.jpg" alt="Profile" className="rounded-circle mb-3" />
-            <h4>John Doe</h4>
-            <p>Date of Birth: 01/01/1990</p>
-            <p>Gender: Male</p>
-            <p>Address: 123 Main St, Anytown USA</p>
-          </div>
-        </Col>
-        <Col md={8}>
-          {/* Tabs Section */}
-          <Tab.Container defaultActiveKey="general">
+        <Col md={9}>
+          <Row className="mb-3">
+            <Col md={3}>
+              <Avatar src={avatar} alt="Avatar" className="rounded-circle" style={{ width: '150px', height: '150px' }} />
+            </Col>
+            <Col md={9}>
+              <h3>Peter Viceall</h3>
+              <p>
+                Gender: Male
+                <br />
+                Age: 35
+                <br />
+                Address: 123 Main St, Los Angeles, CA
+              </p>
+            </Col>
+          </Row>
+          <Tab.Container defaultActiveKey="prescriptions">
             <Nav variant="pills" className="mb-3">
               <Nav.Item>
-                <Nav.Link eventKey="general">General</Nav.Link>
+                <Nav.Link eventKey="prescriptions">Prescriptions</Nav.Link>
               </Nav.Item>
               <Nav.Item>
-                <Nav.Link eventKey="orders">Orders</Nav.Link>
+                <Nav.Link eventKey="history">History</Nav.Link>
               </Nav.Item>
               <Nav.Item>
-                <Nav.Link eventKey="family">Family</Nav.Link>
+                <Nav.Link eventKey="allergies">Allergies</Nav.Link>
               </Nav.Item>
               <Nav.Item>
-                <Nav.Link eventKey="consults">Consults</Nav.Link>
+                <Nav.Link eventKey="conditions">Conditions</Nav.Link>
               </Nav.Item>
               <Nav.Item>
-                <Nav.Link eventKey="messages">Messages</Nav.Link>
+                <Nav.Link eventKey="immunizations">Immunizations</Nav.Link>
               </Nav.Item>
               <Nav.Item>
-                <Nav.Link eventKey="tests">Tests</Nav.Link>
+                <Nav.Link eventKey="notes">Notes</Nav.Link>
               </Nav.Item>
             </Nav>
             <Tab.Content>
-              <Tab.Pane eventKey="general">
-                {/* General Information */}
-                <p>Allergies: Peanuts, Shellfish</p>
-                <p>Medical Conditions: Asthma, High Blood Pressure</p>
+              <Tab.Pane eventKey="prescriptions">
+                <Row>
+                  <Col md={6}>
+                    <h5>Active Drugs</h5>
+                    <ul className="list-unstyled">
+                      <li>
+                        <i className="bi bi-capsule-pill me-2" /> Drug 1 (Dosage)
+                      </li>
+                      <li>
+                        <i className="bi bi-capsule-pill me-2" /> Drug 2 (Dosage)
+                      </li>
+                    </ul>
+                  </Col>
+                  <Col md={6}>
+                    <h5>Used Drugs</h5>
+                    <ul className="list-unstyled">
+                      <li>
+                        <i className="bi bi-capsule-pill me-2" /> Drug 3 (Dosage)
+                      </li>
+                      <li>
+                        <i className="bi bi-capsule-pill me-2" /> Drug 4 (Dosage)
+                      </li>
+                    </ul>
+                  </Col>
+                </Row>
               </Tab.Pane>
-              <Tab.Pane eventKey="orders">
-                {/* Orders/Prescriptions */}
-                <Table striped bordered hover>
-                  <thead>
-                    <tr>
-                      <th>Medication</th>
-                      <th>Dosage</th>
-                      <th>Frequency</th>
-                      <th>Refill Status</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td>Lisinopril</td>
-                      <td>10 mg</td>
-                      <td>Once Daily</td>
-                      <td>Refill Due</td>
-                    </tr>
-                    {/* Add more rows for other medications */}
-                  </tbody>
-                </Table>
-              </Tab.Pane>
-              {/* Add more Tab.Pane components for other tabs */}
+              {/* Add content for other tabs */}
             </Tab.Content>
           </Tab.Container>
         </Col>

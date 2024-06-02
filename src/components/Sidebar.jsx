@@ -377,30 +377,30 @@ const SideBar = () => {
           </CustomMenuItem>
         </SubMenu>
         <SubMenu
-          label="Supply Chain Management"
+          label="Procurement"
           icon={<i className="fas fa-truck"></i>}
-          open={expandedSubMenu === "Supply Chain Management"}
-          onOpenChange={() => handleSubMenuClick("Supply Chain Management")}
+          open={expandedSubMenu === "Procurement"}
+          onOpenChange={() => handleSubMenuClick("Procurement")}
         >
           <CustomMenuItem
             component={
               <Link to="/Procurement" onClick={handleActive}>
-                Inventory Management
+                Inventory
               </Link>
             }
             icon={<i className="fas fa-clipboard-list-check"></i>}
           >
-            Inventory Management
+            Inventory
           </CustomMenuItem>
           <CustomMenuItem
             component={
               <Link to="/purchasing-ordering" onClick={handleActive}>
-                Purchasing & Ordering
+                Purchases & Orders
               </Link>
             }
             icon={<i className="fas fa-shopping-cart"></i>}
           >
-            Purchasing & Ordering
+            Purchases & Orders
           </CustomMenuItem>
           <CustomMenuItem
             component={
@@ -421,25 +421,25 @@ const SideBar = () => {
         >
           <CustomMenuItem
             component={
-              <Link to="/" onClick={handleActive}>
-                Employee Management
+              <Link to="/UserManagement" onClick={handleActive}>
+                Employees
               </Link>
             }
             icon={<i className="fas fa-users-cog"></i>}
           >
-            Employee Management
+            Employees
           </CustomMenuItem>
           <CustomMenuItem
             component={
-              <Link to="/payroll" onClick={handleActive}>
-                Payroll
+              <Link to="/Attendace" onClick={handleActive}>
+                Attendace
               </Link>
             }
             icon={<i className="fas fa-money-bill-wave"></i>}
           >
-            Payroll
+            Attendace
           </CustomMenuItem>
-          <CustomMenuItem
+          {/* <CustomMenuItem
             component={
               <Link to="/benefits-administration" onClick={handleActive}>
                 Benefits Administration
@@ -458,25 +458,25 @@ const SideBar = () => {
             icon={<i className="fas fa-building"></i>}
           >
             Department Management
-          </CustomMenuItem>
+          </CustomMenuItem> */}
         </SubMenu>
         <SubMenu
-          label="Department Management"
+          label="Departments"
           icon={<i className="fas fa-chart-bar"></i>}
-          open={expandedSubMenu === "Department Management"}
-          onOpenChange={() => handleSubMenuClick("Department Management")}
+          open={expandedSubMenu === "Departments"}
+          onOpenChange={() => handleSubMenuClick("Departments")}
         >
           <CustomMenuItem
             component={
-              <Link to="/clinical-reports" onClick={handleActive}>
-                Clinical Reports
+              <Link to="/management" onClick={handleActive}>
+                Management
               </Link>
             }
             icon={<i className="fas fa-file-medical-alt"></i>}
           >
-            Clinical Reports
+            Management
           </CustomMenuItem>
-          <CustomMenuItem
+          {/* <CustomMenuItem
             component={
               <Link to="/financial-reports" onClick={handleActive}>
                 Financial Reports
@@ -485,11 +485,11 @@ const SideBar = () => {
             icon={<i className="fas fa-file-invoice-dollar"></i>}
           >
             Financial Reports
-          </CustomMenuItem>
+          </CustomMenuItem> */}
           <CustomMenuItem
             component={
               <Link to="/DutyRota" onClick={handleActive}>
-                Operational Reports
+                Duty Rota
               </Link>
             }
             icon={<i className="fas fa-chart-pie"></i>}
@@ -505,7 +505,7 @@ const SideBar = () => {
         >
           <CustomMenuItem
             component={
-              <Link to="/system-configuration" onClick={handleActive}>
+              <Link to="/PatientEHR" onClick={handleActive}>
                 System Configuration
               </Link>
             }

@@ -104,7 +104,7 @@ function AppLayout() {
           <Route path='/CardexForm'element={<CardexForm/>}/>
           <Route path='/collections-denials' element={<Collection_Denials/>} />
           <Route path='/electronic-health-records' element={<EHR/>} />
-          <Route path='/patientProfile/:patientId' element={<PatientEHR/>} />
+          <Route path='/PatientEHR/:patientId' element={<PatientEHR/>} />
           <Route path="/PatientEHR" element={<PatientEHR />} />
         </Routes>
       </div>

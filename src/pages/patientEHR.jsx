@@ -1,27 +1,73 @@
 import React, { useState } from 'react';
 import { Container, Row, Col, Nav, Tab, Card, ListGroup, Dropdown, DropdownButton } from 'react-bootstrap';
-import { FaUserCircle, FaHistory, FaPills, FaFileAlt, FaClipboardCheck, FaMoneyBillAlt, FaStickyNote } from 'react-icons/fa';
+import { FaUserCircle, FaHistory, FaPills, FaFileAlt, FaClipboardCheck, FaMoneyBillAlt, FaStickyNote, FaSyncAlt } from 'react-icons/fa';
 import avatar from '../components/logo.svg';
 import { Avatar } from '@mui/material';
+import { Table, Button, Input, Space } from 'antd';
+
 
 const PatientEHR = () => {
-  const admissionDate = '2023-05-15';
+  const [admissionDate, setAdmissionDate] = useState('2023-05-15');
   const insuranceNumber = 'ABC123456789';
   const patientId = '12345';
-  const daysInHospital = 7;
+  const [daysInHospital, setDaysInHospital] = useState(7);
   const visits = [
     { date: '2023-04-01', reason: 'Annual Check-up', type: 'Outpatient' },
     { date: '2023-03-15', reason: 'Flu Symptoms', type: 'Inpatient' },
     { date: '2023-02-20', reason: 'Follow-up', type: 'Outpatient' },
   ];
-  const primaryDiagnosis = 'Hypertension';
-  const secondaryDiagnosis = 'Type 2 Diabetes';
-  const testsPerformed = ['Blood test', 'X-ray', 'CT Scan'];
-  const dischargeCondition = 'Stable';
+  const [primaryDiagnosis, setPrimaryDiagnosis] = useState('Hypertension');
+  const [secondaryDiagnosis, setSecondaryDiagnosis] = useState('Type 2 Diabetes');
+  const [testsPerformed, setTestsPerformed] = useState(['Blood test', 'X-ray', 'CT Scan']);
+  const [dischargeCondition, setDischargeCondition] = useState('Stable');
   const [selectedVisit, setSelectedVisit] = useState(null);
 
+  const [selectedRowKeys, setSelectedRowKeys] = useState([]);
+  const [searchText, setSearchText] = useState('');
+  const [filteredData, setFilteredData] = useState([]);
+
+  const handleVisitSelect = (visit) => {
+    setSelectedVisit(visit);
+    setAdmissionDate(visit.date);
+    setDaysInHospital(visit.type === 'Inpatient' ? 7 : 0);
+  };
+
+  const handleReload = () => {
+    // Reload data logic here
+    console.log('Data reloaded');
+  };
+
+  const handleSearch = (e) => {
+    const value = e.target.value;
+    setSearchText(value);
+    const filtered = documents.filter((doc) => doc.name.toLowerCase().includes(value.toLowerCase()));
+    setFilteredData(filtered);
+  };
+
+  const documents = [
+    { key: '1', name: 'Document 1', dateGenerated: '2023-01-01', dateUpdated: '2023-01-15', actions: 'View' },
+    { key: '2', name: 'Document 2', dateGenerated: '2023-02-01', dateUpdated: '2023-02-15', actions: 'View' },
+    { key: '3', name: 'Document 3', dateGenerated: '2023-03-01', dateUpdated: '2023-03-15', actions: 'View' },
+  ];
+
+  const columns = [
+    { title: 'Document Name', dataIndex: 'name', key: 'name' },
+    { title: 'Date Generated', dataIndex: 'dateGenerated', key: 'dateGenerated' },
+    { title: 'Date Last Updated', dataIndex: 'dateUpdated', key: 'dateUpdated' },
+    { title: 'Actions', dataIndex: 'actions', key: 'actions' },
+  ];
+
+  const rowSelection = {
+    selectedRowKeys,
+    onChange: (selectedRowKeys) => {
+      setSelectedRowKeys(selectedRowKeys);
+    },
+  };
+
+  const filteredDocs = searchText ? filteredData : documents;
+
   return (
-    <Container fluid className="my-5">
+    <Container fluid className="mt-4">
       <Row>
         <Col md={12}>
           <Card className="shadow-lg rounded">
@@ -31,8 +77,10 @@ const PatientEHR = () => {
             <Card.Body>
               <Row className="mb-3 align-items-center">
                 <Col md={3} className="text-center mb-3 mb-md-0">
-                  <Avatar src={avatar} alt="Avatar" style={{ width: '150px', height: '150px' }} />
-                  <h3 className="mt-3 text-primary">Peter Viceall</h3>
+                  <div className="d-flex flex-column align-items-center">
+                    <Avatar src={avatar} alt="Avatar" style={{ width: '150px', height: '150px' }} />
+                    <h3 className="mt-3 text-primary">Peter Viceall</h3>
+                  </div>
                   <div className="mt-3">
                     <span className="me-2 fw-bold text-muted">Choose Visit:</span>
                     <DropdownButton
@@ -43,7 +91,7 @@ const PatientEHR = () => {
                       {visits.map((visit, index) => (
                         <Dropdown.Item
                           key={index}
-                          onClick={() => setSelectedVisit(visit)}
+                          onClick={() => handleVisitSelect(visit)}
                         >
                           {visit.date} ({visit.type})
                         </Dropdown.Item>
@@ -92,39 +140,32 @@ const PatientEHR = () => {
                       </Col>
                     </Row>
                     <Row>
-                      <Col md={6}>
-                        <h6 className="text-muted mb-2">
-                          <FaPills className="me-2 text-primary" />
-                          Primary Diagnosis
-                        </h6>
-                        <p>{primaryDiagnosis}</p>
-                      </Col>
-                      <Col md={6}>
+                      <Col md={12}>
                         <h6 className="text-muted mb-2">
                           <FaFileAlt className="me-2 text-primary" />
-                          Secondary Diagnosis
+                          Medical Information
                         </h6>
-                        <p>{secondaryDiagnosis}</p>
-                      </Col>
-                    </Row>
-                    <Row>
-                      <Col md={6}>
-                        <h6 className="text-muted mb-2">
-                          <FaFileAlt className="me-2 text-primary" />
-                          Tests Performed
-                        </h6>
-                        <ul>
-                          {testsPerformed.map((test, index) => (
-                            <li key={index}>{test}</li>
-                          ))}
-                        </ul>
-                      </Col>
-                      <Col md={6}>
-                        <h6 className="text-muted mb-2">
-                          <FaFileAlt className="me-2 text-primary" />
-                          Discharge Condition
-                        </h6>
-                        <p>{dischargeCondition}</p>
+                        <Row>
+                          <Col md={6}>
+                            <strong>Primary Diagnosis:</strong> {primaryDiagnosis}
+                          </Col>
+                          <Col md={6}>
+                            <strong>Secondary Diagnosis:</strong> {secondaryDiagnosis}
+                          </Col>
+                        </Row>
+                        <Row>
+                          <Col md={6}>
+                            <strong>Tests Performed:</strong>
+                            <ul>
+                              {testsPerformed.map((test, index) => (
+                                <li key={index}>{test}</li>
+                              ))}
+                            </ul>
+                          </Col>
+                          <Col md={6}>
+                            <strong>Discharge Condition:</strong> {dischargeCondition}
+                          </Col>
+                        </Row>
                       </Col>
                     </Row>
                   </Card.Text>
@@ -160,27 +201,26 @@ const PatientEHR = () => {
                 <Tab.Content>
                   <Tab.Pane eventKey="prescriptions">
                     <Row>
-                      <Col md={6}>
-                        <h5 className="text-primary">Active Drugs</h5>
-                        <ListGroup variant="flush">
-                          <ListGroup.Item>
-                            <FaPills className="me-2 text-primary" /> Drug 1 (Dosage)
-                          </ListGroup.Item>
-                          <ListGroup.Item>
-                            <FaPills className="me-2 text-primary" /> Drug 2 (Dosage)
-                          </ListGroup.Item>
-                        </ListGroup>
-                      </Col>
-                      <Col md={6}>
-                        <h5 className="text-primary">Used Drugs</h5>
-                        <ListGroup variant="flush">
-                          <ListGroup.Item>
-                            <FaPills className="me-2 text-primary" /> Drug 3 (Dosage)
-                          </ListGroup.Item>
-                          <ListGroup.Item>
-                            <FaPills className="me-2 text-primary" /> Drug 4 (Dosage)
-                          </ListGroup.Item>
-                        </ListGroup>
+                      <Col md={12}>
+                        <Space style={{ marginBottom: 16, justifyContent: 'space-between', display: 'flex' }}>
+                          <Button icon={<FaSyncAlt />} onClick={handleReload}>
+                            Reload
+                          </Button>
+                          <Input
+                            placeholder="Search documents"
+                            value={searchText}
+                            onChange={handleSearch}
+                            style={{ width: 200 }}
+                          />
+                          <Button type="primary" disabled={!selectedRowKeys.length}>
+                            Selected {selectedRowKeys.length} items
+                          </Button>
+                        </Space>
+                        <Table
+                          rowSelection={rowSelection}
+                          columns={columns}
+                          dataSource={filteredDocs}
+                        />
                       </Col>
                     </Row>
                   </Tab.Pane>

@@ -9,7 +9,9 @@ a{
 }
 .content-container {
   flex-grow: 1;
-  overflow-y: auto; /* Add this if you want the content to be scrollable */
+  overflow-y: auto; 
+  margin-left: 250px; /* Adjust this value based on the sidebar width */
+  padding: 1px; /* add padding to space sidebar and mai content depending on preference*/
 }
 
 

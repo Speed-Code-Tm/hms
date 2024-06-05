@@ -90,6 +90,10 @@ const SideBar = () => {
         color: "#012970",
       }}
       style={{
+        position: 'fixed',
+        left: 0,
+        top: 0,
+        bottom: 0,
         borderRight: "none",
         boxShadow: "0px 0px 20px rgba(1, 41, 112, 0.1)",
         overflowY: "auto",

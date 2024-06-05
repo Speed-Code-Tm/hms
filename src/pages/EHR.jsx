@@ -85,7 +85,7 @@ const EHR = () => {
         ActionDropdown={({ row }) => (
           <div>
             <Button variant="primary" href={`/PatientEHR/${row.original.patientId}`}>
-              ehr profile
+              view
             </Button>
           </div>
         )}

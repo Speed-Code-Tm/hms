@@ -33,7 +33,7 @@ const HospitalRegistrationForm = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log("Form submitted");
+    
   };
 
   const tabs = [

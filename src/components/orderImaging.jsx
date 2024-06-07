@@ -66,7 +66,7 @@ const OrderImaging = ({ show, onHide, patientName }) => {
        reasonForImaging,
        notes,
      };
-     console.log('Imaging Order:', orderData);
+     
 
      // Show success toast
      toast.success('Imaging order submitted successfully!', {});

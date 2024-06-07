@@ -13,13 +13,13 @@ const LaboratoryManagement = () => {
   const [testOrders,setTestOrders] = useState([])
   const handleTabChange = (tab) => {
     setActiveTab(tab);
-    console.log(tab);
+    
   };
 
 
   async function fetchLabTestCatalogue(){
     const testsCatalogueData = await retrieveLabTestCatalogue()
-    console.log(testsCatalogueData);
+    
     setTestCatalogue(testsCatalogueData)
 }
 
@@ -30,7 +30,7 @@ async function fetchLabTestOrders() {
 
 
   useEffect(()=>{
-    console.log(activeTab);
+    
     if(activeTab === 'labTestOrders'){
         fetchLabTestOrders()
     }else if(activeTab === 'testManagement'){

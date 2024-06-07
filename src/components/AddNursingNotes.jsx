@@ -60,7 +60,7 @@ const NursingNotes = ({ show, onHide, patientName, loggedInUser }) => {
     setIsSubmitting(true);
     try {
       // Simulate API call or any other submission logic
-      console.log('Nursing Note submitted:', noteContent);
+      
 
       // Show success toast
       toast.success('Nursing Note submitted successfully!', {

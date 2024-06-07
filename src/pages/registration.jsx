@@ -51,7 +51,7 @@ const PatientRegistration = () => {
       const patientsSnapshot = await getDocs(patientsCollection);
       const patientsData = patientsSnapshot.docs.map((doc) => {
         const patientData = doc.data();
-        console.log("patientData", patientData);
+        
         const patientId = doc.id;
         const patientInfo = patientData[patientId] || {};
         const personalInfo = patientInfo.personalInfo || {};

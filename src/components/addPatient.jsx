@@ -102,7 +102,7 @@ const AddPatientModal = ({ show, onHide }) => {
     try {
       const patientsCollection = collection(db, "patients");
       await addDoc(patientsCollection, data);
-      console.log("Patient document written successfully");
+      
     } catch (error) {
       console.error("Error adding document: ", error);
       toast.error(

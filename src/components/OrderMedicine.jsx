@@ -123,7 +123,7 @@ const OrderMedicine = ({ show, onHide, patientName, loggedInUser }) => {
       //await new Promise((resolve) => setTimeout(resolve, 2000));
 
       // Implement submission logic here
-      console.log("Orders:", orders);
+      
 
       // Show success toast
       toast.success("Orders submitted successfully!", {});

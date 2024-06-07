@@ -98,7 +98,7 @@ const FinancialManagement = () => {
 
   const handleApprove = () => {
     // Implement logic to approve the selected procurement item
-    console.log(`Approved procurement item: ${selectedProcurementItem.item}`);
+    
     handleApprovalModalClose();
   };
 

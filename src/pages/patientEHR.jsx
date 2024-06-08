@@ -118,8 +118,10 @@ const PatientEHR = () => {
     setDateRange(dates);
     if (dates && dates[0] && dates[1]) {
       const filtered = visits.filter((visit) => {
-        const visitDate = moment(visit.date);
-        return visitDate.isBetween(dates[0], dates[1], undefined, "[]");
+        const visitDate = moment(visit.date, "YYYY-MM-DD");
+        const startDate = moment(dates[0]).startOf("day");
+        const endDate = moment(dates[1]).endOf("day");
+        return visitDate.isBetween(startDate, endDate, null, "[]");
       });
       setFilteredData(filtered);
     } else {
@@ -210,11 +212,12 @@ const PatientEHR = () => {
             <Card.Body>
               <Row className="mb-3 align-items-center">
                 <Col md={3} className="text-center mb-3 mb-md-0">
-                  <div className="d-flex flex-column align-items-center"><Avatar
-                    src={avatar}
-                    alt="Avatar"
-                    style={{ width: "150px", height: "150px" }}
-                  />
+                  <div className="d-flex flex-column align-items-center">
+                    <Avatar
+                      src={avatar}
+                      alt="Avatar"
+                      style={{ width: "150px", height: "150px" }}
+                    />
                     <h3 className="mt-3 text-primary">Peter Viceall</h3>
                   </div>
                   <div className="mt-3">
@@ -341,13 +344,7 @@ const PatientEHR = () => {
                       className="rounded-pill px-4"
                     >
                       <FaMoneyBillAlt className="me-2" />
-                      Services and Medication charges
-                    </Nav.Link>
-                  </Nav.Item>
-                  <Nav.Item>
-                    <Nav.Link eventKey="notes" className="rounded-pill px-4">
-                      <FaStickyNote className="me-2" />
-                      Notes
+                      Services ,Items and Medication charges
                     </Nav.Link>
                   </Nav.Item>
                 </Nav>
@@ -425,5 +422,4 @@ const PatientEHR = () => {
     </Container>
   );
 };
-
 export default PatientEHR;

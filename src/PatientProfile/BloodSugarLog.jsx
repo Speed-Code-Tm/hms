@@ -1,8 +1,8 @@
-import { Table, Button, Input, DatePicker, Modal, Form, Select, Tabs,} from 'antd';
+import { Table, Button, Input, DatePicker, Modal, Form, Select, Tabs} from 'antd';
 import React, { useState } from 'react';
 import { Container } from 'react-bootstrap';
 import moment from 'moment';
-
+import ItemTags from '../components/tagItemList';
 
 const { RangePicker } = DatePicker;
 const { TabPane } = Tabs;
@@ -291,10 +291,10 @@ const BloodSugarLog = () => {
           <Tabs defaultActiveKey="1">
             <TabPane tab="Breakfast" key="1">
               <Form.Item name="breakfastPre" label="Pre (mg/dL)">
-                <Input />
+              <ItemTags />
               </Form.Item>
               <Form.Item name="breakfastPost" label="Post (mg/dL)">
-                <Input />
+              <ItemTags />
               </Form.Item>
             </TabPane>
             <TabPane tab="Lunch" key="2">

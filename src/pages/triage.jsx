@@ -3,7 +3,6 @@ import {
   Container,
   Button,
 } from "react-bootstrap";
-import styled from "styled-components";
 import VitalSigns from '../components/AddVitals'
 import ReusableTable from "./ReusableTable";
 const TriageAssessment = () => {
@@ -54,7 +53,6 @@ const TriageAssessment = () => {
   }
 
 
-
   return (
     <Container className="triage-assessment-container">
      <ReusableTable
@@ -77,13 +75,6 @@ const TriageAssessment = () => {
     </Container>
   );
 };
-
-
-
-const ActionCell = styled.div`
-  display: flex;
-  justify-content: center;
-`;
 
 
 export default TriageAssessment;

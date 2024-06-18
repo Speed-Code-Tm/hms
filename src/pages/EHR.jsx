@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from "react";
 import { Container, Button } from "react-bootstrap";
-import ehrprofile from "./patientEHR";
+import PatientEHR from "./patientEHR";
 import ReusableTable from "./ReusableTable";
 const EHR = () => {
   const [data, setData] = useState([
@@ -69,10 +69,6 @@ const EHR = () => {
       accessor: "phoneNumber",
     },
     {
-      Header: "Email Address",
-      accessor: "email",
-    },
-    {
       Header: "Emergency Contact",
       accessor: "emergencyContact",
     },
@@ -88,8 +84,8 @@ const EHR = () => {
         initialState={{ pageIndex: 0, pageSize: 10 }}
         ActionDropdown={({ row }) => (
           <div>
-            <Button variant="primary" href="/ehrprofile">
-              ehr profile
+            <Button variant="primary" href={`/PatientEHR/${row.original.patientId}`}>
+              view
             </Button>
           </div>
         )}

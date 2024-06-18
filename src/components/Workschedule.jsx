@@ -362,7 +362,7 @@ const WorkSchedule = () => {
                           onClick={handleDutyAdd}
                           aria-label="Add Duty"
                           edge="end"
-                          style={{ backgroundColor: "blue" }}
+                          style={{ color: "green" }}
                         >
                           <CheckIcon fontSize="small" />
                         </IconButton>

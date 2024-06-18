@@ -5,7 +5,7 @@
     border-radius: 10px;
     padding: 5px 15px;
     width: 100%;
-    max-width: 300px;
+    /* max-width: 300px; */
     /* margin: 0 auto; */
     background-color: #fff;
     transition: box-shadow 0.3s ease-in-out;

@@ -2,21 +2,26 @@ const express = require('express');
 const app = express();
 const { RtcTokenBuilder, RtcRole } = require('agora-access-token');
 const firebase = require('firebase/app');
-const firestore = require('firebase/firestore');
+require('firebase/firestore');
 const { v4: uuidv4 } = require('uuid');
-
-
 
 const APP_ID = process.env.AGORA_APP_ID;
 const APP_CERTIFICATE = process.env.AGORA_APP_CERTIFICATE;
+
+const firebaseConfig = {
+  // Your Firebase config
+};
+
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
 
 app.use(express.json());
 
 app.post('/create-call', async (req, res) => {
   const { hospitalId, doctorId, patientId, duration } = req.body;
-  const channelName = `${uuidv4()}-${Date.now()}`; // Generate a random channel name
-  const uid = 0; // Set a default UID or use a unique value as needed
-  const expirationTimeInSeconds = 1800; // 30 minutes
+  const channelName = `${uuidv4()}-${Date.now()}`;
+  const uid = 0;
+  const expirationTimeInSeconds = 1800;
   const currentTimestamp = Math.floor(Date.now() / 1000);
   const privilegeExpiredTs = currentTimestamp + expirationTimeInSeconds;
 

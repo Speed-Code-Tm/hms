@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { Container, DropdownButton, Dropdown } from 'react-bootstrap';
+import { Container, DropdownButton, Dropdown, Modal, ProgressBar } from 'react-bootstrap';
 import styled from 'styled-components';
 import ReusableTable from './ReusableTable';
 import VideoCall from '../components/videoCall';
@@ -13,6 +13,10 @@ const Telemedicine = () => {
 
   const [callDetails, setCallDetails] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [progress, setProgress] = useState(0);
+  const [statusMessage, setStatusMessage] = useState('');
+  const [showModal, setShowModal] = useState(false);
+  const [isCancelable, setIsCancelable] = useState(true);
 
   const COLUMNS = [
     { Header: 'Patient Name', accessor: 'patientName' },
@@ -27,6 +31,10 @@ const Telemedicine = () => {
 
   const startCall = async (hospitalId, doctorId, patientId, duration) => {
     setLoading(true);
+    setShowModal(true);
+    setStatusMessage('Connecting to the server...');
+    setProgress(10);
+
     try {
       const response = await fetch('/create-call', {
         method: 'POST',
@@ -36,14 +44,24 @@ const Telemedicine = () => {
         body: JSON.stringify({ hospitalId, doctorId, patientId, duration }),
       });
 
+      setProgress(50);
+      setStatusMessage('Generating the token...');
+
       if (response.ok) {
         const { id, channelName, token } = await response.json();
         setCallDetails({ id, channelName, token });
+        setProgress(100);
+        setStatusMessage('Video call ready!');
+        setIsCancelable(false);
       } else {
         console.error('Error creating call:', response.status);
+        setStatusMessage('Error creating call');
+        setProgress(0);
       }
     } catch (error) {
       console.error('Error creating call:', error);
+      setStatusMessage('Error connecting to server');
+      setProgress(0);
     }
     setLoading(false);
   };
@@ -52,6 +70,14 @@ const Telemedicine = () => {
     const { patientName, specialist, duration } = row.original;
     const hospitalId = 'hospital123'; // Replace with your actual hospital ID
     await startCall(hospitalId, specialist, patientName, duration.replace(' min', ''));
+  };
+
+  const handleClose = () => {
+    if (isCancelable) {
+      setShowModal(false);
+      setProgress(0);
+      setStatusMessage('');
+    }
   };
 
   return (
@@ -77,6 +103,22 @@ const Telemedicine = () => {
       {callDetails && (
         <VideoCall channelName={callDetails.channelName} token={callDetails.token} />
       )}
+      <Modal show={showModal} onHide={handleClose}>
+        <Modal.Header closeButton={isCancelable}>
+          <Modal.Title>Preparing Video Call</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <p>{statusMessage}</p>
+          <ProgressBar now={progress} label={`${progress}%`} />
+        </Modal.Body>
+        <Modal.Footer>
+          {isCancelable && (
+            <button onClick={handleClose} className="btn btn-secondary">
+              Cancel
+            </button>
+          )}
+        </Modal.Footer>
+      </Modal>
     </Container>
   );
 };

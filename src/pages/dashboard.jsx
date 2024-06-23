@@ -1,108 +1,104 @@
 import React, { useState } from 'react';
-import { Container, Row, Col, ListGroup, Button, Badge, Nav } from 'react-bootstrap';
-import FullCalendar from '@fullcalendar/react';
-import dayGridPlugin from '@fullcalendar/daygrid';
-import './dashboard.css';
+import { format } from 'date-fns';
+import { Calendar } from '@/components/ui/calendar';
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { CalendarIcon, BriefcaseIcon, MegaphoneIcon } from 'lucide-react';
 
-// Sample data for upcoming meetings
-const meetings = [
-  { id: 1, title: 'Meeting with Bob', date: '2024-03-24T10:00:00', location: 'Conference Room A' },
-  { id: 2, title: 'Team Sync', date: '2024-03-25T14:30:00', location: 'Virtual' },
-  // ... Add more meeting data as needed
+// Sample data
+const events = [
+  { id: 1, title: 'Team Meeting', type: 'appointment', date: '2024-06-24', time: '10:00 AM', location: 'Conference Room A' },
+  { id: 2, title: 'Project Deadline', type: 'announcement', date: '2024-06-25', time: '11:30 AM', description: 'Submit final project report' },
+  { id: 3, title: 'Client Call', type: 'appointment', date: '2024-06-26', time: '2:00 PM', location: 'Virtual' },
+  { id: 4, title: 'Company Picnic', type: 'announcement', date: '2024-06-28', time: '12:00 PM', description: 'Annual company picnic at Central Park' },
 ];
 
 const Dashboard = () => {
-  const [activeTab, setActiveTab] = useState('appointments');
+  const [selectedDate, setSelectedDate] = useState(new Date());
+  const [activeTab, setActiveTab] = useState("appointments");
 
-  const renderTabContent = () => {
-    switch (activeTab) {
-      case 'appointments':
-        return (
-          <>
-            <h3>Upcoming meetings</h3>
-            <ListGroup variant="flush">
-              {meetings.map((meeting) => (
-                <ListGroup.Item key={meeting.id} className="meeting-item d-flex align-items-center">
-                  {/* Replace with actual user avatar URLs */}
-                  <img src="path-to-avatar.jpg" alt="User Avatar" className="avatar me-3" />
-                  <div className="meeting-details">
-                    <strong>{meeting.title}</strong>
-                    <p>
-                      {new Date(meeting.date).toLocaleString('en-US', {
-                        weekday: 'long',
-                        month: 'long',
-                        day: 'numeric',
-                        hour: 'numeric',
-                        minute: 'numeric',
-                      })}
-                      @ {meeting.location}
-                    </p>
-                  </div>
-                </ListGroup.Item>
-              ))}
-            </ListGroup>
-          </>
-        );
-      case 'work-schedule':
-        return <div>Work schedule content goes here</div>;
-      case 'announcements':
-        return <div>Announcements content goes here</div>;
-      default:
-        return null;
-    }
+  const selectedDateEvents = events.filter(event => event.date === format(selectedDate, 'yyyy-MM-dd'));
+
+  const renderEventList = (eventType) => {
+    const filteredEvents = selectedDateEvents.filter(event => event.type === eventType);
+    
+    return filteredEvents.length > 0 ? (
+      <ul className="space-y-2">
+        {filteredEvents.map(event => (
+          <li key={event.id} className="bg-gray-100 p-3 rounded-md">
+            <div className="font-semibold">{event.title}</div>
+            <div className="text-sm text-gray-600">{event.time}</div>
+            {event.location && <div className="text-sm text-gray-600">{event.location}</div>}
+            {event.description && <div className="text-sm mt-1">{event.description}</div>}
+          </li>
+        ))}
+      </ul>
+    ) : (
+      <p className="text-gray-500">No {eventType}s for the selected date.</p>
+    );
   };
 
   return (
-    <Container fluid>
-      <Row>
-        <Col md={12}>
-          <Nav variant="tabs" activeKey={activeTab} onSelect={(selectedKey) => setActiveTab(selectedKey)} className="dashboard-tabs">
-            <Nav.Item>
-              <Nav.Link eventKey="appointments">
-                <i className="bi bi-calendar-check me-2"></i>
-                Appointments
-                <Badge bg="primary" className="ms-2">
-                  5
+    <div className="container mx-auto p-4">
+      <h1 className="text-3xl font-bold mb-6 text-center">Dashboard</h1>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <Card>
+          <CardHeader>
+            <CardTitle>Calendar</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Calendar
+              mode="single"
+              selected={selectedDate}
+              onSelect={setSelectedDate}
+              className="rounded-md border"
+              modifiers={{
+                hasEvent: (date) => events.some(event => event.date === format(date, 'yyyy-MM-dd'))
+              }}
+              modifiersClassNames={{
+                selected: 'bg-blue-800 text-white hover:bg-blue-700',
+                today: 'bg-orange-500 text-white',
+                hasEvent: 'bg-green-100'
+              }}
+            />
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>
+              {format(selectedDate, 'MMMM d, yyyy')}
+              {selectedDateEvents.length > 0 && (
+                <Badge variant="secondary" className="ml-2">
+                  {selectedDateEvents.length} event{selectedDateEvents.length !== 1 ? 's' : ''}
                 </Badge>
-              </Nav.Link>
-            </Nav.Item>
-            <Nav.Item>
-              <Nav.Link eventKey="work-schedule">
-                <i className="bi bi-calendar-week me-2"></i>
-                Work Schedule
-                <Badge bg="secondary" className="ms-2">
-                  2
-                </Badge>
-              </Nav.Link>
-            </Nav.Item>
-            <Nav.Item>
-              <Nav.Link eventKey="announcements">
-                <i className="bi bi-megaphone me-2"></i>
-                Announcements
-                <Badge bg="success" className="ms-2">
-                  1
-                </Badge>
-              </Nav.Link>
-            </Nav.Item>
-          </Nav>
-        </Col>
-      </Row>
-      <Row>
-        <Col md={7}>{renderTabContent()}</Col>
-        <Col md={5} className="calendar-section">
-          <FullCalendar
-            plugins={[dayGridPlugin]}
-            initialView="dayGridMonth"
-            events={meetings}
-            className="custom-calendar"
-            height={500}
-          />
-          <Button variant="primary" className="mt-3 add-event-btn">
-            Add event
-          </Button>
-        </Col>
-      </Row>
-    </Container>
+              )}
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Tabs value={activeTab} onValueChange={setActiveTab}>
+              <TabsList className="grid w-full grid-cols-2">
+                <TabsTrigger value="appointments">
+                  <CalendarIcon className="w-4 h-4 mr-2" />
+                  Appointments
+                </TabsTrigger>
+                <TabsTrigger value="announcements">
+                  <MegaphoneIcon className="w-4 h-4 mr-2" />
+                  Announcements
+                </TabsTrigger>
+              </TabsList>
+              <TabsContent value="appointments" className="mt-4">
+                {renderEventList('appointment')}
+              </TabsContent>
+              <TabsContent value="announcements" className="mt-4">
+                {renderEventList('announcement')}
+              </TabsContent>
+            </Tabs>
+          </CardContent>
+        </Card>
+      </div>
+    </div>
   );
 };
 

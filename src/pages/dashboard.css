@@ -2,15 +2,23 @@
 .custom-calendar .fc-view-harness {
   margin-bottom: 0;
 }
+
 .custom-calendar .fc-daygrid-day-frame {
   text-align: center;
   padding: 4px;
   border-radius: 4px;
 }
+
 .custom-calendar .fc-day-today {
-  background-color: #ef4444;
-  color: #111827;
+  background-color: #FFA500;
+  color: #fff;
 }
+
+.custom-calendar .fc-daygrid-day-frame.fc-daygrid-day-frame.fc-day-selected {
+  background-color: #0044CC;
+  color: #fff;
+}
+
 .custom-calendar .fc-daygrid-event-dot {
   background-color: #3b82f6;
   border-radius: 50%;
@@ -18,60 +26,70 @@
   height: 4px;
   margin: 2px auto 0;
 }
+
 .custom-calendar .fc-daygrid-day-number {
   font-size: 14px;
   line-height: 20px;
-  color: #000; /* Change to subtle black color */
+  color: #000;
 }
+
 .custom-calendar .fc-daygrid-day.has-event {
   background-color: #111827;
   color: #fff;
 }
+
 .custom-calendar .fc-daygrid-day.has-event .fc-daygrid-day-number {
   font-weight: bold;
 }
+
 .custom-calendar .fc-prev-button,
 .custom-calendar .fc-next-button {
   position: absolute;
   top: 20px;
 }
+
 .custom-calendar .fc-prev-button {
   left: 20px;
 }
+
 .custom-calendar .fc-next-button {
   right: 20px;
 }
+
 .add-event-btn {
   width: 100%;
 }
 
 /* Adjusting size of day boxes */
 .fc-daygrid-day {
-  width: 30px; /* Adjust width as needed */
-  height: 30px; /* Adjust height as needed */
+  width: 30px;
+  height: 30px;
 }
+
 .fc-daygrid-day.fc-day-today {
-  background-color: #ef4444; /* Today's background color */
+  background-color: #ef4444;
 }
+
 .fc-daygrid-day.fc-day-today .fc-daygrid-day-number {
-  color: #fff; /* Today's number color */
+  color: #fff;
 }
+
 .fc-daygrid-day.fc-day-has-event {
-  background-color: #111827; /* Background color for days with events */
-  color: #fff; /* Text color for days with events */
+  background-color: #111827;
+  color: #fff;
 }
+
 .fc-daygrid-day .fc-daygrid-day-top {
   display: flex;
   justify-content: center;
   align-items: center;
   height: 100%;
 }
+
 .fc-daygrid-day .fc-daygrid-day-number {
-  color: #000; /* Default day number color */
-  text-decoration: none; /* Remove underline */
+  color: #000;
 }
 
-/* Tabs */
 /* Tabs */
 .dashboard-tabs {
   justify-content: center;
@@ -106,5 +124,3 @@
   font-size: 0.75rem;
   padding: 0.25rem 0.5rem;
 }
-
-/* Add additional styles as needed */

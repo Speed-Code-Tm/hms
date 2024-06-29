@@ -1,3 +1,7 @@
+/* tailwind utilities */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 /* App container styling */
 .app-container {
